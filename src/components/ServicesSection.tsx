@@ -122,21 +122,20 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
 
     setIsSending(true);
     const payload = {
-      Client_Name: clientName.trim(),
-      Client_Email: clientEmail.trim(),
-      Selected_Scope: `${activeService.number} · ${activeService.title}`,
-      Project_Brief: projectNotes.trim() || 'Looking forward to discussing this project.',
       name: clientName.trim(),
       email: clientEmail.trim(),
+      scope: `${activeService.number} · ${activeService.title}`,
+      message: projectNotes.trim() || 'Looking forward to discussing this project.',
       _replyto: clientEmail.trim(),
       _subject: inquirySubject,
-      _template: 'table',
+      _url: 'https://ais-dev-opnuetggrtsr43h5bm5las-520532524992.asia-southeast1.run.app/',
       _captcha: 'false',
     };
 
     try {
       await fetch(`https://formsubmit.co/ajax/${designerEmail}`, {
         method: 'POST',
+        referrerPolicy: 'origin',
         headers: {
           'Content-Type': 'application/json',
           Accept: 'application/json',
