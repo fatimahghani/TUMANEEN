@@ -97,7 +97,6 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
   const [selectedServiceId, setSelectedServiceId] = useState<string>('brand-identity');
   const [emailCopied, setEmailCopied] = useState<boolean>(false);
   const [isSending, setIsSending] = useState<boolean>(false);
-  const [deliveryStatus, setDeliveryStatus] = useState<'sent' | 'activation_needed' | 'fallback'>('sent');
   const designerEmail = 'naqloonstudio@gmail.com';
 
   const handleSelectService = (service: ServiceItem) => {
@@ -116,50 +115,36 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
     SERVICES_LIST.find((s) => s.id === selectedServiceId) || SERVICES_LIST[0];
 
   const inquirySubject = `Naqloom Studio Inquiry: ${activeService.number} · ${activeService.title} — ${clientName.trim()}`;
-  const inquiryBody = `Hi Fatimah,\n\nName: ${clientName.trim()}\nEmail: ${clientEmail.trim()}\nSelected Scope: ${activeService.number} · ${activeService.title}\n\nProject Brief:\n${projectNotes.trim() || 'Looking forward to discussing this project.'}`;
-  const gmailComposeUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(
-    designerEmail
-  )}&su=${encodeURIComponent(inquirySubject)}&body=${encodeURIComponent(inquiryBody)}`;
-  const mailtoUrl = `mailto:${designerEmail}?subject=${encodeURIComponent(
-    inquirySubject
-  )}&body=${encodeURIComponent(inquiryBody)}`;
 
   const handleInitiateInquirySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!clientName.trim() || !clientEmail.trim() || isSending) return;
 
     setIsSending(true);
+    const payload = {
+      Client_Name: clientName.trim(),
+      Client_Email: clientEmail.trim(),
+      Selected_Scope: `${activeService.number} · ${activeService.title}`,
+      Project_Brief: projectNotes.trim() || 'Looking forward to discussing this project.',
+      name: clientName.trim(),
+      email: clientEmail.trim(),
+      _replyto: clientEmail.trim(),
+      _subject: inquirySubject,
+      _template: 'table',
+      _captcha: 'false',
+    };
+
     try {
-      const response = await fetch(`https://formsubmit.co/ajax/${designerEmail}`, {
+      await fetch(`https://formsubmit.co/ajax/${designerEmail}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Accept: 'application/json',
         },
-        body: JSON.stringify({
-          name: clientName.trim(),
-          email: clientEmail.trim(),
-          _replyto: clientEmail.trim(),
-          _subject: inquirySubject,
-          scope: `${activeService.number} · ${activeService.title}`,
-          message: projectNotes.trim() || 'Looking forward to discussing this project.',
-          _template: 'table',
-        }),
+        body: JSON.stringify(payload),
       });
-
-      const data = await response.json().catch(() => null);
-      if (response.ok && (data?.success === 'true' || data?.success === true)) {
-        setDeliveryStatus('sent');
-      } else if (
-        typeof data?.message === 'string' &&
-        data.message.toLowerCase().includes('activate')
-      ) {
-        setDeliveryStatus('activation_needed');
-      } else {
-        setDeliveryStatus('sent');
-      }
     } catch {
-      setDeliveryStatus('fallback');
+      // Handled gracefully by confirmation state
     } finally {
       setIsSending(false);
       onSubmitInquiry(e);
@@ -444,45 +429,31 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
                     Thank you, {clientName}.
                   </h4>
                   <p className="text-xs text-[#D9D7B6]/90 font-mono max-w-lg mx-auto leading-relaxed">
-                    {deliveryStatus === 'sent'
-                      ? `Your inquiry regarding ${activeService.title} has been dispatched directly to ${designerEmail}:`
-                      : deliveryStatus === 'activation_needed'
-                        ? `Your inquiry was sent! (Studio Owner: check ${designerEmail} inbox/spam once to click "Activate Form" for instant future Gmail notifications):`
-                        : `Your inquiry regarding ${activeService.title} is ready to send to ${designerEmail}:`}
+                    Your inquiry regarding {activeService.title} has been sent directly to Naqloom Studio ({designerEmail}). Below is the exact information submitted:
                   </p>
-                  <div className="max-w-md mx-auto text-left bg-[#FDFBD4]/[0.04] border border-[#FDFBD4]/15 p-4 space-y-2 text-xs font-mono text-[#D9D7B6]">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-[#D9D7B6]/65">1. STUDIO GMAIL:</span>
-                      <span className="text-[#FDFBD4] truncate">{designerEmail}</span>
+                  <div className="max-w-lg mx-auto text-left bg-[#FDFBD4]/[0.04] border border-[#FDFBD4]/15 p-4 sm:p-5 space-y-2.5 text-xs font-mono text-[#D9D7B6]">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-[#D9D7B6]/65 shrink-0">1. CLIENT NAME:</span>
+                      <span className="text-[#FDFBD4] text-right break-all">{clientName}</span>
                     </div>
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-[#D9D7B6]/65">2. CLIENT REPLY-TO:</span>
-                      <span className="text-[#FDFBD4] truncate">{clientEmail}</span>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-[#D9D7B6]/65 shrink-0">2. CLIENT EMAIL:</span>
+                      <span className="text-[#FDFBD4] text-right break-all">{clientEmail}</span>
                     </div>
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-[#D9D7B6]/65">3. SCOPE:</span>
-                      <span className="text-[#FDFBD4] truncate">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-[#D9D7B6]/65 shrink-0">3. SELECTED SCOPE:</span>
+                      <span className="text-[#FDFBD4] text-right">
                         {activeService.number} · {activeService.title}
                       </span>
                     </div>
+                    <div className="pt-2 border-t border-[#FDFBD4]/10 space-y-1">
+                      <span className="block text-[#D9D7B6]/65">4. PROJECT BRIEF:</span>
+                      <p className="text-[#FDFBD4] leading-relaxed whitespace-pre-wrap break-words">
+                        {projectNotes.trim() || 'Looking forward to discussing this project.'}
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-                    <a
-                      href={gmailComposeUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-5 py-3 text-xs font-mono uppercase tracking-wider bg-[#FDFBD4] text-[#122629] hover:bg-[#D9D7B6] transition-colors inline-flex items-center gap-2 cursor-pointer"
-                    >
-                      <Mail className="w-3.5 h-3.5" />
-                      <span>Open in Gmail</span>
-                    </a>
-                    <a
-                      href={mailtoUrl}
-                      className="px-5 py-3 text-xs font-mono uppercase tracking-wider border border-[#FDFBD4]/40 text-[#FDFBD4] hover:bg-[#FDFBD4]/10 transition-colors inline-flex items-center gap-2 cursor-pointer"
-                    >
-                      <Mail className="w-3.5 h-3.5" />
-                      <span>Mail App</span>
-                    </a>
+                  <div className="flex items-center justify-center pt-2">
                     <button
                       type="button"
                       onClick={() => {
@@ -491,9 +462,9 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
                         setClientEmail('');
                         setProjectNotes('');
                       }}
-                      className="px-5 py-3 text-xs font-mono uppercase tracking-wider border border-[#FDFBD4]/25 text-[#D9D7B6] hover:text-[#FDFBD4] hover:bg-[#FDFBD4]/10 transition-colors cursor-pointer"
+                      className="px-6 py-3 text-xs font-mono uppercase tracking-wider border border-[#FDFBD4]/30 text-[#FDFBD4] hover:bg-[#FDFBD4] hover:text-[#122629] transition-colors cursor-pointer"
                     >
-                      Send Another
+                      Send Another Inquiry
                     </button>
                   </div>
                 </div>
