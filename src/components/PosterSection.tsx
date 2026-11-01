@@ -145,8 +145,8 @@ export const PosterSection: React.FC = () => {
     const t = sectionRef.current;
     if (!t) return;
 
-    let o = 1;
-    let P = 1;
+    let o = 0;
+    let P = 0;
     let F = 0;
     let B = 0;
     let I = 0;
@@ -167,37 +167,14 @@ export const PosterSection: React.FC = () => {
     // Smooth neighbor horizontal shift when a card opens
     const neighborShift = new Array<number>(u).fill(0);
 
-    const rowPose = (e: number) => {
-      if (B > 0 && B < 768) {
-        const cols = 4;
-        const col = e % cols;
-        const row = Math.floor(e / cols);
-        const availW = B * 0.88;
-        const gapX = Math.max(8, B * 0.025);
-        const thumbW = (availW - gapX * (cols - 1)) / cols;
-        const mobileScale = clamp(thumbW / Math.max(1, H), 0.18, 0.46);
-        const thumbH = z * mobileScale;
-        const gapY = Math.max(12, I * 0.022);
-        const stepX = thumbW + gapX;
-        const stepY = thumbH + gapY;
-        return {
-          x: (col - (cols - 1) / 2) * stepX,
-          y: (row - 0.5) * stepY - 16,
-          s: mobileScale,
-          z: 0,
-          op: 1,
-          zi: 300 - 12 * e,
-        };
-      }
-      return {
-        x: (e - (u - 1) / 2) * U,
-        y: 0,
-        s: LB.ROW_SCALE,
-        z: 0,
-        op: 1,
-        zi: 300 - 12 * e,
-      };
-    };
+    const rowPose = (e: number) => ({
+      x: (e - (u - 1) / 2) * U,
+      y: 0,
+      s: LB.ROW_SCALE,
+      z: 0,
+      op: 1,
+      zi: 300 - 12 * e,
+    });
 
     const lerpPose = (
       aPose: { x: number; y: number; s: number; z: number; op: number; zi: number },
@@ -215,12 +192,11 @@ export const PosterSection: React.FC = () => {
     const baseLinePose = (e: number, tVal: number, r: number) => {
       const targetRow = rowPose(e);
       if (tVal < 1) {
-        const isMobile = B > 0 && B < 768;
         const tPose = lerpPose(
           {
-            x: isMobile ? targetRow.x * 0.35 : (e - (u - 1) / 2) * W,
-            y: isMobile ? targetRow.y * 0.35 : 0,
-            s: isMobile ? targetRow.s * 0.85 : LB.CLUSTER_SCALE,
+            x: (e - (u - 1) / 2) * W,
+            y: 0,
+            s: LB.CLUSTER_SCALE,
             z: 0,
             op: 1,
             zi: 100,
@@ -251,9 +227,9 @@ export const PosterSection: React.FC = () => {
       B = t.clientWidth;
       I = t.clientHeight;
       const isMobile = B < 768;
-      z = (isMobile ? 0.56 : LB.CARD_H_FRAC) * I;
+      z = (isMobile ? 0.48 : LB.CARD_H_FRAC) * I;
       H = z * LB.CARD_ASPECT;
-      const spanFrac = isMobile ? 0.72 : B < 1024 ? 0.52 : 0.38;
+      const spanFrac = isMobile ? 0.56 : B < 1024 ? 0.48 : 0.38;
       U = Math.min(
         LB.ROW_SCALE * H + LB.ROW_GAP_FRAC * B,
         (spanFrac * B) / Math.max(1, u - 1)
@@ -279,6 +255,7 @@ export const PosterSection: React.FC = () => {
       introActive = true;
       o = 0;
       P = 0;
+      if (hintRef.current) hintRef.current.style.opacity = '0';
       wakeUp();
     };
 
@@ -300,8 +277,6 @@ export const PosterSection: React.FC = () => {
           if (hintRef.current) hintRef.current.style.opacity = '1';
         }
       } else {
-        // Stay locked at 1 (the horizontal line) when scrolling down
-        P = 1;
         const diff = P - o;
         if (Math.abs(diff) >= LB.SNAP) {
           o += diff * LB.EASE;
@@ -321,10 +296,12 @@ export const PosterSection: React.FC = () => {
         const centerX = B / 2;
         const gap = 0.045 * B;
         const startLeft = centerX - (eWidth + gap + tWidth) / 2;
-        const margin = 0.03 * B;
+        const margin = Math.max(10, 0.025 * B);
         const scale = lerp(1, LB.TITLE_MIN, i);
-        const leftX = lerp(startLeft, centerX - q - margin - eWidth * scale, i);
-        const rightX = lerp(startLeft + eWidth + gap, centerX + q + margin, i);
+        const targetLeftX = Math.max(8, centerX - q - margin - eWidth * scale);
+        const targetRightX = Math.min(B - tWidth * scale - 8, centerX + q + margin);
+        const leftX = lerp(startLeft, targetLeftX, i);
+        const rightX = lerp(startLeft + eWidth + gap, targetRightX, i);
         eo = lerp(startLeft + eWidth + gap / 2, centerX, i);
         const wordOpacity = o < 1 ? smoothstep(clamp(o / LB.WORDS_IN, 0, 1)) : 1;
 
@@ -351,10 +328,9 @@ export const PosterSection: React.FC = () => {
           hoverProgress[idx] = targetH;
         }
 
-        // Subtle horizontal breathing room in the line around the hovered poster (desktop/tablet row)
+        // Subtle horizontal breathing room in the line around the hovered poster
         let targetShift = 0;
-        const isMobileGrid = B > 0 && B < 768;
-        if (!isMobileGrid && activeHoverIdx !== null && activeHoverIdx !== idx) {
+        if (activeHoverIdx !== null && activeHoverIdx !== idx) {
           const dist = idx - activeHoverIdx;
           const dir = dist > 0 ? 1 : -1;
           const falloff = Math.max(0.25, 1 - (Math.abs(dist) - 1) * 0.12);
@@ -379,23 +355,19 @@ export const PosterSection: React.FC = () => {
 
         // Ensure opened poster always fits comfortably inside mobile/tablet viewport
         const maxOpenScaleW = (B * (isNarrow ? 0.84 : 0.92)) / Math.max(1, openWidth);
-        const maxOpenScaleH = (I * (isNarrow ? 0.54 : 0.72)) / Math.max(1, z);
+        const maxOpenScaleH = (I * (isNarrow ? 0.56 : 0.72)) / Math.max(1, z);
         const effectiveOpenScale = Math.min(LB.OPEN_SCALE, maxOpenScaleW, maxOpenScaleH);
 
-        // On mobile/narrow viewports, smoothly center the opened card horizontally & vertically so edge posters never clip
+        // On narrow viewports, smoothly center the opened card horizontally so edge posters never clip
         const openTargetX = isNarrow ? 0 : basePose.x + neighborShift[idx];
         const finalX = lerp(basePose.x + neighborShift[idx], openTargetX, hAmt);
-        const finalY = lerp(basePose.y, isNarrow ? -28 : -12, hAmt);
+        const finalY = lerp(basePose.y, isNarrow ? -24 : -12, hAmt);
         const finalS = lerp(basePose.s, effectiveOpenScale, hAmt);
         const finalZ = lerp(basePose.z, 90, hAmt);
         const finalZi = hAmt > 0.05 ? 600 + Math.round(hAmt * 100) : basePose.zi;
 
-        // Dim non-active cards slightly on mobile when a poster is opened so the active poster stands out
-        const anyOpenAmt = activeHoverIdx !== null ? hoverProgress[activeHoverIdx] || 0 : 0;
-        const dimFactor = isMobileGrid && activeHoverIdx !== idx ? lerp(1, 0.28, anyOpenAmt) : 1;
-
         cardEl.style.transform = `translate3d(${(eo + finalX).toFixed(1)}px, ${(I / 2 + finalY).toFixed(1)}px, ${finalZ.toFixed(1)}px) translate(-50%, -50%) scale(${finalS.toFixed(3)})`;
-        cardEl.style.opacity = (basePose.op * dimFactor).toFixed(3);
+        cardEl.style.opacity = basePose.op.toFixed(3);
         cardEl.style.zIndex = String(finalZi);
       }
 
@@ -430,12 +402,22 @@ export const PosterSection: React.FC = () => {
     const intersectionObserver = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
-        if (entry?.isIntersecting && !hasTriggeredIntro) {
-          hasTriggeredIntro = true;
-          startIntroAnimation(performance.now());
+        if (!entry) return;
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.22) {
+          if (!hasTriggeredIntro) {
+            hasTriggeredIntro = true;
+            startIntroAnimation(performance.now());
+          }
+        } else if (!entry.isIntersecting) {
+          // Reset when scrolled completely out of view so returning to Posters replays the Bloom animation
+          hasTriggeredIntro = false;
+          introActive = false;
+          o = 0;
+          P = 0;
+          wakeUp();
         }
       },
-      { threshold: 0.2 }
+      { threshold: [0, 0.22, 0.5] }
     );
     intersectionObserver.observe(t);
 
@@ -463,15 +445,6 @@ export const PosterSection: React.FC = () => {
       aria-label="My Posters"
       className="relative h-[100svh] min-h-[580px] w-full !cursor-default"
     >
-      {/* Continuous Vertical Architectural Studio Margin Lines */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-y-0 left-4 sm:left-10 lg:left-16 w-px bg-gradient-to-b from-transparent via-[#FDFBD4]/[0.07] to-[#FDFBD4]/[0.07] z-[5]"
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-y-0 right-4 sm:right-10 lg:right-16 w-px bg-gradient-to-b from-transparent via-[#FDFBD4]/[0.07] to-[#FDFBD4]/[0.07] z-[5]"
-      />
       <div
         className="lb-stage"
         onClick={() => {
@@ -569,37 +542,14 @@ export const PosterSection: React.FC = () => {
           ))}
         </div>
 
-        {/* Bottom Caption, Quick Numeral Selector Strip (Mobile & Desktop) & Hover Cue */}
+        {/* Bottom Caption & Hover Cue */}
         <div
           onClick={(e) => e.stopPropagation()}
           className="pointer-events-auto absolute inset-x-0 bottom-4 sm:bottom-7 z-[650] flex flex-col items-center justify-center gap-2.5 px-4 sm:px-6 text-center"
         >
-          {/* Touch-friendly Roman Numeral Quick Selector Strip */}
-          <div className="flex items-center justify-center gap-1 sm:gap-1.5 bg-[#122629]/80 backdrop-blur-md border border-[#FDFBD4]/15 px-2.5 py-1">
-            {cards.map((card, idx) => {
-              const isSelected = hoveredPoster?.src === card.src;
-              return (
-                <button
-                  key={card.roman}
-                  type="button"
-                  onClick={() => selectPosterByIndex(isSelected ? null : idx)}
-                  aria-label={`Inspect poster ${card.roman}: ${card.name}`}
-                  className={`px-2 py-1 font-mono text-[10px] uppercase tracking-wider transition-colors cursor-pointer ${
-                    isSelected
-                      ? 'bg-[#FDFBD4] text-[#122629] font-semibold'
-                      : 'text-[#D9D7B6]/75 hover:text-[#FDFBD4]'
-                  }`}
-                >
-                  {card.roman}
-                </button>
-              );
-            })}
-          </div>
-
           {hoveredPoster ? (
             <div className="bg-[#122629]/92 backdrop-blur-md border border-[#FDFBD4]/20 px-4 sm:px-6 py-2.5 sm:py-3 shadow-[0_20px_50px_rgba(0,0,0,0.5)] transition-all duration-200 max-w-[92vw] sm:max-w-xl">
               <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5 text-xs sm:text-base font-display text-[#FDFBD4]">
-                <span className="italic text-[#D9D7B6]">({hoveredPoster.roman})</span>
                 <span>{hoveredPoster.name}</span>
                 <span className="text-[#D9D7B6]/40">·</span>
                 <span className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.18em] text-[#D9D7B6]/80">

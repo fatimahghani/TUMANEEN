@@ -549,9 +549,10 @@
       0 8px 20px -10px rgba(0, 0, 0, 0.45),
       0 0 0 1px rgba(253, 251, 212, 0.14);
   }
-  [data-lens-bloom] .lb-word,
-  [data-lens-bloom] .lb-cap,
-  [data-lens-bloom] .lb-flourish {
+  [data-lens-bloom] .lb-word {
+    font-size: clamp(2.6rem, 11vw, 4.5rem);
+  }
+  [data-lens-bloom] .lb-cap {
     display: none;
   }
   [data-lens-bloom] .lb-scrim {
