@@ -257,7 +257,7 @@ export const ProcessSection: React.FC = () => {
     <section
       id="process"
       ref={sectionRef}
-      aria-label="The Naqloom Process"
+      aria-label="The TUMANEEN Process"
       className="relative w-full h-[3000px] bg-[#FDFBD4] text-[#18383C] select-none"
     >
       {/* Continuous Vertical Architectural Studio Margin Lines */}
@@ -286,7 +286,7 @@ export const ProcessSection: React.FC = () => {
           {/* Mobile-only Compact Title Header (Replaces Left Column so Card 01 is Centered on Mobile) */}
           <div className="sm:hidden flex items-baseline justify-between gap-2 pt-0.5 border-t border-[#18383C]/12">
             <h2 className="font-display text-xl font-normal tracking-tight text-[#18383C]">
-              The Naqloom Process
+              The TUMANEEN Process
             </h2>
             <span className="font-serif italic text-xs text-[#545333]">
               Five-stage discipline
@@ -311,8 +311,8 @@ export const ProcessSection: React.FC = () => {
                   <p className="font-display text-[62px] font-normal leading-[0.98] tracking-[-0.02em] text-[#18383C]">
                     The
                   </p>
-                  <p className="font-display text-[62px] font-normal leading-[0.98] tracking-[-0.02em] text-[#18383C]">
-                    Naqloom
+                  <p className="font-display text-[54px] font-normal leading-[0.98] tracking-[-0.02em] text-[#18383C]">
+                    TUMANEEN
                   </p>
                   <p className="font-display text-[62px] font-normal leading-[0.98] tracking-[-0.02em] text-[#18383C]">
                     Process

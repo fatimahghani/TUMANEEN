@@ -3,8 +3,8 @@ import { motion } from 'motion/react';
 import { ArrowUpRight, Mail } from 'lucide-react';
 
 interface ReadingNookHeroProps {
-  activeNav?: 'home' | 'project' | 'about' | 'services';
-  onSelectNav?: (section: 'home' | 'project' | 'about' | 'services') => void;
+  activeNav?: 'home' | 'project' | 'about' | 'services' | 'posters' | 'process';
+  onSelectNav?: (section: 'home' | 'project' | 'about' | 'services' | 'posters' | 'process') => void;
   onEmailClick?: () => void;
 }
 
@@ -67,23 +67,15 @@ const HERO_REEL_CARDS: HeroReelCardItem[] = [
   },
 ];
 
-const NAQLOOM_LETTERS = [
-  { char: 'N', rot: -1.4, ox: -2.5, oy: 2.0 },
-  { char: 'A', rot: 1.1, ox: 2.0, oy: -2.0 },
-  { char: 'Q', rot: -0.9, ox: -2.0, oy: 2.5 },
-  { char: 'L', rot: 1.5, ox: 2.5, oy: 1.5 },
-  { char: 'O', rot: -1.2, ox: -2.0, oy: -2.0 },
-  { char: 'O', rot: 1.0, ox: 2.0, oy: 2.0 },
-  { char: 'M', rot: -1.3, ox: -2.5, oy: -1.5 },
-];
-
-const STUDIO_LETTERS = [
-  { char: 'S', rot: 1.2, ox: 2.0, oy: -1.5 },
-  { char: 'T', rot: -1.4, ox: -2.0, oy: 2.0 },
-  { char: 'U', rot: 0.9, ox: 1.5, oy: 2.0 },
-  { char: 'D', rot: -1.1, ox: -2.0, oy: -1.5 },
-  { char: 'I', rot: 1.4, ox: 1.5, oy: 1.5 },
-  { char: 'O', rot: -1.0, ox: -2.0, oy: 2.0 },
+const TUMANEEN_LETTERS = [
+  { char: 'T', rot: -1.4, ox: -2.5, oy: 2.0 },
+  { char: 'U', rot: 1.1, ox: 2.0, oy: -2.0 },
+  { char: 'M', rot: -0.9, ox: -2.0, oy: 2.5 },
+  { char: 'A', rot: 1.5, ox: 2.5, oy: 1.5 },
+  { char: 'N', rot: -1.2, ox: -2.0, oy: -2.0 },
+  { char: 'E', rot: 1.0, ox: 2.0, oy: 2.0 },
+  { char: 'E', rot: -1.3, ox: -2.5, oy: -1.5 },
+  { char: 'N', rot: 1.2, ox: 2.0, oy: 1.5 },
 ];
 
 export const ReadingNookHero: React.FC<ReadingNookHeroProps> = ({
@@ -333,7 +325,7 @@ export const ReadingNookHero: React.FC<ReadingNookHeroProps> = ({
         <div
           className={`pt-1.5 sm:pt-2 border-t flex items-center justify-between text-[9px] sm:text-[10px] font-mono tabular-nums ${dividerClasses} ${labelClasses}`}
         >
-          <span>NAQLOOM STUDIO</span>
+          <span>TUMANEEN</span>
           <div className="flex items-center gap-1">
             <span className="inline-block w-2.5 sm:w-3 h-1.5 bg-[#18383C]" />
             <span className="inline-block w-2.5 sm:w-3 h-1.5 bg-[#545333]" />
@@ -519,17 +511,10 @@ export const ReadingNookHero: React.FC<ReadingNookHeroProps> = ({
 
       {/* 2. HAND-DRAWN TITLE IN MIDDLE OF THE COURTYARD */}
       <div className="relative z-20 my-auto flex flex-col items-center justify-center px-3 sm:px-4 py-2 sm:py-4 max-w-full overflow-hidden">
-        {/* ROW 1: "NAQLOOM" */}
+        {/* ROW 1: "TUMANEEN" */}
         <div className="flex items-center justify-center gap-0.5 sm:gap-2 md:gap-2.5">
-          {NAQLOOM_LETTERS.map((item, idx) =>
-            renderHandDrawnLetter(item, idx, 'naqloom', 0, 'clamp(2.55rem, 12.2vw, 10.8rem)')
-          )}
-        </div>
-
-        {/* ROW 2: "STUDIO" */}
-        <div className="flex items-center justify-center gap-1 sm:gap-2.5 md:gap-3.5 -mt-1 sm:-mt-2">
-          {STUDIO_LETTERS.map((item, idx) =>
-            renderHandDrawnLetter(item, idx, 'studio', 0.35, 'clamp(1.95rem, 9vw, 7.6rem)')
+          {TUMANEEN_LETTERS.map((item, idx) =>
+            renderHandDrawnLetter(item, idx, 'tumaneen', 0, 'clamp(2.35rem, 11.2vw, 10.2rem)')
           )}
         </div>
       </div>

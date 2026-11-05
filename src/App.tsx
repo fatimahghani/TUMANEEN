@@ -22,6 +22,7 @@ type NavSectionId = 'home' | 'project' | 'about' | 'services' | 'posters' | 'pro
 export default function App() {
   const [activeNav, setActiveNav] = useState<'home' | 'project' | 'about' | 'services'>('home');
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+  const [isAllProjectsOpen, setIsAllProjectsOpen] = useState<boolean>(false);
   const [showFloatingHeader, setShowFloatingHeader] = useState<boolean>(false);
 
   const [clientName, setClientName] = useState<string>('');
@@ -224,7 +225,7 @@ export default function App() {
               className="group flex items-center gap-3 text-left cursor-pointer shrink-0"
             >
               <span className="font-display text-sm sm:text-[17px] tracking-[0.14em] sm:tracking-[0.16em] uppercase text-[#FDFBD4] group-hover:text-[#D9D7B6] transition-colors">
-                Naqloom Studio
+                TUMANEEN
               </span>
               <span className="hidden sm:inline-block h-3.5 w-px bg-[#FDFBD4]/20" />
               <span className="hidden lg:inline-block font-serif italic text-xs tracking-[0.04em] text-[#D9D7B6]/75">
@@ -361,13 +362,23 @@ export default function App() {
 
           {/* Center Editorial Content */}
           <div className="relative z-10 max-w-5xl w-full mx-auto my-auto py-8 sm:py-12">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3 pb-5 sm:pb-6 mb-8 sm:mb-10 border-b border-[#FDFBD4]/15">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 sm:pb-6 mb-8 sm:mb-10 border-b border-[#FDFBD4]/15">
               <span className="font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.22em] sm:tracking-[0.24em] text-[#D9D7B6]/70">
                 02 · FROM PRINT STUDY TO BRAND WORLD
               </span>
-              <span className="font-serif italic text-sm sm:text-lg tracking-[0.02em] text-[#D9D7B6]/85">
-                Selected Identity &amp; Packaging Case Studies ↓
-              </span>
+              <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+                <span className="font-serif italic text-sm sm:text-lg tracking-[0.02em] text-[#D9D7B6]/85">
+                  Selected Identity &amp; Packaging Case Studies ↓
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setIsAllProjectsOpen(true)}
+                  className="inline-flex items-center gap-2 bg-[#FDFBD4] text-[#122629] hover:bg-[#D9D7B6] px-4 py-2 text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.18em] font-semibold transition-colors shadow-md cursor-pointer"
+                >
+                  <span>View All Projects</span>
+                  <span aria-hidden="true">→</span>
+                </button>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6 sm:gap-8 md:gap-14 items-start">
@@ -380,10 +391,25 @@ export default function App() {
                 </h2>
               </div>
 
-              <div className="md:col-span-7">
+              <div className="md:col-span-7 space-y-6">
                 <p className="font-sans text-sm sm:text-[17px] leading-[1.75] sm:leading-[1.8] text-[#D9D7B6]/85 font-normal max-w-[62ch]">
                   Every visual artifact begins as a quiet study in light, texture, and cultural memory—before expanding into a living brand ecosystem. Where the poster archive captures distilled moments of atmosphere, the following case studies unfold the complete tactile narrative: from bespoke vessel architecture and material finish to packaging rituals crafted to be held and remembered.
                 </p>
+                <div className="pt-1">
+                  <button
+                    type="button"
+                    onClick={() => setIsAllProjectsOpen(true)}
+                    className="group inline-flex items-center gap-2.5 border border-[#FDFBD4]/30 bg-[#FDFBD4]/10 hover:bg-[#FDFBD4] hover:text-[#122629] text-[#FDFBD4] px-5 py-2.5 text-[11px] font-mono uppercase tracking-[0.2em] transition-all duration-300 cursor-pointer"
+                  >
+                    <span>View All Projects ({PORTFOLIO_PROJECTS.length})</span>
+                    <span
+                      aria-hidden="true"
+                      className="transition-transform duration-300 group-hover:translate-x-1"
+                    >
+                      →
+                    </span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -396,7 +422,12 @@ export default function App() {
 
         {/* 3. PROJECTS SECTION (02 · SELECTED CASE STUDIES) */}
         <div className={revealedSection?.id === 'project' ? 'section-reveal-active' : undefined}>
-          <ProjectsSection onSelectProject={(id) => setSelectedProjectId(id)} />
+          <ProjectsSection
+            onSelectProject={(id) => setSelectedProjectId(id)}
+            isAllProjectsOpen={isAllProjectsOpen}
+            onOpenAllProjects={() => setIsAllProjectsOpen(true)}
+            onCloseAllProjects={() => setIsAllProjectsOpen(false)}
+          />
         </div>
 
         {/* 4. PROCESS SECTION (03 · THE PROCESS) */}

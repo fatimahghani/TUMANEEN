@@ -227,9 +227,9 @@ export const CaseStudyModal: React.FC<CaseStudyModalProps> = ({
             const isLumera = project.id === 'lumera-candle-identity';
             const isRiwaq = project.id === 'riwaq-fragrance-identity';
             const isFullBleedPhotoSlide =
-              /behance-lumera-fs-(03|04|08|09)\.jpg$/.test(slide.imageUrl) ||
-              /behance-roast-fs-11[abc]\.jpg$/.test(slide.imageUrl) ||
-              /behance-riwaq-01\.(png|jpg)$/.test(slide.imageUrl);
+              /behance-lumera-fs-(03|04|08|09)\.jpg(\?.*)?$/.test(slide.imageUrl) ||
+              /behance-roast-fs-11[abc]\.jpg(\?.*)?$/.test(slide.imageUrl) ||
+              /behance-riwaq-01\.(png|jpg)(\?.*)?$/.test(slide.imageUrl);
 
             return (
               <section
@@ -245,8 +245,10 @@ export const CaseStudyModal: React.FC<CaseStudyModalProps> = ({
                   src={slide.imageUrl}
                   alt={slide.title}
                   loading="eager"
-                  decoding="async"
-                  className={`h-svh w-screen ${
+                  decoding="sync"
+                  fetchPriority={idx === activeSlide ? 'high' : 'auto'}
+                  draggable={false}
+                  className={`h-svh w-screen [image-rendering:-webkit-optimize-contrast] ${
                     isBehanceCoverSlide
                       ? 'object-cover object-center transition-transform duration-[1.6s] ease-out group-hover:scale-[1.035]'
                       : !isBehanceProject || isFullBleedPhotoSlide
@@ -260,22 +262,22 @@ export const CaseStudyModal: React.FC<CaseStudyModalProps> = ({
                   <>
                     {isLumera ? (
                       <>
-                        <div className="pointer-events-none absolute inset-0 bg-[#24110E]/22 mix-blend-multiply" />
-                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#24110E]/85 via-transparent to-[#24110E]/92" />
-                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#24110E]/82 via-[#24110E]/22 to-transparent" />
+                        <div className="pointer-events-none absolute inset-0 bg-[#24110E]/8 mix-blend-multiply" />
+                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#24110E]/78 via-transparent to-[#24110E]/88" />
+                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#24110E]/75 via-[#24110E]/12 to-transparent" />
                       </>
                     ) : isRiwaq ? (
                       <>
-                        <div className="pointer-events-none absolute inset-0 bg-[#1C0800]/20 mix-blend-multiply" />
-                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#1C0800]/80 via-transparent to-[#1C0800]/90" />
-                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#1C0800]/85 via-[#1C0800]/25 to-transparent" />
+                        <div className="pointer-events-none absolute inset-0 bg-[#1C0800]/6 mix-blend-multiply" />
+                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#1C0800]/75 via-transparent to-[#1C0800]/86" />
+                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#1C0800]/80 via-[#1C0800]/15 to-transparent" />
                       </>
                     ) : (
                       <>
                         {/* Studio Theme Color Wash & Vignette */}
-                        <div className="pointer-events-none absolute inset-0 bg-[#18383C]/28 mix-blend-multiply" />
-                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#18383C]/90 via-[#18383C]/15 to-[#18383C]/95" />
-                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#18383C]/80 via-[#18383C]/20 to-transparent" />
+                        <div className="pointer-events-none absolute inset-0 bg-[#18383C]/12 mix-blend-multiply" />
+                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#18383C]/84 via-transparent to-[#18383C]/90" />
+                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#18383C]/76 via-[#18383C]/12 to-transparent" />
                       </>
                     )}
 

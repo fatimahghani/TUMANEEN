@@ -1,10 +1,13 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowUpRight } from 'lucide-react';
-import { PORTFOLIO_PROJECTS, PortfolioProject } from '../data/portfolioData';
+import { ArrowUpRight, LayoutGrid, X } from 'lucide-react';
+import { PORTFOLIO_PROJECTS, ARCHIVE_INDEX, PortfolioProject } from '../data/portfolioData';
 
 interface ProjectsSectionProps {
   onSelectProject: (projectId: string) => void;
+  isAllProjectsOpen?: boolean;
+  onOpenAllProjects?: () => void;
+  onCloseAllProjects?: () => void;
 }
 
 const BASE_URL = import.meta.env.BASE_URL;
@@ -12,7 +15,7 @@ const BASE_URL = import.meta.env.BASE_URL;
 const PROJECT_SLIDE_IMAGES: Record<string, { url: string; label: string; bgHex?: string }[]> = {
   'lumera-candle-identity': [
     {
-      url: `${BASE_URL}behance-lumera-cover.jpg`,
+      url: `${BASE_URL}behance-lumera-cover.jpg?v=4k`,
       label: '01 / Cover',
       bgHex: '#24110E',
     },
@@ -69,7 +72,7 @@ const PROJECT_SLIDE_IMAGES: Record<string, { url: string; label: string; bgHex?:
   ],
   'riwaq-fragrance-identity': [
     {
-      url: `${BASE_URL}behance-riwaq-cover.jpg`,
+      url: `${BASE_URL}behance-riwaq-cover.jpg?v=4k`,
       label: '01 / Cover',
       bgHex: '#1C0800',
     },
@@ -126,7 +129,7 @@ const PROJECT_SLIDE_IMAGES: Record<string, { url: string; label: string; bgHex?:
   ],
   'roast-and-rhythm-cafe': [
     {
-      url: `${BASE_URL}behance-roast-fs-11c.jpg`,
+      url: `${BASE_URL}behance-roast-fs-11c.jpg?v=4k`,
       label: '01 / Cover',
       bgHex: '#2B1B14',
     },
@@ -201,9 +204,9 @@ const PROJECT_SLIDE_IMAGES: Record<string, { url: string; label: string; bgHex?:
 const getSlideFitClass = (url: string): string => {
   // Pure photographic full-bleed slides without edge-bound typography boards can safely cover
   if (
-    /behance-lumera-fs-(03|04|08|09)\.jpg$/.test(url) ||
-    /behance-roast-fs-11[abc]\.jpg$/.test(url) ||
-    /behance-riwaq-01\.(png|jpg)$/.test(url)
+    /behance-lumera-fs-(03|04|08|09)\.jpg(\?.*)?$/.test(url) ||
+    /behance-roast-fs-11[abc]\.jpg(\?.*)?$/.test(url) ||
+    /behance-riwaq-01\.(png|jpg)(\?.*)?$/.test(url)
   ) {
     return 'object-cover object-center';
   }
@@ -216,7 +219,8 @@ const FullScreenProjectSlide: React.FC<{
   index: number;
   total: number;
   onSelectProject: (projectId: string) => void;
-}> = ({ project, index, total, onSelectProject }) => {
+  onOpenAllProjects: () => void;
+}> = ({ project, index, total, onSelectProject, onOpenAllProjects }) => {
   const gallery = PROJECT_SLIDE_IMAGES[project.id] || [
     { url: project.slides[0]?.imageUrl || '', label: '01 · Overview' },
   ];
@@ -320,11 +324,14 @@ const FullScreenProjectSlide: React.FC<{
               key={currentMedia.url}
               src={currentMedia.url}
               alt={currentMedia.label}
+              decoding="sync"
+              fetchPriority="high"
+              draggable={false}
               initial={{ opacity: 0.85, scale: 1.005 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0.85 }}
               transition={{ duration: 0.35, ease: 'easeOut' }}
-              className={`absolute inset-0 h-svh w-full pointer-events-none ${getSlideFitClass(
+              className={`absolute inset-0 h-svh w-full pointer-events-none [image-rendering:-webkit-optimize-contrast] ${getSlideFitClass(
                 currentMedia.url
               )}`}
             />
@@ -337,50 +344,53 @@ const FullScreenProjectSlide: React.FC<{
                 key={currentMedia.url}
                 src={currentMedia.url}
                 alt={project.title}
+                decoding="sync"
+                fetchPriority="high"
+                draggable={false}
                 initial={{ opacity: 0.75, scale: 1.05 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0.75 }}
                 transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1.6s] ease-out group-hover:scale-[1.04]"
+                className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1.6s] ease-out group-hover:scale-[1.04] [image-rendering:-webkit-optimize-contrast]"
               />
             </AnimatePresence>
 
             {isLumera ? (
               /* Candlelit Ritual · Espresso, Plum & Radiant Gold Cover Atmosphere for LUMERA */
               <>
-                <div className="absolute inset-0 bg-[#24110E]/20 mix-blend-multiply pointer-events-none transition-opacity duration-700 group-hover:opacity-10" />
-                <div className="absolute inset-0 bg-gradient-to-b from-[#24110E]/82 via-transparent to-[#24110E]/92 pointer-events-none" />
-                <div className="absolute inset-0 bg-gradient-to-r from-[#24110E]/80 via-[#24110E]/20 to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-[#24110E]/8 mix-blend-multiply pointer-events-none transition-opacity duration-700 group-hover:opacity-0" />
+                <div className="absolute inset-0 bg-gradient-to-b from-[#24110E]/78 via-transparent to-[#24110E]/88 pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#24110E]/75 via-[#24110E]/12 to-transparent pointer-events-none" />
                 {/* Subtle Warm Candle Flame Glow across the 3 Vessels */}
                 <div
                   className="pointer-events-none absolute inset-0 opacity-80 transition-opacity duration-700 group-hover:opacity-100"
                   style={{
                     background:
-                      'radial-gradient(850px circle at 52% 38%, rgba(217, 155, 60, 0.16), rgba(75, 29, 38, 0.08) 45%, transparent 72%)',
+                      'radial-gradient(850px circle at 52% 38%, rgba(217, 155, 60, 0.14), rgba(75, 29, 38, 0.05) 45%, transparent 72%)',
                   }}
                 />
               </>
             ) : isRiwaq ? (
               /* Desert Heritage · Espresso, Crimson & Sunlit Brass Cover Atmosphere for RIWAQ */
               <>
-                <div className="absolute inset-0 bg-[#1C0800]/20 mix-blend-multiply pointer-events-none transition-opacity duration-700 group-hover:opacity-10" />
-                <div className="absolute inset-0 bg-gradient-to-b from-[#1C0800]/80 via-transparent to-[#1C0800]/90 pointer-events-none" />
-                <div className="absolute inset-0 bg-gradient-to-r from-[#1C0800]/85 via-[#1C0800]/25 to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-[#1C0800]/6 mix-blend-multiply pointer-events-none transition-opacity duration-700 group-hover:opacity-0" />
+                <div className="absolute inset-0 bg-gradient-to-b from-[#1C0800]/75 via-transparent to-[#1C0800]/86 pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#1C0800]/80 via-[#1C0800]/15 to-transparent pointer-events-none" />
                 {/* Subtle Warm Desert Sunlight Glow on Arch & Vessels */}
                 <div
                   className="pointer-events-none absolute inset-0 opacity-75 transition-opacity duration-700 group-hover:opacity-100"
                   style={{
                     background:
-                      'radial-gradient(900px circle at 76% 42%, rgba(232, 199, 160, 0.14), rgba(169, 130, 82, 0.08) 40%, transparent 70%)',
+                      'radial-gradient(900px circle at 76% 42%, rgba(232, 199, 160, 0.12), rgba(169, 130, 82, 0.05) 40%, transparent 70%)',
                   }}
                 />
               </>
             ) : (
               /* Studio Theme Color Wash & Duotone Undertone */
               <>
-                <div className="absolute inset-0 bg-[#18383C]/28 mix-blend-multiply pointer-events-none transition-opacity duration-700 group-hover:opacity-20" />
-                <div className="absolute inset-0 bg-gradient-to-b from-[#18383C]/90 via-[#18383C]/15 to-[#18383C]/95 pointer-events-none" />
-                <div className="absolute inset-0 bg-gradient-to-r from-[#18383C]/80 via-[#18383C]/20 to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-[#18383C]/12 mix-blend-multiply pointer-events-none transition-opacity duration-700 group-hover:opacity-5" />
+                <div className="absolute inset-0 bg-gradient-to-b from-[#18383C]/84 via-transparent to-[#18383C]/90 pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#18383C]/76 via-[#18383C]/12 to-transparent pointer-events-none" />
               </>
             )}
 
@@ -451,7 +461,18 @@ const FullScreenProjectSlide: React.FC<{
             </div>
           )}
 
-          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 pointer-events-auto sm:ml-auto">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 shrink-0 pointer-events-auto sm:ml-auto">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenAllProjects();
+              }}
+              className="inline-flex items-center gap-1.5 bg-[#18383C]/85 backdrop-blur-md border border-[#FDFBD4]/25 px-3 sm:px-3.5 py-1.5 sm:py-2 text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.16em] text-[#FDFBD4] hover:bg-[#FDFBD4] hover:text-[#18383C] transition-colors shadow-md cursor-pointer"
+            >
+              <LayoutGrid className="w-3.5 h-3.5" />
+              <span>View All Projects</span>
+            </button>
             {project.behanceUrl && (
               <a
                 href={project.behanceUrl}
@@ -565,7 +586,40 @@ const FullScreenProjectSlide: React.FC<{
   );
 };
 
-export const ProjectsSection: React.FC<ProjectsSectionProps> = ({ onSelectProject }) => {
+export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
+  onSelectProject,
+  isAllProjectsOpen,
+  onOpenAllProjects,
+  onCloseAllProjects,
+}) => {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isModalOpen = isAllProjectsOpen !== undefined ? isAllProjectsOpen : internalOpen;
+
+  const handleOpen = () => {
+    if (onOpenAllProjects) {
+      onOpenAllProjects();
+    } else {
+      setInternalOpen(true);
+    }
+  };
+
+  const handleClose = () => {
+    if (onCloseAllProjects) {
+      onCloseAllProjects();
+    } else {
+      setInternalOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!isModalOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') handleClose();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isModalOpen]);
+
   return (
     <section
       id="project"
@@ -580,9 +634,192 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({ onSelectProjec
             index={index}
             total={PORTFOLIO_PROJECTS.length}
             onSelectProject={onSelectProject}
+            onOpenAllProjects={handleOpen}
           />
         ))}
       </div>
+
+      {/* Bottom Studio Archive Bar right below the Project Section */}
+      <div className="relative z-20 bg-[#122629] border-t border-b border-[#FDFBD4]/15 px-5 sm:px-10 md:px-16 py-8 sm:py-10">
+        <div className="max-w-[1280px] mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <span className="block font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.22em] text-[#D9D7B6]/70">
+              02 · COMPLETE STUDIO ARCHIVE ({PORTFOLIO_PROJECTS.length} FEATURED CASE STUDIES)
+            </span>
+            <p className="font-serif italic text-base sm:text-xl text-[#FDFBD4]">
+              Explore the complete index of brand identity, fragrance, and packaging systems.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleOpen}
+            className="group inline-flex items-center gap-2.5 bg-[#FDFBD4] text-[#122629] hover:bg-[#D9D7B6] px-5 sm:px-6 py-3 text-[11px] sm:text-xs font-mono uppercase tracking-[0.18em] font-semibold transition-all duration-300 shadow-lg cursor-pointer shrink-0"
+          >
+            <LayoutGrid className="w-4 h-4 transition-transform duration-300 group-hover:scale-110" />
+            <span>View All Projects</span>
+            <span aria-hidden="true" className="transition-transform duration-300 group-hover:translate-x-0.5">
+              →
+            </span>
+          </button>
+        </div>
+      </div>
+
+      {/* ALL PROJECTS ARCHIVE MODAL */}
+      <AnimatePresence>
+        {isModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="fixed inset-0 z-[880] bg-[#122629]/96 backdrop-blur-md text-[#FDFBD4] overflow-y-auto"
+            role="dialog"
+            aria-modal="true"
+            aria-label="All Projects Archive"
+          >
+            <div className="max-w-[1280px] mx-auto px-5 sm:px-8 md:px-12 py-8 sm:py-12">
+              {/* Modal Top Bar */}
+              <div className="flex items-center justify-between gap-4 pb-6 mb-8 sm:mb-10 border-b border-[#FDFBD4]/15">
+                <div>
+                  <span className="block font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.22em] text-[#D9D7B6]/75">
+                    TUMANEEN · ARCHIVE INDEX
+                  </span>
+                  <h2 className="font-display text-2xl sm:text-4xl text-[#FDFBD4] mt-1">
+                    All Selected Projects ({PORTFOLIO_PROJECTS.length})
+                  </h2>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleClose}
+                  className="inline-flex items-center gap-2 border border-[#FDFBD4]/25 bg-[#18383C] hover:bg-[#FDFBD4] hover:text-[#122629] px-4 py-2 text-[11px] font-mono uppercase tracking-[0.18em] transition-colors cursor-pointer"
+                >
+                  <span>Close</span>
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Project Cards Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+                {PORTFOLIO_PROJECTS.map((project, idx) => {
+                  const slides = PROJECT_SLIDE_IMAGES[project.id] || [];
+                  const coverUrl = slides[0]?.url || project.slides[0]?.imageUrl || '';
+                  return (
+                    <div
+                      key={project.id}
+                      onClick={() => {
+                        handleClose();
+                        onSelectProject(project.id);
+                      }}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          handleClose();
+                          onSelectProject(project.id);
+                        }
+                      }}
+                      className="group flex flex-col border border-[#FDFBD4]/18 bg-[#18383C]/65 hover:border-[#FDFBD4]/50 transition-all duration-300 cursor-pointer overflow-hidden"
+                    >
+                      <div className="relative aspect-[16/10] w-full overflow-hidden bg-[#122629]">
+                        <img
+                          src={coverUrl}
+                          alt={project.title}
+                          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#122629]/80 via-transparent to-transparent" />
+                        <span className="absolute top-3 left-3 bg-[#122629]/85 border border-[#FDFBD4]/20 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-[#FDFBD4]">
+                          0{idx + 1} · {project.year}
+                        </span>
+                        <span className="absolute top-3 right-3 bg-[#FDFBD4] text-[#122629] px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.16em]">
+                          {slides.length} Slides
+                        </span>
+                      </div>
+
+                      <div className="flex-1 flex flex-col justify-between p-5 sm:p-6 space-y-4">
+                        <div className="space-y-2">
+                          <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#D9D7B6]/75">
+                            {project.location}
+                          </div>
+                          <h3 className="font-display text-2xl text-[#FDFBD4] group-hover:text-[#D9D7B6] transition-colors">
+                            {project.title}
+                          </h3>
+                          {project.tagline && (
+                            <p className="font-serif italic text-sm text-[#D9D7B6]">
+                              “{project.tagline}”
+                            </p>
+                          )}
+                          <p className="text-xs sm:text-sm text-[#FDFBD4]/80 line-clamp-3 leading-relaxed pt-1">
+                            {project.summary}
+                          </p>
+                        </div>
+
+                        <div className="pt-4 border-t border-[#FDFBD4]/12 flex items-center justify-between gap-2">
+                          <span className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.16em] text-[#FDFBD4] font-semibold group-hover:translate-x-0.5 transition-transform">
+                            <span>Open Case Study</span>
+                            <span>→</span>
+                          </span>
+                          {project.behanceUrl && (
+                            <a
+                              href={project.behanceUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-[0.16em] text-[#D9D7B6] hover:text-[#FDFBD4] border border-[#FDFBD4]/20 px-2.5 py-1"
+                            >
+                              <span>Behance</span>
+                              <ArrowUpRight className="w-3 h-3" />
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Complete Archival Index Ledger */}
+              <div className="mt-10 sm:mt-12 pt-8 border-t border-[#FDFBD4]/15">
+                <div className="font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-[#D9D7B6]/70 mb-4">
+                  CATALOGUED STUDIO INDEX
+                </div>
+                <div className="divide-y divide-[#FDFBD4]/12 border-t border-b border-[#FDFBD4]/12">
+                  {ARCHIVE_INDEX.map((entry, idx) => {
+                    const matchedProject = PORTFOLIO_PROJECTS[idx];
+                    return (
+                      <div
+                        key={entry.code}
+                        onClick={() => {
+                          if (matchedProject) {
+                            handleClose();
+                            onSelectProject(matchedProject.id);
+                          }
+                        }}
+                        className="py-3.5 px-2 flex flex-wrap items-center justify-between gap-3 hover:bg-[#FDFBD4]/5 transition-colors cursor-pointer"
+                      >
+                        <div className="flex items-center gap-4">
+                          <span className="font-mono text-xs text-[#D9D7B6]/70">{entry.code}</span>
+                          <span className="font-display text-base sm:text-lg text-[#FDFBD4]">
+                            {entry.project}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-4 font-mono text-[11px] uppercase tracking-[0.16em] text-[#D9D7B6]">
+                          <span className="hidden sm:inline">{entry.deliverable}</span>
+                          <span>{entry.year}</span>
+                          <span className="text-[#FDFBD4]">View →</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 };
+

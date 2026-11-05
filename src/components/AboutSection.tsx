@@ -138,7 +138,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onContactClick }) =>
               {/* Top Monospace Ticket Header (matching Hero Ticket Cards) */}
               <div className="flex items-center justify-between border-b border-[#FDFBD4]/25 text-[11px] font-mono uppercase tracking-wider text-[#D9D7B6] pb-2.5 mb-3">
                 <span>FATIMAH GHANI</span>
-                <span>NAQLOOM STUDIO</span>
+                <span>TUMANEEN</span>
               </div>
 
               {/* Studio Illustration Viewport */}
@@ -245,7 +245,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onContactClick }) =>
               </h2>
 
               <div className="font-serif italic text-2xl sm:text-[28px] tracking-[0.01em] text-[#545333] mt-2">
-                Founder &amp; Principal Designer at Naqloom Studio
+                Founder &amp; Principal Designer at TUMANEEN
               </div>
             </div>
 

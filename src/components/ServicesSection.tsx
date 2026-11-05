@@ -114,7 +114,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
   const activeService =
     SERVICES_LIST.find((s) => s.id === selectedServiceId) || SERVICES_LIST[0];
 
-  const inquirySubject = `Naqloom Studio Inquiry: ${activeService.number} · ${activeService.title} — ${clientName.trim()}`;
+  const inquirySubject = `TUMANEEN Inquiry: ${activeService.number} · ${activeService.title} — ${clientName.trim()}`;
 
   const handleInitiateInquirySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -343,7 +343,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="font-mono uppercase tracking-wider text-[#D9D7B6]/60">ATELIER</span>
-                  <span className="font-medium text-[#FDFBD4]">Naqloom Studio</span>
+                  <span className="font-medium text-[#FDFBD4]">TUMANEEN</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="font-mono uppercase tracking-wider text-[#D9D7B6]/60">SELECTED SCOPE</span>
@@ -428,7 +428,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
                     Thank you, {clientName}.
                   </h4>
                   <p className="text-xs text-[#D9D7B6]/90 font-mono max-w-lg mx-auto leading-relaxed">
-                    Your inquiry regarding {activeService.title} has been sent directly to Naqloom Studio ({designerEmail}). Below is the exact information submitted:
+                    Your inquiry regarding {activeService.title} has been sent directly to TUMANEEN ({designerEmail}). Below is the exact information submitted:
                   </p>
                   <div className="max-w-lg mx-auto text-left bg-[#FDFBD4]/[0.04] border border-[#FDFBD4]/15 p-4 sm:p-5 space-y-2.5 text-xs font-mono text-[#D9D7B6]">
                     <div className="flex items-center justify-between gap-3">
@@ -555,7 +555,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
           <div className="pt-12 flex flex-col md:flex-row items-start md:items-end justify-between gap-8">
             <div>
               <div className="font-display text-3xl sm:text-4xl tracking-tight text-[#FDFBD4]">
-                NAQLOOM STUDIO
+                TUMANEEN
               </div>
               <p className="font-serif italic text-lg text-[#D9D7B6]/80 mt-1">
                 Brand worlds, tactile packaging, and visual storytelling by Fatimah Ghani.
@@ -595,7 +595,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
               </div>
 
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-8 text-[11px] font-mono tracking-[0.16em] text-[#D9D7B6]/65">
-                <span>© 2026 NAQLOOM STUDIO</span>
+                <span>© 2026 TUMANEEN</span>
                 <span>BRAND IDENTITY · PACKAGING · UI/UX · MOTION</span>
               </div>
             </div>
