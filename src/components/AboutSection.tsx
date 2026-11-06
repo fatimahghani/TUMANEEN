@@ -37,7 +37,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onContactClick }) =>
           <div className="flex items-center gap-2.5 sm:gap-3">
             <span className="font-semibold text-[#5D182B]">04 / 06</span>
             <span className="h-3 w-px bg-[#5D182B]/20" />
-            <span>A NOTE FROM THE DESIGNER</span>
+            <span>THE DESIGNER</span>
           </div>
           <span className="hidden md:inline font-serif italic normal-case tracking-[0.02em] text-sm text-[#945640]">
             Independent Multidisciplinary Design Practice
@@ -71,18 +71,6 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onContactClick }) =>
                 <figcaption><span>PLATE III / WAJOOD</span><span>ORIGINAL PRINT STUDY</span></figcaption>
               </figure>
 
-              {/* Bottom Archival Ticket Bar (matching Hero Ticket Cards) */}
-              <div className="pt-3 mt-3 border-t border-[#F0E4D2]/25 flex items-center justify-between text-[11px] font-mono text-[#D9C0A8]">
-                <span>GRAPHIC DESIGNER</span>
-                <div className="flex items-center gap-2">
-                  <span>AVAILABLE FOR WORK</span>
-                  <div className="flex items-center gap-1">
-                    <span className="inline-block w-2.5 h-1.5 bg-[#5D182B]" />
-                    <span className="inline-block w-2.5 h-1.5 bg-[#D9C0A8]" />
-                    <span className="inline-block w-2.5 h-1.5 bg-[#A87B6C]" />
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
 
@@ -94,16 +82,16 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onContactClick }) =>
               </div>
 
               <h2 className="font-display text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight text-[#5D182B] leading-[1.04]">
-                A little about the maker.
+                Behind the pages.
               </h2>
 
               <div className="font-serif italic text-2xl sm:text-[28px] tracking-[0.01em] text-[#945640] mt-2">
-                Designer, collector of ideas &amp; keeper of TUMANEEN
+                Fatimah Ghani · Graphic designer
               </div>
             </div>
 
             <p className="font-sans text-base sm:text-lg text-[#945640] leading-relaxed max-w-[52ch]">
-              I’m Fatimah, a graphic designer drawn to the little details: how type feels, the stories objects carry, and the space between a first sketch and a finished piece. I make identities, packaging, interfaces and moving images with the same curiosity.
+              I make identities, packaging and visual stories shaped by type, culture and curiosity.
             </p>
 
             {/* Compact 2-Row Specs */}
@@ -116,14 +104,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onContactClick }) =>
                   Brand Identity · Packaging · UI/UX · Motion
                 </span>
               </div>
-              <div className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-                <span className="font-sans text-[11px] font-medium uppercase tracking-[0.2em] text-[#A87B6C]">
-                  TOOLKIT
-                </span>
-                <span className="font-serif italic text-base sm:text-lg font-medium text-[#5D182B]">
-                  Affinity · Figma · Illustrator · After Effects
-                </span>
-              </div>
+              
             </div>
 
             {/* Action Buttons */}
@@ -133,7 +114,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onContactClick }) =>
                 onClick={onContactClick}
                 className="px-6 py-3.5 sm:py-3 bg-[#5D182B] hover:bg-[#945640] text-[#F0E4D2] text-xs font-mono uppercase tracking-wider transition-colors flex items-center justify-center gap-2 cursor-pointer"
               >
-                <span>Work With Me</span>
+                <span>Get in touch</span>
                 <ArrowDownRight className="w-4 h-4" />
               </button>
 
