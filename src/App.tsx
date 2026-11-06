@@ -22,7 +22,7 @@ import { ServicesSection } from './components/ServicesSection';
 type NavSectionId = 'home' | 'project' | 'about' | 'services' | 'posters' | 'process' | 'contact-form';
 
 export default function App() {
-  const [activeNav, setActiveNav] = useState<'home' | 'project' | 'about' | 'services'>('home');
+  const [activeNav, setActiveNav] = useState<'home' | 'posters' | 'project' | 'process' | 'about' | 'services'>('home');
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [isAllProjectsOpen, setIsAllProjectsOpen] = useState<boolean>(false);
   const [showFloatingHeader, setShowFloatingHeader] = useState<boolean>(false);
@@ -32,7 +32,7 @@ export default function App() {
   const [projectNotes, setProjectNotes] = useState<string>('');
   const [inquirySubmitted, setInquirySubmitted] = useState<boolean>(false);
 
-  // Quick retro glow transition state when clicking any section from the top header
+  // Brief ink-page transition when navigating between editorial chapters
   const [activeTransitionKey, setActiveTransitionKey] = useState<number | null>(null);
   const [revealedSection, setRevealedSection] = useState<{
     id: string;
@@ -55,9 +55,11 @@ export default function App() {
       setShowFloatingHeader(y > window.innerHeight * 0.65);
 
       // Keep active top-header indicator synced with scroll position
-      const sections: Array<{ id: 'home' | 'project' | 'about' | 'services'; el: HTMLElement | null }> = [
+      const sections: Array<{ id: 'home' | 'posters' | 'project' | 'process' | 'about' | 'services'; el: HTMLElement | null }> = [
         { id: 'home', el: document.getElementById('home') },
+        { id: 'posters', el: document.getElementById('posters') },
         { id: 'project', el: document.getElementById('project') },
+        { id: 'process', el: document.getElementById('process') },
         { id: 'about', el: document.getElementById('about') },
         { id: 'services', el: document.getElementById('services') },
       ];
@@ -99,6 +101,8 @@ export default function App() {
       if (
         sectionId === 'home' ||
         sectionId === 'project' ||
+        sectionId === 'posters' ||
+        sectionId === 'process' ||
         sectionId === 'about' ||
         sectionId === 'services'
       ) {
@@ -276,7 +280,7 @@ export default function App() {
       </header>
 
       <main className="flex-1">
-        {/* 1. HOME SECTION — FULL-SCREEN RETRO DESIGN STUDIO + IN-PICTURE TOP NAV + HAND-DRAWN TITLE + ROLLING REEL */}
+        {/* ISSUE COVER — SHANAKHT / THE VISUAL NOTEBOOK */}
         <div
           id="home"
           className={revealedSection?.id === 'home' ? 'section-reveal-active' : undefined}
@@ -288,7 +292,7 @@ export default function App() {
           />
         </div>
 
-        {/* 2. POSTER SECTION (01 · POSTER ARCHIVE) — SEAMLESSLY MELTS OUT OF HERO */}
+        {/* 01 / THE POSTER ARCHIVE */}
         <div className={revealedSection?.id === 'posters' ? 'section-reveal-active' : undefined}>
           <PosterSection />
         </div>
