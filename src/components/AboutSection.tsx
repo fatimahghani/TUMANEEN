@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { ArrowDownRight, Check, Copy, Mail } from 'lucide-react';
 
 interface AboutSectionProps {
@@ -8,38 +8,6 @@ interface AboutSectionProps {
 export const AboutSection: React.FC<AboutSectionProps> = ({ onContactClick }) => {
   const [emailCopied, setEmailCopied] = useState<boolean>(false);
   const designerEmail = 'naqloonstudio@gmail.com';
-
-  // Matching 35mm analog film grain tile for the vintage studio frame
-  const grainTileUrl = useMemo(() => {
-    if (typeof document === 'undefined') return '';
-    const size = 200;
-    const canvas = document.createElement('canvas');
-    canvas.width = size;
-    canvas.height = size;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return '';
-
-    const imgData = ctx.createImageData(size, size);
-    const data = imgData.data;
-
-    let seed = 7331;
-    const rand = () => {
-      seed = (seed * 16807) % 2147483647;
-      return (seed - 1) / 2147483646;
-    };
-
-    for (let i = 0; i < data.length; i += 4) {
-      const luma = (rand() - 0.5) * 150;
-      const warm = (rand() - 0.45) * 40;
-      data[i] = Math.min(255, Math.max(0, 128 + luma + warm));
-      data[i + 1] = Math.min(255, Math.max(0, 126 + luma));
-      data[i + 2] = Math.min(255, Math.max(0, 120 + luma));
-      data[i + 3] = 92;
-    }
-
-    ctx.putImageData(imgData, 0, 0);
-    return canvas.toDataURL('image/png');
-  }, []);
 
   const handleCopyEmail = () => {
     navigator.clipboard?.writeText(designerEmail);
@@ -77,65 +45,14 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onContactClick }) =>
           <span className="text-[#A87B6C] shrink-0">FATIMAH GHANI</span>
         </div>
       </div>
-      {/* Postage-Stamp Cutout Mask & Main-Page Style Duotone/Halation Filter */}
-      <svg className="absolute w-0 h-0 pointer-events-none" aria-hidden="true">
-        <defs>
-          <mask id="about-stamp-mask" maskContentUnits="objectBoundingBox">
-            <rect x="0" y="0" width="1" height="1" fill="white" />
-            {Array.from({ length: 16 }).map((_, i) => {
-              const cx = (i + 0.5) / 16;
-              return (
-                <g key={`atb-${i}`}>
-                  <ellipse cx={cx} cy={0} rx={0.015} ry={0.013} fill="black" />
-                  <ellipse cx={cx} cy={1} rx={0.015} ry={0.013} fill="black" />
-                </g>
-              );
-            })}
-            {Array.from({ length: 18 }).map((_, i) => {
-              const cy = (i + 0.5) / 18;
-              return (
-                <g key={`alr-${i}`}>
-                  <ellipse cx={0} cy={cy} rx={0.015} ry={0.013} fill="black" />
-                  <ellipse cx={1} cy={cy} rx={0.015} ry={0.013} fill="black" />
-                </g>
-              );
-            })}
-          </mask>
-
-          {/* Maps black-and-white sketch into Deep Teal (#5D182B) ink + Warm Vintage Cream (#F0E4D2) paper with warm golden halation */}
-          <filter id="naqloom-sketch-grade" colorInterpolationFilters="sRGB">
-            <feColorMatrix
-              type="matrix"
-              values="0.33 0.33 0.33 0 0
-                      0.33 0.33 0.33 0 0
-                      0.33 0.33 0.33 0 0
-                      0    0    0    1 0"
-              result="gray"
-            />
-            <feComponentTransfer in="gray" result="duotone">
-              {/* R: #5D182B (0.094) -> #945640 (0.33) -> #F0E4D2 (0.992) */}
-              <feFuncR type="table" tableValues="0.094 0.28 0.68 0.96 0.992" />
-              {/* G: #5D182B (0.220) -> #945640 (0.325) -> #F0E4D2 (0.984) */}
-              <feFuncG type="table" tableValues="0.220 0.31 0.62 0.91 0.984" />
-              {/* B: #5D182B (0.235) -> #945640 (0.200) -> #F0E4D2 (0.831) */}
-              <feFuncB type="table" tableValues="0.235 0.22 0.45 0.74 0.831" />
-            </feComponentTransfer>
-          </filter>
-        </defs>
-      </svg>
-
       <div className="w-full max-w-[1280px] mx-auto px-5 sm:px-6 md:px-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10 lg:gap-16 items-center">
-          {/* LEFT COLUMN (5 Cols): Vintage Grainy Stamp Card in Main Page Style */}
+          {/* LEFT COLUMN (5 Cols): Original Portfolio Print as an Editorial Plate */}
           <div className="lg:col-span-5">
             <div
-              style={{
-                mask: 'url(#about-stamp-mask)',
-                WebkitMask: 'url(#about-stamp-mask)',
-              }}
               className="tm-about-plate group relative bg-[#945640] text-[#F0E4D2] p-5"
             >
-              {/* Top Monospace Ticket Header (matching Hero Ticket Cards) */}
+              {/* Editorial Print Credit */}
               <div className="flex items-center justify-between border-b border-[#F0E4D2]/25 text-[11px] font-mono uppercase tracking-wider text-[#D9C0A8] pb-2.5 mb-3">
                 <span>FATIMAH GHANI</span>
                 <span>TUMANEEN</span>
