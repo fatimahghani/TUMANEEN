@@ -24,10 +24,9 @@ const INROOT_PROCESS_CARDS: InrootProcessCard[] = [
     centerWord: 'DISCOVERY',
     subtitle: 'Brief & Research',
     description:
-      'Before any design begins, we get on the same page. We start with a short call or questionnaire about your business, audience, and goals, then research competitors and build a moodboard.',
+      'We listen, research and find the right questions.',
     bullets: [
       'Deep dive call or client questionnaire',
-      'Audience, market & competitor research',
       'Visual references, moodboard & roadmap',
     ],
     tools: 'Brief · Research · Moodboard',
@@ -48,10 +47,9 @@ const INROOT_PROCESS_CARDS: InrootProcessCard[] = [
     centerWord: 'STRATEGY',
     subtitle: 'Concepts & Sketches',
     description:
-      'Once we know the “why,” we move into shaping the “how.” I sketch ideas and present 2–3 directions with logo concepts, color palettes, and font pairings so you choose the one that fits best.',
+      'Two or three directions, drawn from one clear idea.',
     bullets: [
       '2–3 distinct creative & brand directions',
-      'Logo sketches & typographic pairings',
       'Curated color systems & brand positioning',
     ],
     tools: 'Sketches · Palette · Typography',
@@ -72,10 +70,9 @@ const INROOT_PROCESS_CARDS: InrootProcessCard[] = [
     centerWord: 'DESIGN',
     subtitle: 'Identity & Layouts',
     description:
-      'Here’s where things start to look real. I translate strategy into cohesive visuals—crafting identity systems, editorial layouts, packaging, and interfaces that look timeless and make sense.',
+      'Type, color and form find their place.',
     bullets: [
       'Primary & secondary logo mark architecture',
-      'Editorial grids, packaging & visual direction',
       'High-fidelity UI layouts & brand touchpoints',
     ],
     tools: 'Identity · Grids · Art Direction',
@@ -96,10 +93,9 @@ const INROOT_PROCESS_CARDS: InrootProcessCard[] = [
     centerWord: 'BUILD',
     subtitle: 'Design & Revisions',
     description:
-      'The chosen direction is built with precision in Affinity, Illustrator, or Figma, then stress-tested on real-world mockups. You give feedback and I refine every detail in focused revision rounds.',
+      'Make it, test it, refine it.',
     bullets: [
       'Vector execution in Illustrator, Affinity & Figma',
-      'Tactile print, packaging & digital mockups',
       'Focused feedback & iterative refinement rounds',
     ],
     tools: 'Vector Design · Mockups · Feedback',
@@ -120,10 +116,9 @@ const INROOT_PROCESS_CARDS: InrootProcessCard[] = [
     centerWord: 'LAUNCH',
     subtitle: 'Final Files & Handover',
     description:
-      'We test everything, refine what’s needed, and make sure your brand is smooth and ready before it meets the world. You receive final logo files, brand guidelines, and print/digital formats.',
+      'Final files, prepared for the real world.',
     bullets: [
       'Final master logo packages (PDF, PNG, SVG, EPS)',
-      'Comprehensive brand guidelines & usage book',
       'Print-ready & digital handover with support',
     ],
     tools: 'Logo Files · Guidelines · Export',
@@ -222,9 +217,9 @@ export const ProcessSection: React.FC = () => {
         {/* Top Quiet Studio Context Bar + Mobile Section Title */}
         <div className="w-full max-w-[1280px] px-4 sm:px-14 lg:px-24 shrink-0 space-y-1.5">
           <div className="flex items-center justify-between text-[10px] sm:text-[11px] font-sans font-medium uppercase tracking-[0.22em] sm:tracking-[0.24em] text-[#945640]">
-            <span>03 / FROM THE NOTEBOOK</span>
+            <span>03 / PROCESS</span>
             <span className="hidden sm:inline font-serif italic normal-case tracking-[0.02em] text-base text-[#945640]">
-              How a quiet concept becomes a tactile brand world
+              From idea to artifact
             </span>
             <span className="font-mono tabular-nums text-[#5D182B]">
               0{activeStepIndex + 1} / 0{INROOT_PROCESS_CARDS.length}
@@ -275,10 +270,10 @@ export const ProcessSection: React.FC = () => {
                 {/* Studio process intro text */}
                 <div className="pt-3 border-t border-[#D9C0A8] space-y-2 max-w-[245px]">
                   <p className="font-serif italic text-base font-medium text-[#5D182B] leading-snug">
-                    How I work — from brief to final files.
+                    From sketch to handover.
                   </p>
                   <p className="font-sans text-xs text-[#945640] leading-relaxed">
-                    Every project follows clear steps, so you always know what happens next. I listen first, explore ideas, refine the best one, and deliver files that are ready to use.
+                    From first sketch to final files.
                   </p>
                 </div>
               </div>
@@ -293,9 +288,9 @@ export const ProcessSection: React.FC = () => {
                 >
                   {/* Original typographic print plate: no synthetic studio photography. */}
                   <div className="tm-process-artboard" aria-hidden="true">
-                    <span className="tm-process-artboard-series">TUMANEEN / METHODS &amp; MARK-MAKING</span>
+                    <span className="tm-process-artboard-series">TUMANEEN / STUDIO NOTES</span>
                     <span className="tm-process-artboard-number">{card.number}</span>
-                    <span className="tm-process-artboard-sidenote">A SMALL CHAPTER IN THE MAKING OF THINGS</span>
+                    <span className="tm-process-artboard-sidenote">THE MAKING OF</span>
                     <span className="tm-process-artboard-registration">+&nbsp;&nbsp;&nbsp;&nbsp;+&nbsp;&nbsp;&nbsp;&nbsp;+</span>
                   </div>
 
