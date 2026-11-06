@@ -293,7 +293,7 @@
   .tm-nav-items { justify-content: start; gap: 17px; }
   .tm-nav-index { font-size: 8px; }
   .tm-story { padding: 25px 15px 8px; }
-  .tm-cover-heading h2 { font-size: clamp(51px, 12.2vw, 62px); }
+  .tm-cover-heading h2 { font-size: clamp(44px, 11.6vw, 62px); }
   .tm-cover-heading h2 .tm-heading-line-three { font-size: .81em; }
   .tm-story-urdu { font-size: 20px; }
   .tm-story-end { gap: 9px; }
