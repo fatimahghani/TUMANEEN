@@ -471,7 +471,7 @@ const FullScreenProjectSlide: React.FC<{
               className="inline-flex items-center gap-1.5 bg-[#5D182B]/85 backdrop-blur-md border border-[#F0E4D2]/25 px-3 sm:px-3.5 py-1.5 sm:py-2 text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.16em] text-[#F0E4D2] hover:bg-[#F0E4D2] hover:text-[#5D182B] transition-colors shadow-md cursor-pointer"
             >
               <LayoutGrid className="w-3.5 h-3.5" />
-              <span>View All Projects</span>
+              <span>View Index</span>
             </button>
             {project.behanceUrl && (
               <a
@@ -627,10 +627,10 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
       className="tm-projects portfolio-section relative bg-[#5D182B]"
     >
       <header className="tm-projects-intro">
-        <div className="tm-projects-kicker"><span>02 / FEATURED CASE STUDIES</span><span>BRAND IDENTITIES &amp; OBJECTS</span></div>
+        <div className="tm-projects-kicker"><span>02 / SELECTED WORK</span><span>TUMANEEN / VOL. I</span></div>
         <div className="tm-projects-title-row">
           <h2>Selected <em>work.</em></h2>
-          <p>A few complete worlds, from the first idea to the last printed detail.<br /><span>SCROLL TO TURN THE PAGES ↓</span></p>
+          <p>Identities, objects &amp; visual stories.<br /><span>SCROLL ↓</span></p>
         </div>
       </header>
       <div>
@@ -651,10 +651,10 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
         <div className="max-w-[1280px] mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="space-y-1">
             <span className="block font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.22em] text-[#D9C0A8]/70">
-              02 · COMPLETE STUDIO ARCHIVE ({PORTFOLIO_PROJECTS.length} FEATURED CASE STUDIES)
+              02 / PROJECT INDEX · {PORTFOLIO_PROJECTS.length} CASE STUDIES
             </span>
             <p className="font-serif italic text-base sm:text-xl text-[#F0E4D2]">
-              Explore the complete index of brand identity, fragrance, and packaging systems.
+              From the archive.
             </p>
           </div>
 
@@ -664,7 +664,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
             className="group inline-flex items-center gap-2.5 bg-[#F0E4D2] text-[#391E25] hover:bg-[#D9C0A8] px-5 sm:px-6 py-3 text-[11px] sm:text-xs font-mono uppercase tracking-[0.18em] font-semibold transition-all duration-300 shadow-lg cursor-pointer shrink-0"
           >
             <LayoutGrid className="w-4 h-4 transition-transform duration-300 group-hover:scale-110" />
-            <span>View All Projects</span>
+            <span>View Index</span>
             <span aria-hidden="true" className="transition-transform duration-300 group-hover:translate-x-0.5">
               →
             </span>
@@ -758,7 +758,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
                               “{project.tagline}”
                             </p>
                           )}
-                          <p className="text-xs sm:text-sm text-[#F0E4D2]/80 line-clamp-3 leading-relaxed pt-1">
+                          <p className="text-xs sm:text-sm text-[#F0E4D2]/80 line-clamp-2 leading-relaxed pt-1">
                             {project.summary}
                           </p>
                         </div>

@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=DM+Mono:wght@400;500&family=Noto+Nastaliq+Urdu:wght@400;500;600&display=swap');
 
 /* One art-directed editorial spread. Everything is scoped to the home hero. */
 .tm-hero {
@@ -14,7 +13,7 @@
   overflow: hidden;
   background: var(--tm-paper);
   color: var(--tm-ink);
-  font-family: 'Archivo Narrow', 'Inter', sans-serif;
+  font-family: 'DM Sans', 'Inter', sans-serif;
 }
 .tm-hero *, .tm-hero *::before, .tm-hero *::after { box-sizing: border-box; }
 .tm-hero a { color: inherit; text-decoration: none; }
@@ -48,13 +47,13 @@
 .tm-masthead-aside span:last-child { font: 500 9px/1.4 'DM Mono', monospace; letter-spacing: .045em; }
 .tm-masthead {
   margin: 0; white-space: nowrap; text-align: center; color: var(--tm-oxblood);
-  font: 700 clamp(78px, 11.4vw, 174px)/.83 'Cormorant Garamond', Georgia, serif;
-  letter-spacing: -.09em; transform: scaleX(1.045); transform-origin: center;
+  font: 600 clamp(70px, 10.4vw, 158px)/.96 'Bodoni Moda', Georgia, serif;
+  letter-spacing: -.075em; transform: none;
 }
 .tm-masthead > span { color: var(--tm-vermilion); margin-left: -.015em; }
 .tm-masthead-signature { justify-self: end; align-self: end; padding-bottom: 22px; display: flex; flex-direction: column; align-items: end; gap: 1px; }
 .tm-masthead-signature span { font: 500 9px/1.4 'DM Mono', monospace; }
-.tm-masthead-signature strong { font: italic 500 48px/.9 'Cormorant Garamond', Georgia, serif; color: var(--tm-vermilion); }
+.tm-masthead-signature strong { font: italic 500 48px/.9 'Bodoni Moda', Georgia, serif; color: var(--tm-vermilion); }
 
 .tm-navigation {
   min-height: 53px; display: flex; align-items: center; justify-content: space-between; gap: 22px;
@@ -64,7 +63,7 @@
 .tm-nav-item {
   display: inline-flex; align-items: baseline; gap: 4px; white-space: nowrap;
   border-bottom: 2px solid transparent; padding: 14px 0 12px;
-  font: 600 14px/1.15 'Archivo Narrow', sans-serif; text-transform: uppercase; letter-spacing: .04em;
+  font: 600 14px/1.15 'DM Sans', sans-serif; text-transform: uppercase; letter-spacing: .04em;
   transition: color .2s, border-color .2s;
 }
 .tm-nav-index { color: #a47b70; font: 400 9px/1 'DM Mono', monospace; }
@@ -101,20 +100,20 @@
 .tm-cover-heading { position: relative; margin-top: 24px; }
 .tm-heading-prefix {
   margin: 0 0 16px; color: #d9a58c;
-  font: italic 500 20px/1 'Cormorant Garamond', Georgia, serif;
+  font: italic 400 27px/1 'Instrument Serif', Georgia, serif;
 }
 .tm-cover-heading h2 {
-  margin: 0; font: 500 clamp(67px, 6.3vw, 105px)/.78 'Cormorant Garamond', Georgia, serif;
+  margin: 0; font: 500 clamp(56px, 5.35vw, 88px)/.93 'Bodoni Moda', Georgia, serif;
   letter-spacing: -.062em;
 }
 .tm-cover-heading h2 span { display: block; white-space: nowrap; }
 .tm-heading-line-one { font-style: italic; font-weight: 400; }
 .tm-cover-heading h2 .tm-heading-line-two {
-  font-weight: 600; font-size: 1.28em; letter-spacing: -.085em; margin: .045em 0 .08em -.03em; 
+  font-weight: 600; font-size: 1.18em; letter-spacing: -.065em; margin: .045em 0 .08em -.03em; 
 }
-.tm-cover-heading h2 .tm-heading-line-three { font-size: .85em; letter-spacing: -.07em; }
-.tm-heading-line-three em { color: #f1b791; font-weight: 400; }
-.tm-heading-mark { position: absolute; color: #cd8168; font: 400 116px/.5 'Cormorant Garamond', Georgia, serif; right: 5%; top: 40px; opacity: .48; }
+.tm-cover-heading h2 .tm-heading-line-three { font-size: .78em; letter-spacing: -.055em; }
+.tm-heading-line-three em { color: #f1b791; font: italic 400 1.06em/.95 'Instrument Serif', Georgia, serif; }
+.tm-heading-mark { position: absolute; color: #cd8168; font: 400 116px/.5 'Bodoni Moda', Georgia, serif; right: 5%; top: 40px; opacity: .48; }
 .tm-story-urdu {
   width: fit-content; margin: 22px 0 0; color: #e2ae8e;
   font: 500 clamp(20px,2.6vw,36px)/2.2 'Noto Nastaliq Urdu', serif;
@@ -123,12 +122,12 @@
 .tm-story-end { display: flex; gap: 17px; flex-direction: column; margin-top: auto; padding-top: 32px; }
 .tm-story-essay { display: flex; gap: 12px; max-width: 360px; margin: 0; }
 .tm-essay-initial {
-  flex: none; font: 600 61px/.8 'Cormorant Garamond', Georgia, serif; color: #e8b68f;
+  flex: none; font: 600 61px/.8 'Bodoni Moda', Georgia, serif; color: #e8b68f;
 }
 .tm-essay-body { display: flex; flex-direction: column; gap: 5px; }
 .tm-essay-body strong { font: 500 9px/1.5 'DM Mono', monospace; letter-spacing: .065em; }
 .tm-essay-body > span {
-  color: #e7cab8; max-width: 300px; font: 400 13px/1.48 'Archivo Narrow', sans-serif; letter-spacing: .015em;
+  color: #e7cab8; max-width: 300px; font: 400 13px/1.48 'DM Sans', sans-serif; letter-spacing: .015em;
 }
 .tm-cover-link {
   display: inline-flex; align-self: flex-start; align-items: center; gap: 12px;
@@ -166,7 +165,7 @@
 }
 .tm-picture-index {
   position: absolute; z-index: 3; bottom: 23px; left: 1%; 
-  font: italic 500 114px/.7 'Cormorant Garamond', Georgia, serif; color: #df9574;
+  font: italic 500 114px/.7 'Bodoni Moda', Georgia, serif; color: #df9574;
   transform: rotate(-9deg);
 }
 .tm-picture-notch { position: absolute; z-index: 4; width: 19px; height: 1px; background: var(--tm-ink-light); left: 7%; }
@@ -183,7 +182,7 @@
   margin: 0 36px; min-height: 40px; border-top: 1px solid rgba(240,229,211,.42);
   color: #d7af9e; font: 500 9px/1.3 'DM Mono', monospace; letter-spacing: .02em;
 }
-.tm-cover-baseline-star { justify-self: end; font: 25px/1 'Cormorant Garamond', Georgia, serif; }
+.tm-cover-baseline-star { justify-self: end; font: 25px/1 'Bodoni Moda', Georgia, serif; }
 
 .tm-afterword {
   display: grid; grid-template-columns: 90px minmax(0,1.2fr) minmax(0,.9fr) minmax(0,.8fr);
@@ -191,25 +190,25 @@
 }
 .tm-afterword-number {
   color: var(--tm-vermilion); white-space: nowrap;
-  font: italic 600 80px/.8 'Cormorant Garamond', Georgia, serif; letter-spacing: -.075em;
+  font: italic 600 80px/.8 'Bodoni Moda', Georgia, serif; letter-spacing: -.075em;
 }
 .tm-afterword-number span { font-size: .6em; }
 .tm-label { display: block; color: #8f513f; font: 500 9px/1.45 'DM Mono', monospace; letter-spacing: .04em; }
 .tm-afterword-copy p {
   margin: 10px 0 0; color: var(--tm-oxblood);
-  font: 500 clamp(25px,2.8vw,41px)/.99 'Cormorant Garamond', Georgia, serif;
+  font: 500 clamp(25px,2.8vw,41px)/.99 'Bodoni Moda', Georgia, serif;
   letter-spacing: -.025em;
 }
 .tm-afterword-copy em { font-weight: 400; }
 .tm-afterword-body { padding-top: 2px; }
-.tm-afterword-body p { margin: 0 0 13px; max-width: 225px; font: 500 15px/1.35 'Archivo Narrow', sans-serif; }
+.tm-afterword-body p { margin: 0 0 13px; max-width: 225px; font: 500 15px/1.35 'DM Sans', sans-serif; }
 .tm-afterword-body a { display: inline-flex; align-items: center; gap: 5px; border-bottom: 1px solid var(--tm-line); padding: 5px 0; font: 500 9px/1 'DM Mono', monospace; }
 .tm-contents { display: flex; flex-direction: column; gap: 0; }
 .tm-contents .tm-label { margin-bottom: 7px; }
 .tm-contents a {
   display: grid; grid-template-columns: 18px 1fr 14px; align-items: center; gap: 6px;
   border-top: 1px solid var(--tm-line); min-height: 30px;
-  font: 600 12px/1.1 'Archivo Narrow', sans-serif; letter-spacing: .035em;
+  font: 600 12px/1.1 'DM Sans', sans-serif; letter-spacing: .035em;
 }
 .tm-contents a span { color: #9a604e; font: 500 9px/1 'DM Mono', monospace; }
 .tm-contents a:hover { color: var(--tm-vermilion); }
@@ -225,7 +224,7 @@
 @media (max-width: 1180px) {
   .tm-sheet { width: calc(100% - 62px); }
   .tm-masthead-wrap { grid-template-columns: 110px minmax(0, 1fr) 95px; min-height: 142px; }
-  .tm-masthead { font-size: 11.3vw; }
+  .tm-masthead { font-size: 10.15vw; }
   .tm-masthead-aside [lang="ur"] { font-size: 19px; }
   .tm-masthead-aside span:last-child { font-size: 8px; }
   .tm-masthead-signature span { font-size: 8px; }
@@ -233,7 +232,7 @@
   .tm-nav-items { gap: 18px; }
   .tm-cover-inner { min-height: 555px; grid-template-columns: 54% 46%; }
   .tm-story { padding-left: 36px; }
-  .tm-cover-heading h2 { font-size: 7vw; }
+  .tm-cover-heading h2 { font-size: 5.9vw; }
   .tm-heading-mark { display: none; }
   .tm-picture-print { width: 75%; left: 12%; }
   .tm-picture-underprint { width: 73%; left: 14%; }
@@ -249,7 +248,7 @@
   .tm-running-center { display: none; }
   .tm-masthead-wrap { grid-template-columns: minmax(0,1fr) 65px; min-height: 103px; }
   .tm-masthead-aside { display: none; }
-  .tm-masthead { text-align: left; font-size: clamp(48px, 13vw, 96px); transform: none; }
+  .tm-masthead { text-align: left; font-size: clamp(39px, 11.5vw, 83px); transform: none; }
   .tm-masthead-signature { padding-bottom: 14px; }
   .tm-masthead-signature span { font-size: 7px; }
   .tm-masthead-signature strong { font-size: 28px; }
@@ -265,8 +264,8 @@
   .tm-story-topline { font-size: 9px; }
   .tm-cover-heading { margin-top: 17px; }
   .tm-heading-prefix { margin-bottom: 15px; font-size: 19px; }
-  .tm-cover-heading h2 { font-size: clamp(61px, 11.3vw, 89px); }
-  .tm-cover-heading h2 .tm-heading-line-two { font-size: 1.23em; }
+  .tm-cover-heading h2 { font-size: clamp(51px, 10vw, 79px); }
+  .tm-cover-heading h2 .tm-heading-line-two { font-size: 1.16em; }
   .tm-story-urdu { margin-top: 12px; font-size: clamp(21px, 5vw, 29px); }
   .tm-story-end { margin-top: 10px; padding-top: 18px; }
   .tm-story-essay { max-width: 420px; }
@@ -287,14 +286,14 @@
 @media (max-width: 480px) {
   .tm-running { font-size: 7px; }
   .tm-masthead-wrap { grid-template-columns: minmax(0,1fr) 43px; min-height: 80px; }
-  .tm-masthead { font-size: clamp(42px, 11.7vw, 60px); letter-spacing: -.09em; }
+  .tm-masthead { font-size: clamp(36px, 10.1vw, 54px); letter-spacing: -.08em; }
   .tm-masthead-signature strong { font-size: 23px; }
   .tm-masthead-signature span { font-size: 6px; }
   .tm-nav-items { justify-content: start; gap: 17px; }
   .tm-nav-index { font-size: 8px; }
   .tm-story { padding: 25px 15px 8px; }
-  .tm-cover-heading h2 { font-size: clamp(44px, 11.6vw, 62px); }
-  .tm-cover-heading h2 .tm-heading-line-three { font-size: .81em; }
+  .tm-cover-heading h2 { font-size: clamp(38px, 9.5vw, 53px); }
+  .tm-cover-heading h2 .tm-heading-line-three { font-size: .77em; }
   .tm-story-urdu { font-size: 20px; }
   .tm-story-end { gap: 9px; }
   .tm-picture-column { min-height: clamp(325px, 101vw, 465px); }
@@ -315,3 +314,11 @@
 @media (prefers-reduced-motion: reduce) {
   .tm-hero *, .tm-hero *::before, .tm-hero *::after { animation: none !important; transition: none !important; }
 }
+
+/* A distinct literary voice with enough space for the artwork. */
+.tm-hero .tm-heading-prefix, .tm-hero .tm-masthead-signature strong { font-family: 'Instrument Serif', Georgia, serif; }
+.tm-hero .tm-heading-prefix { font-size: clamp(21px, 2vw, 29px); line-height: 1.1; }
+.tm-hero .tm-cover-heading { margin-top: clamp(21px, 4vw, 42px); }
+.tm-hero .tm-essay-body > span { font-family: 'DM Sans', sans-serif; font-size: 12px; line-height: 1.5; }
+.tm-hero .tm-footer { margin-top: 18px; }
+@media (max-width: 480px) { .tm-hero .tm-heading-prefix { font-size: 21px; } }

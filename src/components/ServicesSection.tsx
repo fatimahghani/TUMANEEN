@@ -21,7 +21,7 @@ const SERVICES_LIST: ServiceItem[] = [
     id: 'brand-identity',
     number: '01',
     title: 'Brand Identity',
-    subtitle: 'Complete visual systems that make your brand unmistakable.',
+    subtitle: 'A distinct visual identity.',
     tools: 'Illustrator · Affinity',
     deliverables: [
       'Primary & Secondary Logos',
@@ -34,7 +34,7 @@ const SERVICES_LIST: ServiceItem[] = [
     id: 'packaging-design',
     number: '02',
     title: 'Packaging Design',
-    subtitle: 'Tactile labels, boxes, and print-ready dielines that stand out.',
+    subtitle: 'Packaging made to be held.',
     tools: 'Illustrator · Dimension',
     deliverables: [
       'Box & Bottle Labels',
@@ -47,7 +47,7 @@ const SERVICES_LIST: ServiceItem[] = [
     id: 'ui-ux-design',
     number: '03',
     title: 'UI/UX Design',
-    subtitle: 'Clean, intuitive websites and app interfaces designed for clarity.',
+    subtitle: 'Clear digital experiences.',
     tools: 'Figma · Prototyping',
     deliverables: [
       'Website & Landing Pages',
@@ -60,7 +60,7 @@ const SERVICES_LIST: ServiceItem[] = [
     id: 'motion-graphics',
     number: '04',
     title: 'Motion Graphics',
-    subtitle: 'Expressive animations that bring logos and campaigns to life.',
+    subtitle: 'Design in motion.',
     tools: 'After Effects · Figma',
     deliverables: [
       'Animated Logo Reveals',
@@ -178,7 +178,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
               <span>THE COMMISSION INDEX</span>
             </div>
             <span className="hidden md:inline font-serif italic normal-case tracking-[0.02em] text-sm text-[#945640]">
-              Archival Deliverables &amp; Commission Scopes
+              FOUR DISCIPLINES
             </span>
             <span className="text-[#A87B6C] shrink-0">01 — 04</span>
           </div>
@@ -192,12 +192,12 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
                 What I can make.
               </h2>
               <div className="font-serif italic text-2xl sm:text-[28px] tracking-[0.01em] text-[#945640] mt-2">
-                An index of disciplines &amp; deliverables
+                For print, screen &amp; everything between.
               </div>
             </div>
 
             <p className="font-sans text-sm text-[#945640] max-w-md leading-relaxed">
-              Select a discipline below to inspect its archival deliverables or commission a tailored scope in the studio inquiry ledger.
+              Select a discipline to begin.
             </p>
           </div>
 
@@ -248,7 +248,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
                         isSelected ? 'text-[#D9C0A8]/70' : 'text-[#A87B6C]'
                       }`}
                     >
-                      Included Deliverables
+                      INCLUDES
                     </div>
                     <ul className="space-y-2.5 mb-8">
                       {service.deliverables.map((item) => (
@@ -325,16 +325,16 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
             <div className="lg:col-span-5 flex flex-col justify-between space-y-8">
               <div>
                 <div className="text-[11px] font-sans font-medium uppercase tracking-[0.24em] text-[#D9C0A8]/75 mb-3">
-                  06 · INITIATE A PROJECT
+                  06 / INQUIRIES
                 </div>
                 <h2 className="font-display text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight text-[#F0E4D2] leading-[1.04]">
                   Let's make something.
                 </h2>
                 <div className="font-serif italic text-2xl sm:text-[28px] tracking-[0.01em] text-[#D9C0A8] mt-2">
-                  A good project starts with a conversation.
+                  Tell me what you have in mind.
                 </div>
                 <p className="font-sans text-sm text-[#D9C0A8]/80 mt-4 leading-relaxed max-w-md">
-                  Have a brand identity, packaging ritual, or digital experience in mind? Share a few notes below and I’ll respond personally within 24 hours.
+                  A few details are all we need to begin.
                 </p>
               </div>
 
@@ -342,10 +342,6 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
                 <div className="flex items-center justify-between">
                   <span className="font-mono uppercase tracking-wider text-[#D9C0A8]/60">DESIGNER</span>
                   <span className="font-medium text-[#F0E4D2]">Fatimah Ghani</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="font-mono uppercase tracking-wider text-[#D9C0A8]/60">ATELIER</span>
-                  <span className="font-medium text-[#F0E4D2]">TUMANEEN</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="font-mono uppercase tracking-wider text-[#D9C0A8]/60">SELECTED SCOPE</span>
@@ -373,7 +369,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
                 {/* Social & Portfolio Channels in Inquiry Ledger */}
                 <div className="pt-4 mt-4 border-t border-[#F0E4D2]/15">
                   <span className="block font-mono text-[10px] uppercase tracking-[0.2em] text-[#D9C0A8]/60 mb-3">
-                    SOCIAL &amp; PORTFOLIO CHANNELS
+                    ELSEWHERE
                   </span>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                     {[
@@ -406,12 +402,6 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
                           </span>
                           <ArrowUpRight className="hidden sm:block w-3.5 h-3.5 opacity-75 group-hover:opacity-100 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                         </div>
-                        <div className="flex items-center gap-1.5 sm:mt-1">
-                          <span className="font-serif italic text-xs text-[#D9C0A8]/80 group-hover:text-[#391E25]/80 truncate">
-                            {account.handle}
-                          </span>
-                          <ArrowUpRight className="sm:hidden w-3.5 h-3.5 opacity-75 group-hover:opacity-100" />
-                        </div>
                       </a>
                     ))}
                   </div>
@@ -430,7 +420,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
                     Thank you, {clientName}.
                   </h4>
                   <p className="text-xs text-[#D9C0A8]/90 font-mono max-w-lg mx-auto leading-relaxed">
-                    Your inquiry regarding {activeService.title} has been sent directly to TUMANEEN ({designerEmail}). Below is the exact information submitted:
+                    Your {activeService.title.toLowerCase()} inquiry is noted. Here's your copy:
                   </p>
                   <div className="max-w-lg mx-auto text-left bg-[#F0E4D2]/[0.04] border border-[#F0E4D2]/15 p-4 sm:p-5 space-y-2.5 text-xs font-mono text-[#D9C0A8]">
                     <div className="flex items-center justify-between gap-3">
@@ -465,7 +455,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
                       }}
                       className="px-6 py-3 text-xs font-mono uppercase tracking-wider border border-[#F0E4D2]/30 text-[#F0E4D2] hover:bg-[#F0E4D2] hover:text-[#391E25] transition-colors cursor-pointer"
                     >
-                      Send Another Inquiry
+                      Write another note
                     </button>
                   </div>
                 </div>
@@ -474,7 +464,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
                   {/* Interactive Service Selector Bar */}
                   <div>
                     <label className="block text-[11px] font-mono uppercase tracking-[0.18em] text-[#D9C0A8]/75 mb-3">
-                      01 / CHOOSE YOUR DISCIPLINE
+                      01 / PROJECT TYPE
                     </label>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                       {SERVICES_LIST.map((srv) => {
@@ -500,7 +490,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
                   {/* Name & Email */}
                   <div>
                     <label className="block text-[11px] font-mono uppercase tracking-[0.18em] text-[#D9C0A8]/75 mb-3">
-                      02 / INTRODUCE YOURSELF
+                      02 / YOUR DETAILS
                     </label>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <input
@@ -525,7 +515,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
                   {/* Project Notes */}
                   <div>
                     <label className="block text-[11px] font-mono uppercase tracking-[0.18em] text-[#D9C0A8]/75 mb-3">
-                      03 / TELL ME THE IDEA
+                      03 / YOUR IDEA
                     </label>
                     <textarea
                       rows={4}
@@ -544,7 +534,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
                     <Send className="w-3.5 h-3.5" />
                     <span>
                       {isSending
-                        ? 'Transmitting to Studio Gmail...'
+                        ? 'Sending...'
                         : `Send ${activeService.title} Inquiry`}
                     </span>
                   </button>
