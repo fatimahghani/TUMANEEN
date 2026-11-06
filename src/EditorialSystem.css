@@ -265,12 +265,40 @@
   box-shadow: 13px 13px 0 rgba(93,24,43,.25);
   border-radius: 0;
 }
-.tm-process-card img[alt=""] { opacity: .08; }
-.tm-process-card img:not([alt=""]) {
-  filter: sepia(.28) saturate(.64) contrast(1.12) brightness(.88) !important;
+.tm-process-artboard {
+  position: absolute; inset: 0; overflow: hidden;
+  color: #f0e4d2;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 76px, rgba(240,228,210,.08) 77px, transparent 78px),
+    repeating-linear-gradient(0deg, transparent 0 76px, rgba(240,228,210,.07) 77px, transparent 78px),
+    #5d182b;
 }
-.tm-process-card > div[class*="mix-blend-screen"] { display: none; }
-.tm-process-card > div[class*="backdrop-blur"] {
+.tm-process-card[data-step="02"] .tm-process-artboard,
+.tm-process-card[data-step="04"] .tm-process-artboard { background-color: #945640; }
+.tm-process-card[data-step="03"] .tm-process-artboard { background-color: #391e25; }
+.tm-process-artboard::before {
+  content: ''; position: absolute; width: 64%; aspect-ratio: 1; left: 18%; top: 21%;
+  border: 1px solid rgba(240,228,210,.37); border-radius: 50%;
+  box-shadow: 0 0 0 26px rgba(240,228,210,.036), 0 0 0 53px rgba(240,228,210,.04);
+}
+.tm-process-artboard-series {
+  position: absolute; left: 26px; top: 58px;
+  font: 500 9px/1.4 'DM Mono', monospace; letter-spacing: .12em; opacity: .65;
+}
+.tm-process-artboard-number {
+  position: absolute; bottom: 16%; right: -1%;
+  font: italic 600 clamp(240px, 27vw, 395px)/.65 'Cormorant Garamond', Georgia, serif;
+  letter-spacing: -.13em; color: rgba(240,228,210,.14); transform: rotate(-10deg);
+}
+.tm-process-artboard-sidenote {
+  position: absolute; right: 16px; top: 26%; writing-mode: vertical-rl;
+  font: 500 9px/1.4 'DM Mono', monospace; letter-spacing: .08em; opacity: .55;
+}
+.tm-process-artboard-registration {
+  position: absolute; bottom: 21%; left: 25px; font: 500 28px/1 'DM Mono', monospace;
+  opacity: .8; letter-spacing: .1em;
+}
+ .tm-process-card > div[class*="backdrop-blur"] {
   backdrop-filter: none;
   border-radius: 0;
   background: rgba(57, 30, 37, .93) !important;
