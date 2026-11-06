@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 @theme {
-  --font-display: "Bodoni Moda", Georgia, serif;
-  --font-serif: "Instrument Serif", Georgia, serif;
-  --font-sans: "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono: "DM Mono", monospace;
+  --font-display: "Fraunces", Georgia, serif;
+  --font-serif: "Fraunces", Georgia, serif;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: "Inter", sans-serif;
 
   --color-canvas: #E9DCC5;
   --color-beige: #D9C0A8;
@@ -638,7 +638,7 @@
   box-sizing: border-box;
   color: #1f1f1f;
   cursor: pointer;
-  font-family: 'Roboto', var(--font-sans), arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: 14px;
   height: 40px;
   letter-spacing: 0.25px;
@@ -680,7 +680,7 @@
 .gsi-material-button .gsi-material-button-contents {
   -webkit-flex-grow: 1;
   flex-grow: 1;
-  font-family: 'Roboto', var(--font-sans), arial, sans-serif;
+  font-family: var(--font-sans);
   font-weight: 500;
   overflow: hidden;
   text-overflow: ellipsis;

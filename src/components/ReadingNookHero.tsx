@@ -49,9 +49,7 @@ export const ReadingNookHero: React.FC<ReadingNookHeroProps> = ({
 
         <header className="tm-header">
           <div className="tm-masthead-wrap">
-            <div className="tm-masthead-aside" aria-hidden="true">
-              <span lang="ur" dir="rtl">دفترِ نقش</span>
-            </div>
+            <div className="tm-masthead-aside" aria-hidden="true" />
             <h1 id="tm-hero-title" className="tm-masthead">TUMANEEN<span aria-hidden="true">.</span></h1>
             <div className="tm-masthead-signature">
               <span>ISSUE Nº 001</span>
@@ -104,7 +102,7 @@ export const ReadingNookHero: React.FC<ReadingNookHeroProps> = ({
               <div className="tm-story-end">
                 <p className="tm-story-essay">
                   <span className="tm-essay-body">
-                    <strong>SHANAKHT / شناخت</strong>
+                    <strong>SHANAKHT</strong>
                     <span>Identity, in the streets of Androon Lahore.</span>
                   </span>
                 </p>
@@ -115,7 +113,6 @@ export const ReadingNookHero: React.FC<ReadingNookHeroProps> = ({
             </div>
 
             <div className="tm-picture-column">
-              <span className="tm-urdu-backdrop" lang="ur" dir="rtl" aria-hidden="true">شناخت</span>
               <span className="tm-picture-notch tm-picture-notch-top" aria-hidden="true" />
               <span className="tm-picture-notch tm-picture-notch-bottom" aria-hidden="true" />
               <div className="tm-picture-underprint" aria-hidden="true" />
@@ -143,8 +140,8 @@ export const ReadingNookHero: React.FC<ReadingNookHeroProps> = ({
         </div>
 
         <footer className="tm-footer">
-          <span>FATIMAH GHANI / VISUAL DESIGNER</span>
-          <span lang="ur" dir="rtl">ایک بصری ڈائری</span>
+          <span className="tm-footer-wordmark">tumaneen.</span>
+          <span className="tm-footer-designer">FATIMAH GHANI / VISUAL DESIGNER</span>
           <a href="#posters" onClick={(event) => goTo(event, 'posters')}>
             TURN THE PAGE <ArrowDownRight size={15} strokeWidth={1.8} aria-hidden="true" />
           </a>

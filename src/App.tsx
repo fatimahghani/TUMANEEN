@@ -186,8 +186,8 @@ export default function App() {
               onClick={() => scrollToSection('home')}
               className="group flex items-center gap-3 text-left cursor-pointer shrink-0"
             >
-              <span className="font-display text-sm sm:text-[17px] tracking-[0.14em] sm:tracking-[0.16em] uppercase text-[#F0E4D2] group-hover:text-[#D9C0A8] transition-colors">
-                TUMANEEN. 
+              <span className="font-display text-sm sm:text-[17px] text-[#F0E4D2] group-hover:text-[#D9C0A8] transition-colors">
+                tumaneen.
               </span>
               <span className="hidden sm:inline-block h-3.5 w-px bg-[#F0E4D2]/20" />
               <span className="hidden lg:inline-block font-serif italic text-xs tracking-[0.04em] text-[#D9C0A8]/75">
