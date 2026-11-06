@@ -441,8 +441,8 @@ export const PosterSection: React.FC = () => {
     <section
       id="posters"
       ref={sectionRef}
-      data-lens-bloom=""
-      aria-label="My Posters"
+      data-lens-bloom="" data-editorial-posters=""
+      aria-label="The Poster Index"
       className="relative h-[100svh] min-h-[580px] w-full !cursor-default"
     >
       <div
@@ -459,12 +459,12 @@ export const PosterSection: React.FC = () => {
           className="absolute top-0 left-0 right-0 z-[630] flex items-center justify-between px-4 sm:px-12 lg:px-[clamp(24px,7vw,100px)] py-5 sm:py-7 pointer-events-auto"
         >
           <div className="flex items-center gap-3">
-            <span className="font-sans text-[10px] sm:text-[11px] font-medium uppercase tracking-[0.22em] sm:tracking-[0.26em] text-[#FDFBD4]/65">
-              01 · POSTER ARCHIVE
+            <span className="font-sans text-[10px] sm:text-[11px] font-medium uppercase tracking-[0.22em] sm:tracking-[0.26em] text-[#F0E4D2]/65">
+              01 / THE POSTER INDEX
             </span>
-            <span className="hidden sm:inline-block h-1 w-1 rounded-full bg-[#D9D7B6]/40" />
-            <span className="hidden sm:inline-block font-serif italic text-[16px] sm:text-[19px] tracking-[0.02em] text-[#D9D7B6]/90">
-              Curated by color &amp; theme · Hover or tap any poster to inspect full frame
+            <span className="hidden sm:inline-block h-1 w-1 rounded-full bg-[#D9C0A8]/40" />
+            <span className="hidden sm:inline-block font-serif italic text-[16px] sm:text-[19px] tracking-[0.02em] text-[#D9C0A8]/90">
+              Eight collected experiments in culture, color and form.
             </span>
           </div>
 
@@ -475,8 +475,8 @@ export const PosterSection: React.FC = () => {
                 e.stopPropagation();
                 controlsRef.current?.replayBloom();
               }}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-mono uppercase tracking-[0.18em] text-[#FDFBD4]/70 hover:text-[#FDFBD4] border border-[#FDFBD4]/15 hover:border-[#FDFBD4]/40 transition-colors cursor-pointer bg-[#122629]/50 backdrop-blur-sm"
-              title="Replay Bloom Animation"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-mono uppercase tracking-[0.18em] text-[#F0E4D2]/70 hover:text-[#F0E4D2] border border-[#F0E4D2]/15 hover:border-[#F0E4D2]/40 transition-colors cursor-pointer bg-[#391E25]/50 backdrop-blur-sm"
+              title="Replay print sequence"
             >
               <Sparkles className="w-3 h-3" />
               Bloom
@@ -548,22 +548,22 @@ export const PosterSection: React.FC = () => {
           className="pointer-events-auto absolute inset-x-0 bottom-4 sm:bottom-7 z-[650] flex flex-col items-center justify-center gap-2.5 px-4 sm:px-6 text-center"
         >
           {hoveredPoster ? (
-            <div className="bg-[#122629]/92 backdrop-blur-md border border-[#FDFBD4]/20 px-4 sm:px-6 py-2.5 sm:py-3 shadow-[0_20px_50px_rgba(0,0,0,0.5)] transition-all duration-200 max-w-[92vw] sm:max-w-xl">
-              <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5 text-xs sm:text-base font-display text-[#FDFBD4]">
+            <div className="bg-[#391E25]/92 backdrop-blur-md border border-[#F0E4D2]/20 px-4 sm:px-6 py-2.5 sm:py-3 shadow-[0_20px_50px_rgba(0,0,0,0.5)] transition-all duration-200 max-w-[92vw] sm:max-w-xl">
+              <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5 text-xs sm:text-base font-display text-[#F0E4D2]">
                 <span>{hoveredPoster.name}</span>
-                <span className="text-[#D9D7B6]/40">·</span>
-                <span className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.18em] text-[#D9D7B6]/80">
+                <span className="text-[#D9C0A8]/40">·</span>
+                <span className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.18em] text-[#D9C0A8]/80">
                   {hoveredPoster.project}
                 </span>
               </div>
-              <p className="mt-1 font-serif italic text-xs sm:text-base text-[#D9D7B6]/90 line-clamp-2 sm:line-clamp-none">
+              <p className="mt-1 font-serif italic text-xs sm:text-base text-[#D9C0A8]/90 line-clamp-2 sm:line-clamp-none">
                 {hoveredPoster.description}
               </p>
             </div>
           ) : (
             <div ref={hintRef} className="lb-hint !static !transform-none" aria-hidden="true">
               <span className="lb-hint-track !h-3.5 sm:!h-[22px]" />
-              <span className="lb-hint-label">Hover or tap any poster to open</span>
+              <span className="lb-hint-label">SELECT A PRINT TO VIEW / TAP OR HOVER</span>
             </div>
           )}
         </div>

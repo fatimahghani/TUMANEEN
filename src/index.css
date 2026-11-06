@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 @theme {
-  --font-display: "Fraunces", Georgia, serif;
-  --font-serif: "Fraunces", Georgia, serif;
-  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono: "Inter", "JetBrains Mono", monospace;
+  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-serif: "Cormorant Garamond", Georgia, serif;
+  --font-sans: "Archivo Narrow", "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: "DM Mono", "JetBrains Mono", monospace;
 
   --color-canvas: #FDFBD4;
   --color-beige: #D9D7B6;
