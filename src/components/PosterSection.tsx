@@ -463,9 +463,6 @@ export const PosterSection: React.FC = () => {
               01 / THE POSTER INDEX
             </span>
             <span className="hidden sm:inline-block h-1 w-1 rounded-full bg-[#D9C0A8]/40" />
-            <span className="hidden sm:inline-block font-serif italic text-[16px] sm:text-[19px] tracking-[0.02em] text-[#D9C0A8]/90">
-              Eight collected experiments in culture, color and form.
-            </span>
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
@@ -556,14 +553,11 @@ export const PosterSection: React.FC = () => {
                   {hoveredPoster.project}
                 </span>
               </div>
-              <p className="mt-1 font-serif italic text-xs sm:text-base text-[#D9C0A8]/90 line-clamp-2 sm:line-clamp-none">
-                {hoveredPoster.description}
-              </p>
             </div>
           ) : (
             <div ref={hintRef} className="lb-hint !static !transform-none" aria-hidden="true">
               <span className="lb-hint-track !h-3.5 sm:!h-[22px]" />
-              <span className="lb-hint-label">SELECT A PRINT TO VIEW / TAP OR HOVER</span>
+              <span className="lb-hint-label">HOVER OR TAP TO VIEW</span>
             </div>
           )}
         </div>
