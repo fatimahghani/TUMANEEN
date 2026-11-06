@@ -178,7 +178,7 @@ export default function App() {
             : 'opacity-0 -translate-y-3 pointer-events-none'
         }`}
       >
-        <div className="tm-floating-surface relative bg-[#391E25]/95 text-[#F0E4D2] border-b border-[#F0E4D2]/15">
+        <div className="tm-floating-surface relative bg-[#4B2830] text-[#EFE6D6] border-b border-[#F0E4D2]/15">
           <div className="w-full max-w-[1280px] mx-auto px-4 sm:px-6 md:px-12 h-14 sm:h-16 flex items-center justify-between gap-3 sm:gap-6">
             {/* Left Brand Identity Lockup */}
             <button

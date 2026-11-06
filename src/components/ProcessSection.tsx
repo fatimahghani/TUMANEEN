@@ -201,7 +201,7 @@ export const ProcessSection: React.FC = () => {
       id="process"
       ref={sectionRef}
       aria-label="How the work happens"
-      className="tm-process relative w-full h-[3000px] bg-[#F0E4D2] text-[#5D182B] select-none"
+      className="tm-process relative w-full h-[3000px] bg-[#EFE6D6] text-[#24201D] select-none"
     >
       {/* Continuous Vertical Architectural Studio Margin Lines */}
       <div
@@ -370,6 +370,7 @@ export const ProcessSection: React.FC = () => {
               return (
                 <button
                   key={card.number}
+                  aria-current={isCurrent ? 'step' : undefined}
                   type="button"
                   onClick={() => scrollToCardIndex(idx)}
                   className={`

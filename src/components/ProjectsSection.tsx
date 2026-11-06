@@ -624,7 +624,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
     <section
       id="project"
       aria-label="Selected Projects"
-      className="tm-projects portfolio-section relative bg-[#5D182B]"
+      className="tm-projects portfolio-section relative bg-[#EFE6D6]"
     >
       <header className="tm-projects-intro">
         <div className="tm-projects-kicker"><span>02 / SELECTED WORK</span><span>TUMANEEN / VOL. I</span></div>
