@@ -6,10 +6,10 @@
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: "Inter", sans-serif;
 
-  --color-canvas: #E9DCC5;
-  --color-beige: #D9C0A8;
-  --color-taupe: #A87B6C;
-  --color-olive: #5D182B;
+  --color-canvas: #EFE6D6;
+  --color-beige: #B68A76;
+  --color-taupe: #75735B;
+  --color-olive: #75735B;
 }
 
 @layer base {
@@ -18,8 +18,8 @@
   }
 
   body {
-    background-color: #E9DCC5;
-    color: #391E25;
+    background-color: #EFE6D6;
+    color: #24201D;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;

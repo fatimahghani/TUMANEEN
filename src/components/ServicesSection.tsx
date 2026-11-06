@@ -157,7 +157,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
         id="services"
         data-editorial-services=""
         aria-label="Design Services"
-        className="tm-services relative pt-10 pb-20 md:pt-14 md:pb-24 bg-[#F0E4D2] text-[#5D182B] overflow-hidden"
+        className="tm-services relative pt-10 pb-20 md:pt-14 md:pb-24 bg-[#EFE6D6] text-[#24201D] overflow-hidden"
       >
         {/* Continuous Vertical Architectural Studio Margin Lines */}
         <div
@@ -208,6 +208,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
               return (
                 <div
                   key={service.id}
+                  data-selected={isSelected}
                   onClick={() => setSelectedServiceId(service.id)}
                   className={`tm-service-card group relative flex flex-col justify-between p-7 md:p-8 min-h-[390px] transition-all duration-300 cursor-pointer ${
                     isSelected
@@ -296,7 +297,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
         id="contact-form"
         data-editorial-contact=""
         aria-label="Start a Project"
-        className="relative bg-[#391E25] text-[#F0E4D2] pt-24 pb-14 md:pt-32 md:pb-16 overflow-hidden"
+        className="relative bg-[#4B2830] text-[#EFE6D6] pt-24 pb-14 md:pt-32 md:pb-16 overflow-hidden"
       >
         {/* Top Atmospheric Transition Veil from Parchment into Deep Studio */}
         <div

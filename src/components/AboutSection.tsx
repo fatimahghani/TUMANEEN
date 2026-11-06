@@ -19,7 +19,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onContactClick }) =>
     <section
       id="about"
       aria-label="About Fatimah Ghani"
-      className="tm-about relative pt-12 pb-16 md:pt-16 md:pb-20 bg-[#F0E4D2] text-[#5D182B] overflow-hidden"
+      className="tm-about relative pt-12 pb-16 md:pt-16 md:pb-20 bg-[#EFE6D6] text-[#24201D] overflow-hidden"
     >
       {/* Continuous Vertical Architectural Studio Margin Lines */}
       <div
