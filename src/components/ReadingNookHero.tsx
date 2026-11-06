@@ -82,7 +82,7 @@ export const ReadingNookHero: React.FC<ReadingNookHeroProps> = ({
           </div>
         </header>
 
-        <main className="tm-cover">
+        <div className="tm-cover">
           <span className="tm-cover-rail" aria-hidden="true">TUMANEEN / COVER STORY / 001</span>
           <div className="tm-cover-inner">
             <div className="tm-story">
@@ -147,7 +147,7 @@ export const ReadingNookHero: React.FC<ReadingNookHeroProps> = ({
             <span>ANDROON LAHORE — PAKISTAN</span>
             <span className="tm-cover-baseline-star" aria-hidden="true">✳</span>
           </div>
-        </main>
+        </div>
 
         <div className="tm-afterword">
           <div className="tm-afterword-number" aria-hidden="true">01<span>/</span></div>
