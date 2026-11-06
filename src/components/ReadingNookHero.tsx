@@ -44,7 +44,6 @@ export const ReadingNookHero: React.FC<ReadingNookHeroProps> = ({
       <div className="tm-sheet">
         <div className="tm-running">
           <span>AN INDEPENDENT VISUAL NOTEBOOK</span>
-          <span className="tm-running-center">ART / TYPE / IDENTITY / ALL THE IN-BETWEEN</span>
           <span>VOLUME I <span aria-hidden="true">—</span> 2026</span>
         </div>
 
@@ -52,13 +51,11 @@ export const ReadingNookHero: React.FC<ReadingNookHeroProps> = ({
           <div className="tm-masthead-wrap">
             <div className="tm-masthead-aside" aria-hidden="true">
               <span lang="ur" dir="rtl">دفترِ نقش</span>
-              <span>NOTES ON<br />MAKING &amp; MEANING</span>
             </div>
             <h1 id="tm-hero-title" className="tm-masthead">TUMANEEN<span aria-hidden="true">.</span></h1>
             <div className="tm-masthead-signature">
               <span>ISSUE Nº 001</span>
               <strong>FG.</strong>
-              <span>A VISUAL DIARY</span>
             </div>
           </div>
 
@@ -83,17 +80,17 @@ export const ReadingNookHero: React.FC<ReadingNookHeroProps> = ({
         </header>
 
         <div className="tm-cover">
-          <span className="tm-cover-rail" aria-hidden="true">TUMANEEN / COVER STORY / 001</span>
+          <span className="tm-cover-rail" aria-hidden="true">COVER STORY / II</span>
           <div className="tm-cover-inner">
             <div className="tm-story">
               <div className="tm-story-topline">
                 <span>THE COVER STORY</span>
                 <span className="tm-story-rule" aria-hidden="true" />
-                <span>02 / 08</span>
+                <span>SHANAKHT / II</span>
               </div>
 
               <div className="tm-cover-heading">
-                <p className="tm-heading-prefix">On belonging, memory &amp; a city.</p>
+                <p className="tm-heading-prefix">A story of belonging.</p>
                 <h2>
                   <span className="tm-heading-line-one">The address</span>
                   <span className="tm-heading-line-two">changed.</span>
@@ -106,15 +103,13 @@ export const ReadingNookHero: React.FC<ReadingNookHeroProps> = ({
 
               <div className="tm-story-end">
                 <p className="tm-story-essay">
-                  <span className="tm-essay-initial" aria-hidden="true">S</span>
                   <span className="tm-essay-body">
                     <strong>SHANAKHT / شناخت</strong>
-                    <span>A poster about identity and the streets of Androon Lahore.
-                      One of the pieces in my growing collection of visual notes.</span>
+                    <span>Identity, in the streets of Androon Lahore.</span>
                   </span>
                 </p>
                 <a href="#posters" onClick={(event) => goTo(event, 'posters')} className="tm-cover-link">
-                  SEE THE POSTER ARCHIVE <ArrowUpRight size={16} aria-hidden="true" />
+                  VIEW THE PRINTS <ArrowUpRight size={16} aria-hidden="true" />
                 </a>
               </div>
             </div>
@@ -134,42 +129,21 @@ export const ReadingNookHero: React.FC<ReadingNookHeroProps> = ({
                 />
                 <figcaption className="tm-picture-caption">
                   <span>PLATE II</span>
-                  <span>SHANAKHT / ORIGINAL ARTWORK</span>
+                  <span>FATIMAH GHANI</span>
                 </figcaption>
               </figure>
               <div className="tm-picture-index" aria-hidden="true">II.</div>
-              <span className="tm-picture-vertical" aria-hidden="true">THE ADDRESS CHANGED / THE IDENTITY DID NOT</span>
             </div>
           </div>
 
           <div className="tm-cover-baseline">
             <span>FIG. 02 / CULTURAL IDENTITY · URDU TYPOGRAPHY</span>
-            <span>ANDROON LAHORE — PAKISTAN</span>
             <span className="tm-cover-baseline-star" aria-hidden="true">✳</span>
           </div>
         </div>
 
-        <div className="tm-afterword">
-          <div className="tm-afterword-number" aria-hidden="true">01<span>/</span></div>
-          <div className="tm-afterword-copy">
-            <span className="tm-label">FROM THE DESK OF FATIMAH GHANI</span>
-            <p>Things I made.<br /><em>Things I kept thinking about.</em></p>
-          </div>
-          <div className="tm-afterword-body">
-            <p>TUMANEEN is my ongoing index of posters, identities, experiments
-              and happy accidents. More sketchbook than showroom.</p>
-            <a href="#about" onClick={(event) => goTo(event, 'about')}>MEET THE DESIGNER <ArrowUpRight size={14} aria-hidden="true" /></a>
-          </div>
-          <div className="tm-contents">
-            <span className="tm-label">IN THIS EDITION</span>
-            <a href="#posters" onClick={(event) => goTo(event, 'posters')}><span>01</span> THE POSTER ARCHIVE <ArrowUpRight size={13} aria-hidden="true" /></a>
-            <a href="#project" onClick={(event) => goTo(event, 'project')}><span>02</span> SELECTED PROJECTS <ArrowUpRight size={13} aria-hidden="true" /></a>
-            <a href="#process" onClick={(event) => goTo(event, 'process')}><span>03</span> HOW I WORK <ArrowUpRight size={13} aria-hidden="true" /></a>
-          </div>
-        </div>
-
         <footer className="tm-footer">
-          <span>FATIMAH GHANI / GRAPHIC DESIGN &amp; VISUAL IDENTITY</span>
+          <span>FATIMAH GHANI / VISUAL DESIGNER</span>
           <span lang="ur" dir="rtl">ایک بصری ڈائری</span>
           <a href="#posters" onClick={(event) => goTo(event, 'posters')}>
             TURN THE PAGE <ArrowDownRight size={15} strokeWidth={1.8} aria-hidden="true" />
