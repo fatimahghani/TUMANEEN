@@ -1,0 +1,548 @@
+/*
+ * TUMANEEN / VOL. I
+ * A site-wide design system borrowed from ink, journals, South Asian print,
+ * and the existing Shanakht-led editorial cover.
+ *
+ * Intentionally scoped. Artwork and scroll interactions are not restyled
+ * into generic cards, nor are the source image files touched.
+ */
+
+.tm-site {
+  --tm-paper: #e9dcc5;
+  --tm-paper-light: #f0e4d2;
+  --tm-paper-deep: #d9c0a8;
+  --tm-ink: #391e25;
+  --tm-wine: #5d182b;
+  --tm-red: #b95038;
+  --tm-rust: #945640;
+  --tm-soft-rule: rgba(57, 30, 37, .24);
+  --tm-light-rule: rgba(240, 228, 210, .34);
+  color: var(--tm-ink);
+  background: var(--tm-paper);
+  font-family: 'Archivo Narrow', 'Inter', sans-serif;
+  letter-spacing: .007em;
+}
+.tm-site ::selection { background: var(--tm-wine); color: var(--tm-paper-light); }
+.tm-site :is(button, a, input, textarea, [role="button"]):focus-visible {
+  outline: 2px solid var(--tm-red);
+  outline-offset: 3px;
+}
+.tm-site :is(.font-display, .font-serif) { font-family: 'Cormorant Garamond', Georgia, serif; }
+.tm-site :is(.font-mono, [class*="font-mono"]) { font-family: 'DM Mono', monospace; }
+.tm-site :is(h1, h2, h3, h4) { text-wrap: balance; }
+.tm-page-turn-flash {
+  background: linear-gradient(105deg, rgba(93, 24, 43, .94), rgba(160, 79, 59, .56) 52%, rgba(233, 220, 197, .12));
+  border-right: 3px solid var(--tm-paper-light);
+}
+
+/* Sticky navigation: not a glassy product header, a magazine's running index. */
+.tm-site [data-editorial-nav] .tm-floating-surface {
+  background: rgba(57, 30, 37, .97);
+  color: var(--tm-paper-light);
+  border-bottom: 2px solid #b95038;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+.tm-site [data-editorial-nav] .tm-floating-surface > div:first-child {
+  min-height: 66px;
+  max-width: 1440px;
+}
+.tm-site [data-editorial-nav] .tm-floating-surface > div:first-child > button:first-child > span:first-child {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 700;
+  font-size: clamp(24px, 2.4vw, 35px);
+  text-transform: none;
+  letter-spacing: -.06em;
+}
+.tm-site [data-editorial-nav] nav button {
+  font-family: 'Archivo Narrow', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .035em;
+}
+.tm-site [data-editorial-nav] button:last-child:focus-visible { outline-color: var(--tm-paper); }
+.tm-site [data-editorial-nav] .tm-floating-surface > div:first-child > button:last-child {
+  border: 1px solid var(--tm-paper-light);
+  background: transparent;
+  color: var(--tm-paper-light);
+  padding: 11px 15px;
+  box-shadow: none;
+}
+.tm-site [data-editorial-nav] .tm-floating-surface > div:first-child > button:last-child:hover {
+  background: var(--tm-paper-light);
+  color: var(--tm-wine);
+}
+
+/* 01 — A dimly inked, gallery-like poster index. Keep the original interaction. */
+.tm-site #posters[data-lens-bloom] {
+  --lb-stage: #5d182b;
+  --lb-stage-deep: #391e25;
+  --lb-text: #f0e4d2;
+  --lb-muted: rgba(240, 228, 210, .7);
+  --lb-faint: rgba(240, 228, 210, .6);
+  --lb-line: rgba(240, 228, 210, .32);
+  --lb-glow: rgba(240, 228, 210, .36);
+  background: #5d182b;
+  color: #f0e4d2;
+  box-shadow: inset 0 12px 0 #391e25;
+}
+.tm-site #posters[data-lens-bloom]::after {
+  content: 'TUMANEEN    /    FOLIO 01';
+  pointer-events: none; position: absolute; z-index: 500;
+  right: 19px; top: 50%; writing-mode: vertical-rl;
+  color: rgba(240, 228, 210, .48);
+  font: 500 9px/1 'DM Mono', monospace;
+  letter-spacing: .16em;
+}
+.tm-site #posters .lb-word {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 500;
+  letter-spacing: -.065em;
+  color: #f0e4d2;
+  font-size: clamp(72px, 12vw, 210px);
+  line-height: .79;
+}
+.tm-site #posters .lb-word-l { font-style: italic; }
+.tm-site #posters .lb-word-r { font-weight: 650; }
+.tm-site #posters .lb-card {
+  border-radius: 0;
+  border: 7px solid #e9dcc5;
+  box-shadow: 10px 18px 35px rgba(27, 4, 13, .42), 0 0 0 1px rgba(255, 245, 225, .2);
+}
+.tm-site #posters .lb-hint-label {
+  font-family: 'DM Mono', monospace;
+  letter-spacing: .08em;
+  color: rgba(240, 228, 210, .75);
+  font-size: 9px;
+}
+.tm-site #posters [data-lb-ui] { border-bottom: 1px solid rgba(240, 228, 210, .22); }
+.tm-site #posters [data-lb-ui] > div:first-child > span:first-child {
+  color: #f0e4d2;
+  font: 500 10px/1.2 'DM Mono', monospace;
+  letter-spacing: .05em;
+}
+.tm-site #posters [data-lb-ui] span.font-serif {
+  font: italic 19px/1.1 'Cormorant Garamond', Georgia, serif;
+  color: #d9c0a8;
+}
+.tm-site #posters [data-lb-ui] button {
+  border: 1px solid rgba(240, 228, 210, .5);
+  background: transparent; color: #f0e4d2;
+  backdrop-filter: none;
+  border-radius: 0;
+}
+.tm-site #posters [data-lb-ui] button:hover { background: #f0e4d2; color: #5d182b; }
+.tm-site #posters .lb-cardtitle { font-family: 'Cormorant Garamond', Georgia, serif; }
+.tm-site #posters .lb-cap { font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; }
+.tm-site #posters .lb-card + .lb-card { outline: 0; }
+
+/* A transition with editorial purpose, not a generic cinematic gradient. */
+.tm-bridge {
+  position: relative; overflow: hidden;
+  background: var(--tm-paper);
+  color: var(--tm-ink);
+  padding: 0 0 clamp(45px, 6vw, 95px);
+}
+.tm-bridge::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .27;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='.18'/%3E%3C/svg%3E");
+  background-size: 150px;
+}
+.tm-bridge-inner { width: min(calc(100% - 88px), 1440px); position: relative; margin: 0 auto; }
+.tm-bridge-running, .tm-bridge-footer {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  border-top: 1px solid var(--tm-ink); border-bottom: 1px solid var(--tm-ink);
+  padding: 12px 0; font: 500 10px/1.3 'DM Mono', monospace;
+  letter-spacing: .06em;
+}
+.tm-bridge-running { margin-top: 0; border-top: 0; }
+.tm-bridge-footer { border-bottom: 0; }
+.tm-bridge-layout {
+  display: grid; grid-template-columns: minmax(65px, .8fr) minmax(0, 5.4fr) minmax(240px, 3.4fr);
+  gap: clamp(16px, 3.5vw, 54px);
+  padding: clamp(52px, 7vw, 110px) 0 clamp(45px, 7vw, 95px);
+}
+.tm-bridge-issue { color: var(--tm-red); font: italic 500 clamp(100px, 11vw, 190px)/.7 'Cormorant Garamond', Georgia, serif; letter-spacing: -.13em; }
+.tm-bridge-issue span { font-size: .7em; }
+.tm-bridge-kicker { display: block; padding-bottom: 14px; border-bottom: 1px solid var(--tm-soft-rule); font: 500 10px/1.4 'DM Mono', monospace; letter-spacing: .08em; }
+.tm-bridge-statement h2 {
+  margin: 18px 0 5px; color: var(--tm-wine);
+  font: 550 clamp(69px, 7.7vw, 130px)/.80 'Cormorant Garamond', Georgia, serif;
+  letter-spacing: -.072em;
+}
+.tm-bridge-statement h2 em { color: var(--tm-red); font-weight: 400; }
+.tm-bridge-urdu { color: var(--tm-rust); font: 500 clamp(18px, 2.1vw, 31px)/2.1 'Noto Nastaliq Urdu', serif; margin-top: 15px; }
+.tm-bridge-notes { padding: 35px 0 0; }
+.tm-bridge-notes-top {
+  display: flex; justify-content: space-between; align-items: center; border-top: 3px double var(--tm-ink);
+  padding-top: 12px; margin-bottom: 32px; color: var(--tm-red);
+  font: 500 10px/1.3 'DM Mono', monospace;
+}
+.tm-bridge-notes p { margin: 0 0 19px; max-width: 325px; color: #53363b; font: 500 clamp(18px, 1.9vw, 26px)/1.22 'Archivo Narrow', sans-serif; }
+.tm-bridge-notes p + p { font-size: clamp(15px, 1.3vw, 18px); line-height: 1.4; }
+.tm-bridge-notes button {
+  display: inline-flex; align-items: center; justify-content: space-between; gap: 15px; width: 100%; max-width: 345px;
+  background: var(--tm-wine); color: var(--tm-paper-light); border: 1px solid var(--tm-wine);
+  padding: 15px; font: 500 10px/1.3 'DM Mono', monospace; cursor: pointer; transition: background .2s;
+}
+.tm-bridge-notes button:hover { background: var(--tm-ink); }
+.tm-bridge-small { display: block; margin-top: 15px; font: 500 9px/1.3 'DM Mono', monospace; color: var(--tm-rust); }
+
+/* 02 — the portfolio is a sequence of art-directed plates. */
+.tm-projects { background: var(--tm-wine); }
+.tm-projects-intro {
+  padding: 25px max(44px, calc((100vw - 1440px) / 2)) clamp(50px, 7.8vw, 115px);
+  background: #e9dcc5; color: var(--tm-ink);
+}
+.tm-projects-kicker {
+  display: flex; justify-content: space-between; align-items: center; gap: 15px;
+  border-top: 3px double var(--tm-ink); border-bottom: 1px solid var(--tm-ink);
+  padding: 12px 0; font: 500 10px/1.25 'DM Mono', monospace;
+}
+.tm-projects-title-row {
+  display: flex; justify-content: space-between; align-items: end; gap: 30px;
+  padding-top: clamp(25px, 5vw, 68px);
+}
+.tm-projects-title-row h2 {
+  margin: 0; color: var(--tm-wine);
+  font: 550 clamp(80px, 11vw, 170px)/.76 'Cormorant Garamond', Georgia, serif;
+  letter-spacing: -.07em;
+}
+.tm-projects-title-row h2 em { font-weight: 400; color: var(--tm-red); }
+.tm-projects-title-row p { margin: 0; max-width: 235px; font: italic 23px/1.08 'Cormorant Garamond', Georgia, serif; }
+.tm-projects-title-row p span { display: block; padding-top: 17px; font: 500 9px/1.4 'DM Mono', monospace; color: var(--tm-rust); letter-spacing: .05em; }
+.tm-project-spread { background: var(--tm-wine); }
+.tm-project-spread::after {
+  position: absolute; content: 'TUMANEEN / FOLIO 02'; pointer-events: none; z-index: 8;
+  right: 13px; bottom: 105px; color: rgba(240,228,210,.55);
+  font: 500 9px/1 'DM Mono', monospace;
+  letter-spacing: .13em; writing-mode: vertical-rl;
+}
+.tm-project-spread h3 {
+  font: 600 clamp(46px, 6vw, 104px)/.84 'Cormorant Garamond', Georgia, serif;
+  letter-spacing: -.055em;
+  text-shadow: 0 2px 12px rgba(35, 4, 14, .28);
+}
+.tm-project-spread .font-serif { font-size: clamp(18px, 1.7vw, 26px); }
+.tm-project-spread [class*="rounded-"] { border-radius: 0; }
+.tm-project-spread [class*="backdrop-blur"] { backdrop-filter: none; }
+.tm-projects > div:nth-of-type(2) {
+  background: var(--tm-ink); border-top: 2px solid var(--tm-red);
+}
+.tm-projects > div:nth-of-type(2) p.font-serif { font-size: clamp(19px, 2vw, 27px); }
+.tm-project-archive-dialog { background: rgba(57, 30, 37, .99); backdrop-filter: none; }
+.tm-project-archive-dialog h2 { font: 550 clamp(44px, 6vw, 88px)/.88 'Cormorant Garamond', Georgia, serif; letter-spacing: -.04em; }
+.tm-project-archive-dialog [role="button"] {
+  border: 1px solid rgba(240,228,210,.35);
+  background: rgba(240,228,210,.06);
+  box-shadow: none;
+}
+.tm-project-archive-dialog [role="button"] h3 { font: 550 37px/.95 'Cormorant Garamond', Georgia, serif; letter-spacing: -.035em; }
+
+/* 03 — the process is a paper chapter with oversized print plates. */
+.tm-process { background: var(--tm-paper) !important; color: var(--tm-ink) !important; }
+.tm-process::before {
+  content: 'THE MAKING OF / A VISUAL IDENTITY'; position: absolute;
+  top: 16px; left: max(18px, calc((100vw - 1340px) / 2));
+  pointer-events: none; color: var(--tm-rust);
+  font: 500 9px/1.2 'DM Mono', monospace; letter-spacing: .07em;
+}
+.tm-process .sticky > div:first-child { border-bottom: 1px solid var(--tm-soft-rule); padding-bottom: 13px; }
+.tm-process .sticky > div:first-child > div > span:first-child {
+  font: 500 10px/1.4 'DM Mono', monospace;
+  letter-spacing: .065em;
+}
+.tm-process .sticky p.font-display {
+  color: var(--tm-wine);
+  font: 600 clamp(52px, 5.3vw, 81px)/.86 'Cormorant Garamond', Georgia, serif;
+  letter-spacing: -.075em;
+}
+.tm-process .sticky p.font-display:first-child { font-style: italic; color: var(--tm-red); }
+.tm-process .sticky .font-serif { color: var(--tm-rust); }
+.tm-process-card {
+  border: 9px solid var(--tm-paper-light);
+  outline: 1px solid var(--tm-ink);
+  box-shadow: 13px 13px 0 rgba(93,24,43,.25);
+  border-radius: 0;
+}
+.tm-process-artboard {
+  position: absolute; inset: 0; overflow: hidden;
+  color: #f0e4d2;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 76px, rgba(240,228,210,.08) 77px, transparent 78px),
+    repeating-linear-gradient(0deg, transparent 0 76px, rgba(240,228,210,.07) 77px, transparent 78px),
+    #5d182b;
+}
+.tm-process-card[data-step="02"] .tm-process-artboard,
+.tm-process-card[data-step="04"] .tm-process-artboard { background-color: #945640; }
+.tm-process-card[data-step="03"] .tm-process-artboard { background-color: #391e25; }
+.tm-process-artboard::before {
+  content: ''; position: absolute; width: 64%; aspect-ratio: 1; left: 18%; top: 21%;
+  border: 1px solid rgba(240,228,210,.37); border-radius: 50%;
+  box-shadow: 0 0 0 26px rgba(240,228,210,.036), 0 0 0 53px rgba(240,228,210,.04);
+}
+.tm-process-artboard-series {
+  position: absolute; left: 26px; top: 58px;
+  font: 500 9px/1.4 'DM Mono', monospace; letter-spacing: .12em; opacity: .65;
+}
+.tm-process-artboard-number {
+  position: absolute; bottom: 16%; right: -1%;
+  font: italic 600 clamp(240px, 27vw, 395px)/.65 'Cormorant Garamond', Georgia, serif;
+  letter-spacing: -.13em; color: rgba(240,228,210,.14); transform: rotate(-10deg);
+}
+.tm-process-artboard-sidenote {
+  position: absolute; right: 16px; top: 26%; writing-mode: vertical-rl;
+  font: 500 9px/1.4 'DM Mono', monospace; letter-spacing: .08em; opacity: .55;
+}
+.tm-process-artboard-registration {
+  position: absolute; bottom: 21%; left: 25px; font: 500 28px/1 'DM Mono', monospace;
+  opacity: .8; letter-spacing: .1em;
+}
+ .tm-process-card > div[class*="backdrop-blur"] {
+  backdrop-filter: none;
+  border-radius: 0;
+  background: rgba(57, 30, 37, .93) !important;
+  border: 1px solid rgba(240,228,210,.6);
+  box-shadow: none;
+}
+.tm-process-card h3 {
+  -webkit-text-fill-color: var(--tm-paper-light) !important;
+  color: var(--tm-paper-light) !important; background-image: none !important;
+  font: italic 550 clamp(53px, 6.4vw, 86px)/.9 'Cormorant Garamond', Georgia, serif;
+  letter-spacing: -.055em;
+  text-shadow: 1px 2px 0 #391e25;
+}
+.tm-process-card li { font-family: 'Archivo Narrow', sans-serif; letter-spacing: .01em; }
+.tm-process button { border-radius: 0 !important; }
+
+/* 04 — a designer's letter beside an actual piece from the archive. */
+.tm-about {
+  background: var(--tm-paper) !important;
+  color: var(--tm-ink) !important;
+  padding-top: clamp(70px, 9vw, 155px);
+  padding-bottom: clamp(95px, 10vw, 165px);
+}
+.tm-about [class*="border-t"][class*="border-b"] { border-color: var(--tm-soft-rule); }
+.tm-about h2 {
+  color: var(--tm-wine) !important;
+  font: 550 clamp(58px, 6.2vw, 101px)/.84 'Cormorant Garamond', Georgia, serif;
+  letter-spacing: -.065em;
+  max-width: 740px;
+}
+.tm-about h2 + div.font-serif {
+  font: italic 500 clamp(22px, 2.7vw, 38px)/1.02 'Cormorant Garamond', Georgia, serif;
+  color: var(--tm-red) !important;
+}
+.tm-about p.font-sans { max-width: 56ch; color: #65434a; font: 500 clamp(17px, 1.7vw, 23px)/1.38 'Archivo Narrow', sans-serif; }
+.tm-about-plate {
+  mask: none !important;
+  -webkit-mask: none !important;
+  position: relative;
+  padding: 17px;
+  background: var(--tm-wine) !important;
+  box-shadow: 13px 13px 0 #b95038;
+}
+.tm-about-plate::after {
+  content: 'THE VISUAL NOTEBOOK';
+  position: absolute; bottom: 8px; right: -23px; transform: rotate(-90deg) translateX(100%); transform-origin: right bottom;
+  color: var(--tm-rust); font: 500 9px/1 'DM Mono', monospace; letter-spacing: .08em;
+}
+.tm-about-artwork { display: flex; flex-direction: column; gap: 9px; margin: 0; }
+.tm-about-artwork-window {
+  display: grid; place-items: center;
+  aspect-ratio: 1 / 1; overflow: hidden; background: var(--tm-paper);
+}
+.tm-about-artwork img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.tm-about-artwork figcaption {
+  display: flex; justify-content: space-between; gap: 10px;
+  font: 500 9px/1.3 'DM Mono', monospace;
+  letter-spacing: .07em; color: var(--tm-paper-light);
+}
+.tm-about button { border-radius: 0; }
+.tm-about button:first-child:hover { background: var(--tm-ink); }
+.tm-about [class*="divide-y"] { border-color: var(--tm-soft-rule); }
+.tm-about .lg\:col-span-7 { padding-left: clamp(0px, 2vw, 33px); }
+
+/* 05 — commission services as a printed catalogue, not floating pricing cards. */
+.tm-services {
+  background: #f0e4d2 !important;
+  color: var(--tm-ink);
+  padding-top: clamp(65px, 8vw, 115px);
+  padding-bottom: clamp(90px, 10vw, 140px);
+  border-top: 3px double var(--tm-wine);
+}
+.tm-services h2 {
+  color: var(--tm-wine) !important;
+  font: 550 clamp(67px, 8vw, 128px)/.8 'Cormorant Garamond', Georgia, serif;
+  letter-spacing: -.063em;
+}
+.tm-services h2 + div.font-serif { font: italic 500 clamp(24px, 2.5vw, 37px)/1 'Cormorant Garamond', Georgia, serif; color: var(--tm-red) !important; }
+.tm-services > div:last-child > div:nth-child(2) {
+  border-top: 3px double var(--tm-wine);
+  border-bottom: 3px double var(--tm-wine);
+  border-left: 0; border-right: 0;
+  gap: 0;
+}
+.tm-service-card {
+  position: relative;
+  background: transparent !important;
+  color: var(--tm-ink) !important;
+  border-right: 1px solid var(--tm-soft-rule);
+  border-bottom: 1px solid var(--tm-soft-rule);
+  min-height: 455px;
+  padding: clamp(17px, 2.7vw, 39px);
+  transition: background .2s;
+}
+.tm-service-card:last-child { border-right: 0; }
+.tm-service-card:hover, .tm-service-card:focus-within { background: #e4d0ba !important; }
+.tm-service-card h3 {
+  color: var(--tm-wine);
+  font: 600 clamp(37px, 3.5vw, 59px)/.9 'Cormorant Garamond', Georgia, serif;
+  letter-spacing: -.045em;
+}
+.tm-service-card p.font-serif {
+  color: var(--tm-rust) !important;
+  font: italic 500 23px/1.04 'Cormorant Garamond', Georgia, serif;
+}
+.tm-service-card ul { color: var(--tm-ink); font: 500 15px/1.3 'Archivo Narrow', sans-serif; }
+.tm-service-card [class*="font-mono"] { color: var(--tm-rust) !important; }
+.tm-service-card > div:first-child > div:first-child > span:first-child {
+  font: italic 600 52px/.8 'Cormorant Garamond', Georgia, serif;
+  color: var(--tm-red) !important;
+}
+.tm-service-card button {
+  color: var(--tm-wine) !important; background: transparent !important;
+  border: 1px solid var(--tm-wine) !important;
+  font: 500 10px/1.2 'DM Mono', monospace;
+  border-radius: 0;
+}
+.tm-service-card button:hover { background: var(--tm-wine) !important; color: var(--tm-paper-light) !important; }
+
+/* 06 — a correspondence page: copper/cream on oxblood, no glass. */
+.tm-site [data-editorial-contact] {
+  background: var(--tm-wine) !important;
+  color: var(--tm-paper-light) !important;
+  border-top: 7px solid var(--tm-red);
+  padding-top: clamp(85px, 10vw, 150px);
+}
+.tm-site [data-editorial-contact] > div[aria-hidden="true"] { opacity: .15; }
+.tm-site [data-editorial-contact] h2 {
+  color: var(--tm-paper-light) !important;
+  font: 500 clamp(69px, 7vw, 110px)/.82 'Cormorant Garamond', Georgia, serif;
+  letter-spacing: -.065em;
+}
+.tm-site [data-editorial-contact] h2 + div.font-serif {
+  font: italic 400 clamp(25px, 2.9vw, 40px)/1 'Cormorant Garamond', Georgia, serif;
+  color: #edbd9f !important;
+}
+.tm-site [data-editorial-contact] input,
+.tm-site [data-editorial-contact] textarea {
+  border: 0; border-bottom: 1px solid rgba(240,228,210,.63);
+  background: transparent; color: var(--tm-paper-light);
+  border-radius: 0;
+  padding: 16px 0 13px;
+  font: 500 19px/1.35 'Archivo Narrow', sans-serif;
+}
+.tm-site [data-editorial-contact] input::placeholder,
+.tm-site [data-editorial-contact] textarea::placeholder { color: rgba(240,228,210,.72); }
+.tm-site [data-editorial-contact] :is(input, textarea):focus {
+  outline: none;
+  border-bottom: 2px solid #f0e4d2;
+  box-shadow: none;
+}
+.tm-site [data-editorial-contact] form > div > label {
+  font: 500 10px/1.4 'DM Mono', monospace;
+  letter-spacing: .07em;
+  color: #edbd9f !important;
+}
+.tm-site [data-editorial-contact] form button {
+  border-radius: 0;
+  box-shadow: none;
+}
+.tm-site [data-editorial-contact] form > button[type="submit"] {
+  background: #f0e4d2; color: var(--tm-wine);
+  font: 500 11px/1.3 'DM Mono', monospace;
+  letter-spacing: .06em; border: 1px solid #f0e4d2;
+}
+.tm-site [data-editorial-contact] form > button[type="submit"]:hover {
+  background: transparent; color: #f0e4d2;
+}
+.tm-site [data-editorial-contact] form button[type="button"] { border: 1px solid rgba(240,228,210,.36); }
+.tm-site [data-editorial-contact] [class*="backdrop-blur"] { backdrop-filter: none; }
+.tm-site [data-editorial-contact] [class*="shadow-"] { box-shadow: none; }
+.tm-site [data-editorial-contact] a { text-decoration-thickness: 1px; text-underline-offset: 5px; }
+.tm-site [data-editorial-contact] > div:last-child > div:last-child > div:first-child .font-display {
+  font-size: clamp(65px, 8.7vw, 145px);
+  line-height: .8;
+  font-weight: 600;
+  letter-spacing: -.085em;
+}
+
+/* Fullscreen project viewer: a restrained gallery that does not alter boards. */
+.tm-case-modal { background: var(--tm-ink) !important; color: var(--tm-paper-light) !important; }
+.tm-case-modal > header { border-radius: 0; }
+.tm-case-modal > header [class*="backdrop-blur"] { backdrop-filter: none; }
+.tm-case-modal [class*="rounded-"] { border-radius: 0; }
+.tm-case-modal h3.font-display {
+  font: 600 clamp(48px, 6vw, 100px)/.9 'Cormorant Garamond', Georgia, serif;
+  letter-spacing: -.05em;
+}
+
+/* The optical margins are generous on desktop but never eat the mobile viewport. */
+@media (max-width: 1100px) {
+  .tm-bridge-inner { width: calc(100% - 58px); }
+  .tm-bridge-layout { grid-template-columns: 70px 1fr 1fr; gap: 18px; }
+  .tm-bridge-statement h2 { font-size: clamp(65px, 8vw, 105px); }
+  .tm-projects-intro { padding-left: 29px; padding-right: 29px; }
+  .tm-service-card { min-height: 435px; }
+}
+@media (max-width: 790px) {
+  .tm-bridge-inner { width: calc(100% - 34px); }
+  .tm-bridge-layout { grid-template-columns: 1fr 1fr; gap: 20px; padding: 47px 0; }
+  .tm-bridge-issue { grid-column: 1 / -1; font-size: 88px; }
+  .tm-bridge-statement h2 { font-size: clamp(63px, 10vw, 95px); }
+  .tm-bridge-notes { padding-top: 0; }
+  .tm-projects-intro { padding: 19px 17px 60px; }
+  .tm-projects-title-row { gap: 20px; }
+  .tm-projects-title-row h2 { font-size: 13vw; }
+  .tm-projects-title-row p { font-size: 19px; }
+  .tm-about .lg\:col-span-7 { padding-left: 0; }
+  .tm-about h2 { font-size: clamp(58px, 9vw, 85px); }
+  .tm-services h2 { font-size: clamp(60px, 10vw, 96px); }
+  .tm-service-card:nth-child(2n) { border-right: 0; }
+  .tm-site #posters .lb-word { font-size: clamp(56px, 12vw, 102px); }
+  .tm-site #posters .lb-card { border-width: 4px; }
+  .tm-site #posters[data-lens-bloom]::after { display: none; }
+}
+@media (max-width: 550px) {
+  .tm-bridge-layout { display: block; padding: 27px 0 45px; }
+  .tm-bridge-running, .tm-bridge-footer { font-size: 8px; }
+  .tm-bridge-issue { font-size: 82px; margin: 14px 0 35px; }
+  .tm-bridge-statement h2 { font-size: clamp(62px, 12.5vw, 86px); }
+  .tm-bridge-urdu { margin: 11px 0 28px; }
+  .tm-bridge-notes p { max-width: 100%; }
+  .tm-bridge-notes button { max-width: none; }
+  .tm-projects-kicker { font-size: 8px; }
+  .tm-projects-kicker span:last-child { display: none; }
+  .tm-projects-title-row { display: block; }
+  .tm-projects-title-row h2 { font-size: clamp(75px, 17vw, 115px); }
+  .tm-projects-title-row p { margin-top: 27px; max-width: 250px; }
+  .tm-project-spread h3 { font-size: clamp(46px, 11vw, 70px); }
+  .tm-process-card { border-width: 5px; box-shadow: 5px 5px 0 rgba(93,24,43,.25); }
+  .tm-process-card h3 { font-size: clamp(52px, 11vw, 67px); }
+  .tm-about { padding-top: 60px; padding-bottom: 80px; }
+  .tm-about h2 { font-size: clamp(55px, 13vw, 74px); }
+  .tm-about-plate { margin-right: 13px; }
+  .tm-services { padding: 68px 0 85px; }
+  .tm-services h2 { font-size: clamp(58px, 13vw, 85px); }
+  .tm-service-card { border-right: 0; min-height: 0; padding: 22px 8px 30px; }
+  .tm-site [data-editorial-contact] { padding-top: 72px; }
+  .tm-site [data-editorial-contact] h2 { font-size: clamp(67px, 15vw, 89px); }
+  .tm-site #posters .lb-word { font-size: clamp(52px, 12vw, 68px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tm-site *,
+  .tm-site *::before,
+  .tm-site *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+  .tm-page-turn-flash { display: none; }
+}

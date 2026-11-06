@@ -95,7 +95,7 @@ export const CaseStudyModal: React.FC<CaseStudyModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-[800] h-svh w-screen bg-[#18383C] text-[#FDFBD4] overflow-hidden select-none"
+      className="tm-case-modal fixed inset-0 z-[800] h-svh w-screen bg-[#5D182B] text-[#F0E4D2] overflow-hidden select-none"
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-project-title"
@@ -107,19 +107,19 @@ export const CaseStudyModal: React.FC<CaseStudyModalProps> = ({
       {showCursor && (
         <div
           ref={cursorIndicatorRef}
-          className="pointer-events-none fixed top-0 left-0 z-50 hidden lg:flex items-center gap-2 px-3 py-1 bg-[#FDFBD4]/95 text-[#18383C] font-mono text-[10px] uppercase tracking-[0.2em] shadow-xl will-change-transform"
+          className="pointer-events-none fixed top-0 left-0 z-50 hidden lg:flex items-center gap-2 px-3 py-1 bg-[#F0E4D2]/95 text-[#5D182B] font-mono text-[10px] uppercase tracking-[0.2em] shadow-xl will-change-transform"
         >
           <span>
             {formatNum(activeSlide + 1)} / {formatNum(totalItems)}
           </span>
-          <span className="text-[#878672]">·</span>
+          <span className="text-[#A87B6C]">·</span>
           <span>{activeSlide < totalItems - 1 ? 'Next ↓' : 'Top ↑'}</span>
         </div>
       )}
 
       {/* Floating Minimal Corner Controls (No full-width solid bar blocking full-screen slides) */}
       <header className="fixed top-3 right-3 left-3 sm:left-auto sm:top-4 sm:right-5 z-40 flex flex-wrap items-center justify-end gap-1.5 sm:gap-2 pointer-events-none">
-        <div className="pointer-events-auto px-2.5 sm:px-3 py-1.5 bg-[#18383C]/85 backdrop-blur-md text-[#FDFBD4] font-mono text-[10px] uppercase tracking-[0.18em] tabular-nums shadow-lg">
+        <div className="pointer-events-auto px-2.5 sm:px-3 py-1.5 bg-[#5D182B]/85 backdrop-blur-md text-[#F0E4D2] font-mono text-[10px] uppercase tracking-[0.18em] tabular-nums shadow-lg">
           {formatNum(activeSlide + 1)} / {formatNum(totalItems)}
         </div>
 
@@ -128,7 +128,7 @@ export const CaseStudyModal: React.FC<CaseStudyModalProps> = ({
             href={project.behanceUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="pointer-events-auto px-2.5 sm:px-3 py-1.5 bg-[#18383C]/85 backdrop-blur-md text-[#FDFBD4] hover:bg-[#FDFBD4] hover:text-[#18383C] transition-colors font-mono text-[10px] uppercase tracking-[0.18em] inline-flex items-center gap-1 sm:gap-1.5 shadow-lg"
+            className="pointer-events-auto px-2.5 sm:px-3 py-1.5 bg-[#5D182B]/85 backdrop-blur-md text-[#F0E4D2] hover:bg-[#F0E4D2] hover:text-[#5D182B] transition-colors font-mono text-[10px] uppercase tracking-[0.18em] inline-flex items-center gap-1 sm:gap-1.5 shadow-lg"
           >
             <span>Behance</span>
             <ArrowUpRight className="w-3.5 h-3.5" />
@@ -140,8 +140,8 @@ export const CaseStudyModal: React.FC<CaseStudyModalProps> = ({
             onClick={() => setShowGrid(!showGrid)}
             className={`pointer-events-auto inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] px-2.5 sm:px-3 py-1.5 transition-colors cursor-pointer shadow-lg ${
               showGrid
-                ? 'bg-[#FDFBD4] text-[#18383C]'
-                : 'bg-[#18383C]/85 text-[#FDFBD4] hover:bg-[#FDFBD4] hover:text-[#18383C]'
+                ? 'bg-[#F0E4D2] text-[#5D182B]'
+                : 'bg-[#5D182B]/85 text-[#F0E4D2] hover:bg-[#F0E4D2] hover:text-[#5D182B]'
             }`}
           >
             <Grid className="w-3.5 h-3.5" />
@@ -151,7 +151,7 @@ export const CaseStudyModal: React.FC<CaseStudyModalProps> = ({
 
         <button
           onClick={onPrevProject}
-          className="pointer-events-auto px-2 sm:px-2.5 py-1.5 bg-[#18383C]/85 backdrop-blur-md text-[#FDFBD4] hover:bg-[#FDFBD4] hover:text-[#18383C] transition-colors cursor-pointer font-mono text-[10px] uppercase tracking-[0.18em] inline-flex items-center gap-1 shadow-lg"
+          className="pointer-events-auto px-2 sm:px-2.5 py-1.5 bg-[#5D182B]/85 backdrop-blur-md text-[#F0E4D2] hover:bg-[#F0E4D2] hover:text-[#5D182B] transition-colors cursor-pointer font-mono text-[10px] uppercase tracking-[0.18em] inline-flex items-center gap-1 shadow-lg"
           title="Previous Project"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
@@ -159,7 +159,7 @@ export const CaseStudyModal: React.FC<CaseStudyModalProps> = ({
         </button>
         <button
           onClick={onNextProject}
-          className="pointer-events-auto px-2 sm:px-2.5 py-1.5 bg-[#18383C]/85 backdrop-blur-md text-[#FDFBD4] hover:bg-[#FDFBD4] hover:text-[#18383C] transition-colors cursor-pointer font-mono text-[10px] uppercase tracking-[0.18em] inline-flex items-center gap-1 shadow-lg"
+          className="pointer-events-auto px-2 sm:px-2.5 py-1.5 bg-[#5D182B]/85 backdrop-blur-md text-[#F0E4D2] hover:bg-[#F0E4D2] hover:text-[#5D182B] transition-colors cursor-pointer font-mono text-[10px] uppercase tracking-[0.18em] inline-flex items-center gap-1 shadow-lg"
           title="Next Project"
         >
           <span className="hidden md:inline">Next</span>
@@ -168,7 +168,7 @@ export const CaseStudyModal: React.FC<CaseStudyModalProps> = ({
 
         <button
           onClick={onClose}
-          className="pointer-events-auto p-1.5 bg-[#18383C] text-[#FDFBD4] hover:bg-[#FDFBD4] hover:text-[#18383C] transition-colors cursor-pointer shadow-lg"
+          className="pointer-events-auto p-1.5 bg-[#5D182B] text-[#F0E4D2] hover:bg-[#F0E4D2] hover:text-[#5D182B] transition-colors cursor-pointer shadow-lg"
           aria-label="Close Slides"
         >
           <X className="w-4 h-4" />
@@ -192,7 +192,7 @@ export const CaseStudyModal: React.FC<CaseStudyModalProps> = ({
             aria-label={`Slide ${idx + 1}: ${item.title}`}
           >
             <span
-              className={`hidden md:inline-block font-mono text-[10px] uppercase tracking-[0.18em] transition-all duration-200 px-2 py-0.5 bg-[#18383C]/90 text-[#FDFBD4] ${
+              className={`hidden md:inline-block font-mono text-[10px] uppercase tracking-[0.18em] transition-all duration-200 px-2 py-0.5 bg-[#5D182B]/90 text-[#F0E4D2] ${
                 activeSlide === idx
                   ? 'opacity-100'
                   : 'opacity-0 group-hover:opacity-95'
@@ -203,8 +203,8 @@ export const CaseStudyModal: React.FC<CaseStudyModalProps> = ({
             <span
               className={`block transition-all duration-300 shadow-sm ${
                 activeSlide === idx
-                  ? 'w-2 h-5 bg-[#18383C] ring-1 ring-[#FDFBD4]'
-                  : 'w-1.5 h-2 bg-[#18383C]/50 ring-1 ring-[#FDFBD4]/60 group-hover:bg-[#18383C]'
+                  ? 'w-2 h-5 bg-[#5D182B] ring-1 ring-[#F0E4D2]'
+                  : 'w-1.5 h-2 bg-[#5D182B]/50 ring-1 ring-[#F0E4D2]/60 group-hover:bg-[#5D182B]'
               }`}
             />
           </button>
@@ -275,39 +275,39 @@ export const CaseStudyModal: React.FC<CaseStudyModalProps> = ({
                     ) : (
                       <>
                         {/* Studio Theme Color Wash & Vignette */}
-                        <div className="pointer-events-none absolute inset-0 bg-[#18383C]/12 mix-blend-multiply" />
-                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#18383C]/84 via-transparent to-[#18383C]/90" />
-                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#18383C]/76 via-[#18383C]/12 to-transparent" />
+                        <div className="pointer-events-none absolute inset-0 bg-[#5D182B]/12 mix-blend-multiply" />
+                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#5D182B]/84 via-transparent to-[#5D182B]/90" />
+                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#5D182B]/76 via-[#5D182B]/12 to-transparent" />
                       </>
                     )}
 
                     {/* Archival Studio Frame & Corner Marks */}
-                    <div className="pointer-events-none absolute inset-3 sm:inset-5 border border-[#FDFBD4]/15">
-                      <span className="absolute -top-px -left-px h-3 w-3 border-t-2 border-l-2 border-[#FDFBD4]/60" />
-                      <span className="absolute -top-px -right-px h-3 w-3 border-t-2 border-r-2 border-[#FDFBD4]/60" />
-                      <span className="absolute -bottom-px -left-px h-3 w-3 border-b-2 border-l-2 border-[#FDFBD4]/60" />
-                      <span className="absolute -bottom-px -right-px h-3 w-3 border-b-2 border-r-2 border-[#FDFBD4]/60" />
+                    <div className="pointer-events-none absolute inset-3 sm:inset-5 border border-[#F0E4D2]/15">
+                      <span className="absolute -top-px -left-px h-3 w-3 border-t-2 border-l-2 border-[#F0E4D2]/60" />
+                      <span className="absolute -top-px -right-px h-3 w-3 border-t-2 border-r-2 border-[#F0E4D2]/60" />
+                      <span className="absolute -bottom-px -left-px h-3 w-3 border-b-2 border-l-2 border-[#F0E4D2]/60" />
+                      <span className="absolute -bottom-px -right-px h-3 w-3 border-b-2 border-r-2 border-[#F0E4D2]/60" />
                     </div>
 
                     {/* Cover Brand Header & Story Details */}
                     <div className="pointer-events-none absolute inset-0 z-10 flex flex-col justify-between p-5 pt-14 pr-8 sm:p-10 md:p-12">
                       <div className="max-w-2xl space-y-1.5 sm:space-y-2 pt-1 sm:pt-2">
-                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.18em] sm:tracking-[0.2em] text-[#D9D7B6]">
-                          <span className="text-[#FDFBD4] font-semibold">01 / COVER</span>
-                          <span aria-hidden="true" className="text-[#878672]">
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.18em] sm:tracking-[0.2em] text-[#D9C0A8]">
+                          <span className="text-[#F0E4D2] font-semibold">01 / COVER</span>
+                          <span aria-hidden="true" className="text-[#A87B6C]">
                             ·
                           </span>
                           <span>{project.location}</span>
-                          <span aria-hidden="true" className="text-[#878672]">
+                          <span aria-hidden="true" className="text-[#A87B6C]">
                             ·
                           </span>
                           <span>{project.year}</span>
                         </div>
-                        <h3 className="font-display text-2xl sm:text-5xl md:text-6xl font-bold tracking-tight text-[#FDFBD4] leading-[1.04]">
+                        <h3 className="font-display text-2xl sm:text-5xl md:text-6xl font-bold tracking-tight text-[#F0E4D2] leading-[1.04]">
                           {project.title}
                         </h3>
                         {project.tagline && (
-                          <p className="font-serif italic text-sm sm:text-xl text-[#D9D7B6] leading-snug">
+                          <p className="font-serif italic text-sm sm:text-xl text-[#D9C0A8] leading-snug">
                             {isLumera
                               ? `“${project.tagline}” — Fragrance for the memories we keep.`
                               : isRiwaq
@@ -326,22 +326,22 @@ export const CaseStudyModal: React.FC<CaseStudyModalProps> = ({
                                 : isRiwaq
                                   ? 'border-[#A98252]'
                                   : 'border-[#C75A2E]'
-                            } pl-3.5 text-xs sm:text-sm text-[#FDFBD4]/95 leading-snug line-clamp-2`}
+                            } pl-3.5 text-xs sm:text-sm text-[#F0E4D2]/95 leading-snug line-clamp-2`}
                           >
                             {project.summary}
                           </p>
-                          <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.18em] text-[#D9D7B6]">
+                          <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.18em] text-[#D9C0A8]">
                             <span>{project.discipline}</span>
                             {project.extractedPalette && (
                               <>
-                                <span aria-hidden="true" className="text-[#878672]">
+                                <span aria-hidden="true" className="text-[#A87B6C]">
                                   ·
                                 </span>
                                 <div className="flex items-center gap-1.5">
                                   {project.extractedPalette.map((swatch) => (
                                     <span
                                       key={swatch.hex}
-                                      className="h-2.5 w-2.5 border border-[#FDFBD4]/40"
+                                      className="h-2.5 w-2.5 border border-[#F0E4D2]/40"
                                       style={{ backgroundColor: swatch.hex }}
                                     />
                                   ))}
@@ -351,9 +351,9 @@ export const CaseStudyModal: React.FC<CaseStudyModalProps> = ({
                           </div>
                         </div>
 
-                        <div className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-[#FDFBD4] bg-[#18383C]/85 border border-[#FDFBD4]/25 px-4 py-2 self-start lg:self-end">
+                        <div className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-[#F0E4D2] bg-[#5D182B]/85 border border-[#F0E4D2]/25 px-4 py-2 self-start lg:self-end">
                           <span>Scroll Case Study</span>
-                          <ArrowDown className="w-3.5 h-3.5 text-[#D9D7B6]" />
+                          <ArrowDown className="w-3.5 h-3.5 text-[#D9C0A8]" />
                         </div>
                       </div>
                     </div>
@@ -362,13 +362,13 @@ export const CaseStudyModal: React.FC<CaseStudyModalProps> = ({
 
                 {/* Minimal Floating Action on Last Slide Only (or non-Behance slides, plus mobile caption bar on inner slides) */}
                 {!isBehanceProject ? (
-                  <div className="absolute inset-x-0 bottom-0 z-10 px-6 sm:px-12 py-3 bg-[#18383C]/90 backdrop-blur-md border-t border-[#FDFBD4]/15 flex items-center justify-between gap-4">
+                  <div className="absolute inset-x-0 bottom-0 z-10 px-6 sm:px-12 py-3 bg-[#5D182B]/90 backdrop-blur-md border-t border-[#F0E4D2]/15 flex items-center justify-between gap-4">
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 min-w-0">
-                      <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#D9D7B6] tabular-nums shrink-0">
+                      <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#D9C0A8] tabular-nums shrink-0">
                         {slide.kicker || `${formatNum(idx + 1)} / ${formatNum(slides.length)}`}
                       </span>
-                      <span className="text-[#878672] hidden sm:inline">·</span>
-                      <h3 className="font-serif text-sm sm:text-base text-[#FDFBD4] truncate">
+                      <span className="text-[#A87B6C] hidden sm:inline">·</span>
+                      <h3 className="font-serif text-sm sm:text-base text-[#F0E4D2] truncate">
                         {slide.title}
                       </h3>
                     </div>
@@ -377,7 +377,7 @@ export const CaseStudyModal: React.FC<CaseStudyModalProps> = ({
                         e.stopPropagation();
                         scrollToSlide(nextIdx);
                       }}
-                      className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-[#D9D7B6] hover:text-[#FDFBD4] cursor-pointer"
+                      className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-[#D9C0A8] hover:text-[#F0E4D2] cursor-pointer"
                     >
                       <span>Next Slide</span>
                       <ArrowDown className="w-3.5 h-3.5" />
@@ -390,14 +390,14 @@ export const CaseStudyModal: React.FC<CaseStudyModalProps> = ({
                   >
                     <button
                       onClick={() => onSelectScope(project.discipline, project.title)}
-                      className="inline-flex items-center gap-1.5 bg-[#18383C] text-[#FDFBD4] font-mono text-[10px] uppercase tracking-[0.18em] px-4 py-2 hover:bg-[#2B1B14] transition-colors cursor-pointer font-semibold shadow-lg"
+                      className="inline-flex items-center gap-1.5 bg-[#5D182B] text-[#F0E4D2] font-mono text-[10px] uppercase tracking-[0.18em] px-4 py-2 hover:bg-[#2B1B14] transition-colors cursor-pointer font-semibold shadow-lg"
                     >
                       <span>Inquire</span>
                       <ArrowUpRight className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={onNextProject}
-                      className="inline-flex items-center gap-1.5 bg-[#18383C]/85 text-[#FDFBD4] font-mono text-[10px] uppercase tracking-[0.18em] px-4 py-2 hover:bg-[#18383C] transition-colors cursor-pointer shadow-lg"
+                      className="inline-flex items-center gap-1.5 bg-[#5D182B]/85 text-[#F0E4D2] font-mono text-[10px] uppercase tracking-[0.18em] px-4 py-2 hover:bg-[#5D182B] transition-colors cursor-pointer shadow-lg"
                     >
                       <span>Next Project</span>
                       <ArrowRight className="w-3.5 h-3.5" />
@@ -406,20 +406,20 @@ export const CaseStudyModal: React.FC<CaseStudyModalProps> = ({
                 ) : !isBehanceCoverSlide ? (
                   <div
                     onClick={(e) => e.stopPropagation()}
-                    className="sm:hidden absolute inset-x-0 bottom-0 z-10 px-4 py-2.5 bg-[#18383C]/90 backdrop-blur-md border-t border-[#FDFBD4]/15 flex items-center justify-between gap-3"
+                    className="sm:hidden absolute inset-x-0 bottom-0 z-10 px-4 py-2.5 bg-[#5D182B]/90 backdrop-blur-md border-t border-[#F0E4D2]/15 flex items-center justify-between gap-3"
                   >
                     <div className="flex items-center gap-2 min-w-0">
-                      <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#D9D7B6] tabular-nums shrink-0">
+                      <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#D9C0A8] tabular-nums shrink-0">
                         {formatNum(idx + 1)} / {formatNum(slides.length)}
                       </span>
-                      <span className="text-[#878672]">·</span>
-                      <span className="font-serif text-xs text-[#FDFBD4] truncate">
+                      <span className="text-[#A87B6C]">·</span>
+                      <span className="font-serif text-xs text-[#F0E4D2] truncate">
                         {slide.title}
                       </span>
                     </div>
                     <button
                       onClick={() => scrollToSlide(nextIdx)}
-                      className="inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-[0.16em] text-[#D9D7B6] shrink-0 cursor-pointer"
+                      className="inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-[0.16em] text-[#D9C0A8] shrink-0 cursor-pointer"
                     >
                       <span>Next</span>
                       <ArrowDown className="w-3 h-3" />
@@ -438,21 +438,21 @@ export const CaseStudyModal: React.FC<CaseStudyModalProps> = ({
                 ref={(el) => {
                   slideRefs.current[idx] = el;
                 }}
-                className="relative h-svh w-screen snap-start overflow-hidden flex flex-col justify-between bg-[#18383C]"
+                className="relative h-svh w-screen snap-start overflow-hidden flex flex-col justify-between bg-[#5D182B]"
               >
                 <div className="grid grid-cols-2 lg:grid-cols-4 flex-1 w-full h-full pt-14">
                   {QUITE_CLEAR_SWATCHES.map((swatch) => (
                     <div
                       key={swatch.id}
                       onClick={(e) => handleCopyHex(swatch.hex, e)}
-                      className="relative flex flex-col justify-end p-6 sm:p-10 border-r border-b border-[#18383C]/20 cursor-pointer transition-transform duration-500 hover:scale-[1.01]"
+                      className="relative flex flex-col justify-end p-6 sm:p-10 border-r border-b border-[#5D182B]/20 cursor-pointer transition-transform duration-500 hover:scale-[1.01]"
                       style={{ backgroundColor: swatch.hex }}
                     >
-                      <div className="bg-[#18383C]/85 backdrop-blur-md p-4 border border-[#FDFBD4]/15">
-                        <p className="font-mono text-xs text-[#FDFBD4] uppercase tracking-[0.15em]">
+                      <div className="bg-[#5D182B]/85 backdrop-blur-md p-4 border border-[#F0E4D2]/15">
+                        <p className="font-mono text-xs text-[#F0E4D2] uppercase tracking-[0.15em]">
                           {swatch.name}
                         </p>
-                        <p className="font-mono text-[11px] text-[#D9D7B6] mt-0.5">
+                        <p className="font-mono text-[11px] text-[#D9C0A8] mt-0.5">
                           {copiedHex === swatch.hex ? 'Copied' : swatch.hex}
                         </p>
                       </div>
@@ -460,13 +460,13 @@ export const CaseStudyModal: React.FC<CaseStudyModalProps> = ({
                   ))}
                 </div>
 
-                <div className="bg-[#18383C] border-t border-[#FDFBD4]/20 px-6 sm:px-12 py-4 flex items-center justify-between gap-4">
+                <div className="bg-[#5D182B] border-t border-[#F0E4D2]/20 px-6 sm:px-12 py-4 flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
-                    <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#D9D7B6]">
+                    <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#D9C0A8]">
                       {slide.spec}
                     </span>
-                    <span className="text-[#878672]">·</span>
-                    <h3 className="font-serif text-base sm:text-lg text-[#FDFBD4]">
+                    <span className="text-[#A87B6C]">·</span>
+                    <h3 className="font-serif text-base sm:text-lg text-[#F0E4D2]">
                       {slide.title}
                     </h3>
                   </div>
@@ -474,14 +474,14 @@ export const CaseStudyModal: React.FC<CaseStudyModalProps> = ({
                   <div className="flex items-center gap-2.5">
                     <button
                       onClick={() => onSelectScope(project.discipline, project.title)}
-                      className="inline-flex items-center gap-1.5 bg-[#FDFBD4] text-[#18383C] font-mono text-[10px] uppercase tracking-[0.18em] px-3.5 py-1.5 hover:bg-[#D9D7B6] transition-colors cursor-pointer font-semibold"
+                      className="inline-flex items-center gap-1.5 bg-[#F0E4D2] text-[#5D182B] font-mono text-[10px] uppercase tracking-[0.18em] px-3.5 py-1.5 hover:bg-[#D9C0A8] transition-colors cursor-pointer font-semibold"
                     >
                       <span>Inquire</span>
                       <ArrowUpRight className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={onNextProject}
-                      className="inline-flex items-center gap-1.5 border border-[#FDFBD4]/30 text-[#FDFBD4] font-mono text-[10px] uppercase tracking-[0.18em] px-3.5 py-1.5 hover:bg-[#FDFBD4] hover:text-[#18383C] transition-colors cursor-pointer"
+                      className="inline-flex items-center gap-1.5 border border-[#F0E4D2]/30 text-[#F0E4D2] font-mono text-[10px] uppercase tracking-[0.18em] px-3.5 py-1.5 hover:bg-[#F0E4D2] hover:text-[#5D182B] transition-colors cursor-pointer"
                     >
                       <span>Next Project</span>
                       <ArrowRight className="w-3.5 h-3.5" />
@@ -500,7 +500,7 @@ export const CaseStudyModal: React.FC<CaseStudyModalProps> = ({
                 slideRefs.current[idx] = el;
               }}
               onClick={() => scrollToSlide(nextIdx)}
-              className="relative h-svh w-screen snap-start overflow-hidden bg-[#18383C] cursor-pointer flex flex-col justify-between"
+              className="relative h-svh w-screen snap-start overflow-hidden bg-[#5D182B] cursor-pointer flex flex-col justify-between"
             >
               <div className="flex-1 w-full h-full pt-14 overflow-hidden">
                 <GraphicArtwork
@@ -510,17 +510,17 @@ export const CaseStudyModal: React.FC<CaseStudyModalProps> = ({
                 />
               </div>
 
-              <div className="px-6 sm:px-12 py-3.5 bg-[#18383C]/90 backdrop-blur-md border-t border-[#FDFBD4]/15 flex items-center justify-between gap-4">
+              <div className="px-6 sm:px-12 py-3.5 bg-[#5D182B]/90 backdrop-blur-md border-t border-[#F0E4D2]/15 flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#D9D7B6]">
+                  <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#D9C0A8]">
                     {slide.spec}
                   </span>
-                  <span className="text-[#878672]">·</span>
-                  <h3 className="font-serif text-base sm:text-lg text-[#FDFBD4]">
+                  <span className="text-[#A87B6C]">·</span>
+                  <h3 className="font-serif text-base sm:text-lg text-[#F0E4D2]">
                     {slide.title}
                   </h3>
                 </div>
-                <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#D9D7B6]">
+                <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#D9C0A8]">
                   Next Slide ↓
                 </span>
               </div>

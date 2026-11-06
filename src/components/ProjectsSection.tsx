@@ -314,8 +314,8 @@ const FullScreenProjectSlide: React.FC<{
           }
         }}
         aria-label={`Open case study for ${project.title}`}
-        style={{ backgroundColor: currentMedia.bgHex || '#18383C' }}
-        className="group relative flex flex-col justify-between h-svh w-full cursor-pointer outline-none text-left select-none overflow-hidden"
+        style={{ backgroundColor: currentMedia.bgHex || '#5D182B' }}
+        className="tm-project-spread group relative flex flex-col justify-between h-svh w-full cursor-pointer outline-none text-left select-none overflow-hidden"
       >
         {isBehanceSlideDeck && !isCoverSlide ? (
           /* ASPECT-RATIO-PRESERVING FULL SCREEN SLIDE FOR INNER BEHANCE BOARDS (NO STRETCHING) */
@@ -388,18 +388,18 @@ const FullScreenProjectSlide: React.FC<{
             ) : (
               /* Studio Theme Color Wash & Duotone Undertone */
               <>
-                <div className="absolute inset-0 bg-[#18383C]/12 mix-blend-multiply pointer-events-none transition-opacity duration-700 group-hover:opacity-5" />
-                <div className="absolute inset-0 bg-gradient-to-b from-[#18383C]/84 via-transparent to-[#18383C]/90 pointer-events-none" />
-                <div className="absolute inset-0 bg-gradient-to-r from-[#18383C]/76 via-[#18383C]/12 to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-[#5D182B]/12 mix-blend-multiply pointer-events-none transition-opacity duration-700 group-hover:opacity-5" />
+                <div className="absolute inset-0 bg-gradient-to-b from-[#5D182B]/84 via-transparent to-[#5D182B]/90 pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#5D182B]/76 via-[#5D182B]/12 to-transparent pointer-events-none" />
               </>
             )}
 
             {/* Archival Studio Inner Hairline Frame & Corner Marks */}
-            <div className="pointer-events-none absolute inset-3 sm:inset-5 border border-[#FDFBD4]/15 transition-colors duration-500 group-hover:border-[#FDFBD4]/30">
-              <span className="absolute -top-px -left-px h-3 w-3 border-t-2 border-l-2 border-[#FDFBD4]/60" />
-              <span className="absolute -top-px -right-px h-3 w-3 border-t-2 border-r-2 border-[#FDFBD4]/60" />
-              <span className="absolute -bottom-px -left-px h-3 w-3 border-b-2 border-l-2 border-[#FDFBD4]/60" />
-              <span className="absolute -bottom-px -right-px h-3 w-3 border-b-2 border-r-2 border-[#FDFBD4]/60" />
+            <div className="pointer-events-none absolute inset-3 sm:inset-5 border border-[#F0E4D2]/15 transition-colors duration-500 group-hover:border-[#F0E4D2]/30">
+              <span className="absolute -top-px -left-px h-3 w-3 border-t-2 border-l-2 border-[#F0E4D2]/60" />
+              <span className="absolute -top-px -right-px h-3 w-3 border-t-2 border-r-2 border-[#F0E4D2]/60" />
+              <span className="absolute -bottom-px -left-px h-3 w-3 border-b-2 border-l-2 border-[#F0E4D2]/60" />
+              <span className="absolute -bottom-px -right-px h-3 w-3 border-b-2 border-r-2 border-[#F0E4D2]/60" />
             </div>
           </>
         )}
@@ -408,10 +408,10 @@ const FullScreenProjectSlide: React.FC<{
         {isHovered && (
           <div
             ref={cursorBadgeRef}
-            className="pointer-events-none hidden md:flex items-center gap-2 fixed top-0 left-0 z-30 bg-[#18383C]/95 border border-[#FDFBD4]/25 px-3.5 py-1.5 text-[11px] font-mono uppercase tracking-[0.16em] text-[#FDFBD4] shadow-xl will-change-transform"
+            className="pointer-events-none hidden md:flex items-center gap-2 fixed top-0 left-0 z-30 bg-[#5D182B]/95 border border-[#F0E4D2]/25 px-3.5 py-1.5 text-[11px] font-mono uppercase tracking-[0.16em] text-[#F0E4D2] shadow-xl will-change-transform"
           >
-            <span>Case Study</span>
-            <ArrowUpRight className="w-3.5 h-3.5 text-[#D9D7B6]" />
+            <span>Read the story</span>
+            <ArrowUpRight className="w-3.5 h-3.5 text-[#D9C0A8]" />
           </div>
         )}
 
@@ -420,15 +420,15 @@ const FullScreenProjectSlide: React.FC<{
           {showCoverBrandOverlay ? (
             <div className="max-w-2xl space-y-1.5 sm:space-y-2">
               {/* Unboxed Metadata Line */}
-              <div className="flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.18em] sm:tracking-[0.2em] text-[#D9D7B6]">
-                <span className="text-[#FDFBD4] font-semibold">
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.18em] sm:tracking-[0.2em] text-[#D9C0A8]">
+                <span className="text-[#F0E4D2] font-semibold">
                   {formatNum(index + 1)} / {formatNum(total)}
                 </span>
-                <span aria-hidden="true" className="text-[#878672]">
+                <span aria-hidden="true" className="text-[#A87B6C]">
                   ·
                 </span>
                 <span>{project.location}</span>
-                <span aria-hidden="true" className="text-[#878672]">
+                <span aria-hidden="true" className="text-[#A87B6C]">
                   ·
                 </span>
                 <span>{project.year}</span>
@@ -436,11 +436,11 @@ const FullScreenProjectSlide: React.FC<{
 
               {/* Project Title & Tagline */}
               <div className="space-y-1">
-                <h3 className="font-display text-2xl sm:text-5xl md:text-6xl font-bold tracking-tight text-[#FDFBD4] leading-[1.04]">
+                <h3 className="font-display text-2xl sm:text-5xl md:text-6xl font-bold tracking-tight text-[#F0E4D2] leading-[1.04]">
                   {project.title}
                 </h3>
                 {project.tagline && (
-                  <p className="font-serif italic text-sm sm:text-xl text-[#D9D7B6] leading-snug">
+                  <p className="font-serif italic text-sm sm:text-xl text-[#D9C0A8] leading-snug">
                     {isLumera
                       ? `“${project.tagline}” — Fragrance for the memories we keep.`
                       : isRiwaq
@@ -452,11 +452,11 @@ const FullScreenProjectSlide: React.FC<{
             </div>
           ) : (
             /* Mobile-only compact project header on inner slides so vertical phone screen is framed */
-            <div className="sm:hidden bg-[#18383C]/85 backdrop-blur-md border border-[#FDFBD4]/20 px-3 py-1.5">
-              <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.16em] text-[#FDFBD4]">
+            <div className="sm:hidden bg-[#5D182B]/85 backdrop-blur-md border border-[#F0E4D2]/20 px-3 py-1.5">
+              <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.16em] text-[#F0E4D2]">
                 <span className="font-semibold">{project.title}</span>
-                <span className="text-[#D9D7B6]/50">·</span>
-                <span className="text-[#D9D7B6]">{currentMedia.label}</span>
+                <span className="text-[#D9C0A8]/50">·</span>
+                <span className="text-[#D9C0A8]">{currentMedia.label}</span>
               </div>
             </div>
           )}
@@ -468,7 +468,7 @@ const FullScreenProjectSlide: React.FC<{
                 e.stopPropagation();
                 onOpenAllProjects();
               }}
-              className="inline-flex items-center gap-1.5 bg-[#18383C]/85 backdrop-blur-md border border-[#FDFBD4]/25 px-3 sm:px-3.5 py-1.5 sm:py-2 text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.16em] text-[#FDFBD4] hover:bg-[#FDFBD4] hover:text-[#18383C] transition-colors shadow-md cursor-pointer"
+              className="inline-flex items-center gap-1.5 bg-[#5D182B]/85 backdrop-blur-md border border-[#F0E4D2]/25 px-3 sm:px-3.5 py-1.5 sm:py-2 text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.16em] text-[#F0E4D2] hover:bg-[#F0E4D2] hover:text-[#5D182B] transition-colors shadow-md cursor-pointer"
             >
               <LayoutGrid className="w-3.5 h-3.5" />
               <span>View All Projects</span>
@@ -479,13 +479,13 @@ const FullScreenProjectSlide: React.FC<{
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
-                className="inline-flex items-center gap-1.5 bg-[#18383C]/85 backdrop-blur-md border border-[#FDFBD4]/25 px-3 sm:px-3.5 py-1.5 sm:py-2 text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.16em] text-[#FDFBD4] hover:bg-[#FDFBD4] hover:text-[#18383C] transition-colors shadow-md"
+                className="inline-flex items-center gap-1.5 bg-[#5D182B]/85 backdrop-blur-md border border-[#F0E4D2]/25 px-3 sm:px-3.5 py-1.5 sm:py-2 text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.16em] text-[#F0E4D2] hover:bg-[#F0E4D2] hover:text-[#5D182B] transition-colors shadow-md"
               >
                 <span>Behance</span>
                 <ArrowUpRight className="w-3.5 h-3.5" />
               </a>
             )}
-            <span className="inline-flex items-center gap-1.5 sm:gap-2 bg-[#FDFBD4] px-3 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.16em] font-semibold text-[#18383C] shadow-md transition-transform duration-300 group-hover:translate-x-0.5">
+            <span className="inline-flex items-center gap-1.5 sm:gap-2 bg-[#F0E4D2] px-3 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.16em] font-semibold text-[#5D182B] shadow-md transition-transform duration-300 group-hover:translate-x-0.5">
               <span>Case Study</span>
               <span aria-hidden="true">→</span>
             </span>
@@ -503,15 +503,15 @@ const FullScreenProjectSlide: React.FC<{
                     : isRiwaq
                       ? 'border-[#A98252]'
                       : 'border-[#C75A2E]'
-                } pl-3 sm:pl-3.5 text-xs sm:text-sm text-[#FDFBD4]/95 leading-snug line-clamp-2`}
+                } pl-3 sm:pl-3.5 text-xs sm:text-sm text-[#F0E4D2]/95 leading-snug line-clamp-2`}
               >
                 {project.summary}
               </p>
-              <div className="flex flex-wrap items-center gap-2 sm:gap-3 font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.16em] sm:tracking-[0.18em] text-[#D9D7B6]">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3 font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.16em] sm:tracking-[0.18em] text-[#D9C0A8]">
                 <span>{project.discipline}</span>
                 {project.extractedPalette && (
                   <>
-                    <span aria-hidden="true" className="text-[#878672]">
+                    <span aria-hidden="true" className="text-[#A87B6C]">
                       ·
                     </span>
                     <div className="flex items-center gap-1.5">
@@ -519,7 +519,7 @@ const FullScreenProjectSlide: React.FC<{
                         <span
                           key={swatch.hex}
                           title={swatch.name}
-                          className="h-2.5 w-2.5 border border-[#FDFBD4]/40"
+                          className="h-2.5 w-2.5 border border-[#F0E4D2]/40"
                           style={{ backgroundColor: swatch.hex }}
                         />
                       ))}
@@ -535,7 +535,7 @@ const FullScreenProjectSlide: React.FC<{
           {/* Slide Scrubber Navigation with Touch Prev/Next Buttons */}
           <div
             onClick={(e) => e.stopPropagation()}
-            className="flex items-center justify-between sm:justify-start gap-2 w-full sm:w-auto self-start lg:self-end max-w-full overflow-x-auto no-scrollbar bg-[#18383C]/88 backdrop-blur-md border border-[#FDFBD4]/20 px-3 sm:px-3.5 py-1.5 sm:py-2 pointer-events-auto shadow-lg"
+            className="flex items-center justify-between sm:justify-start gap-2 w-full sm:w-auto self-start lg:self-end max-w-full overflow-x-auto no-scrollbar bg-[#5D182B]/88 backdrop-blur-md border border-[#F0E4D2]/20 px-3 sm:px-3.5 py-1.5 sm:py-2 pointer-events-auto shadow-lg"
           >
             <div className="flex items-center gap-1.5 shrink-0">
               <button
@@ -544,7 +544,7 @@ const FullScreenProjectSlide: React.FC<{
                   setActiveImageIdx((prev) => (prev - 1 + gallery.length) % gallery.length)
                 }
                 aria-label="Previous slide"
-                className="px-1.5 py-0.5 text-[11px] font-mono text-[#FDFBD4]/80 hover:text-[#FDFBD4] border border-[#FDFBD4]/20 cursor-pointer"
+                className="px-1.5 py-0.5 text-[11px] font-mono text-[#F0E4D2]/80 hover:text-[#F0E4D2] border border-[#F0E4D2]/20 cursor-pointer"
               >
                 ←
               </button>
@@ -552,11 +552,11 @@ const FullScreenProjectSlide: React.FC<{
                 type="button"
                 onClick={() => setActiveImageIdx((prev) => (prev + 1) % gallery.length)}
                 aria-label="Next slide"
-                className="px-1.5 py-0.5 text-[11px] font-mono text-[#FDFBD4]/80 hover:text-[#FDFBD4] border border-[#FDFBD4]/20 cursor-pointer"
+                className="px-1.5 py-0.5 text-[11px] font-mono text-[#F0E4D2]/80 hover:text-[#F0E4D2] border border-[#F0E4D2]/20 cursor-pointer"
               >
                 →
               </button>
-              <span className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.14em] sm:tracking-[0.16em] text-[#D9D7B6] ml-1 whitespace-nowrap shrink-0">
+              <span className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.14em] sm:tracking-[0.16em] text-[#D9C0A8] ml-1 whitespace-nowrap shrink-0">
                 {currentMedia.label}
               </span>
             </div>
@@ -572,8 +572,8 @@ const FullScreenProjectSlide: React.FC<{
                   <span
                     className={`h-1.5 transition-all duration-300 ${
                       activeImageIdx === idx
-                        ? 'w-4 sm:w-6 bg-[#FDFBD4]'
-                        : 'w-1.5 sm:w-2 bg-[#FDFBD4]/35 hover:bg-[#FDFBD4]/75'
+                        ? 'w-4 sm:w-6 bg-[#F0E4D2]'
+                        : 'w-1.5 sm:w-2 bg-[#F0E4D2]/35 hover:bg-[#F0E4D2]/75'
                     }`}
                   />
                 </button>
@@ -624,8 +624,15 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
     <section
       id="project"
       aria-label="Selected Projects"
-      className="portfolio-section relative bg-[#18383C]"
+      className="tm-projects portfolio-section relative bg-[#5D182B]"
     >
+      <header className="tm-projects-intro">
+        <div className="tm-projects-kicker"><span>02 / FEATURED CASE STUDIES</span><span>BRAND IDENTITIES &amp; OBJECTS</span></div>
+        <div className="tm-projects-title-row">
+          <h2>Selected <em>work.</em></h2>
+          <p>A few complete worlds, from the first idea to the last printed detail.<br /><span>SCROLL TO TURN THE PAGES ↓</span></p>
+        </div>
+      </header>
       <div>
         {PORTFOLIO_PROJECTS.map((project, index) => (
           <FullScreenProjectSlide
@@ -640,13 +647,13 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
       </div>
 
       {/* Bottom Studio Archive Bar right below the Project Section */}
-      <div className="relative z-20 bg-[#122629] border-t border-b border-[#FDFBD4]/15 px-5 sm:px-10 md:px-16 py-8 sm:py-10">
+      <div className="relative z-20 bg-[#391E25] border-t border-b border-[#F0E4D2]/15 px-5 sm:px-10 md:px-16 py-8 sm:py-10">
         <div className="max-w-[1280px] mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="space-y-1">
-            <span className="block font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.22em] text-[#D9D7B6]/70">
+            <span className="block font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.22em] text-[#D9C0A8]/70">
               02 · COMPLETE STUDIO ARCHIVE ({PORTFOLIO_PROJECTS.length} FEATURED CASE STUDIES)
             </span>
-            <p className="font-serif italic text-base sm:text-xl text-[#FDFBD4]">
+            <p className="font-serif italic text-base sm:text-xl text-[#F0E4D2]">
               Explore the complete index of brand identity, fragrance, and packaging systems.
             </p>
           </div>
@@ -654,7 +661,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
           <button
             type="button"
             onClick={handleOpen}
-            className="group inline-flex items-center gap-2.5 bg-[#FDFBD4] text-[#122629] hover:bg-[#D9D7B6] px-5 sm:px-6 py-3 text-[11px] sm:text-xs font-mono uppercase tracking-[0.18em] font-semibold transition-all duration-300 shadow-lg cursor-pointer shrink-0"
+            className="group inline-flex items-center gap-2.5 bg-[#F0E4D2] text-[#391E25] hover:bg-[#D9C0A8] px-5 sm:px-6 py-3 text-[11px] sm:text-xs font-mono uppercase tracking-[0.18em] font-semibold transition-all duration-300 shadow-lg cursor-pointer shrink-0"
           >
             <LayoutGrid className="w-4 h-4 transition-transform duration-300 group-hover:scale-110" />
             <span>View All Projects</span>
@@ -673,27 +680,27 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="fixed inset-0 z-[880] bg-[#122629]/96 backdrop-blur-md text-[#FDFBD4] overflow-y-auto"
+            className="tm-project-archive-dialog fixed inset-0 z-[880] bg-[#391E25]/96 backdrop-blur-md text-[#F0E4D2] overflow-y-auto"
             role="dialog"
             aria-modal="true"
             aria-label="All Projects Archive"
           >
             <div className="max-w-[1280px] mx-auto px-5 sm:px-8 md:px-12 py-8 sm:py-12">
               {/* Modal Top Bar */}
-              <div className="flex items-center justify-between gap-4 pb-6 mb-8 sm:mb-10 border-b border-[#FDFBD4]/15">
+              <div className="flex items-center justify-between gap-4 pb-6 mb-8 sm:mb-10 border-b border-[#F0E4D2]/15">
                 <div>
-                  <span className="block font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.22em] text-[#D9D7B6]/75">
+                  <span className="block font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.22em] text-[#D9C0A8]/75">
                     TUMANEEN · ARCHIVE INDEX
                   </span>
-                  <h2 className="font-display text-2xl sm:text-4xl text-[#FDFBD4] mt-1">
-                    All Selected Projects ({PORTFOLIO_PROJECTS.length})
+                  <h2 className="font-display text-2xl sm:text-4xl text-[#F0E4D2] mt-1">
+                    The complete index ({PORTFOLIO_PROJECTS.length})
                   </h2>
                 </div>
 
                 <button
                   type="button"
                   onClick={handleClose}
-                  className="inline-flex items-center gap-2 border border-[#FDFBD4]/25 bg-[#18383C] hover:bg-[#FDFBD4] hover:text-[#122629] px-4 py-2 text-[11px] font-mono uppercase tracking-[0.18em] transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-2 border border-[#F0E4D2]/25 bg-[#5D182B] hover:bg-[#F0E4D2] hover:text-[#391E25] px-4 py-2 text-[11px] font-mono uppercase tracking-[0.18em] transition-colors cursor-pointer"
                 >
                   <span>Close</span>
                   <X className="w-4 h-4" />
@@ -721,44 +728,44 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
                           onSelectProject(project.id);
                         }
                       }}
-                      className="group flex flex-col border border-[#FDFBD4]/18 bg-[#18383C]/65 hover:border-[#FDFBD4]/50 transition-all duration-300 cursor-pointer overflow-hidden"
+                      className="group flex flex-col border border-[#F0E4D2]/18 bg-[#5D182B]/65 hover:border-[#F0E4D2]/50 transition-all duration-300 cursor-pointer overflow-hidden"
                     >
-                      <div className="relative aspect-[16/10] w-full overflow-hidden bg-[#122629]">
+                      <div className="relative aspect-[16/10] w-full overflow-hidden bg-[#391E25]">
                         <img
                           src={coverUrl}
                           alt={project.title}
                           className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#122629]/80 via-transparent to-transparent" />
-                        <span className="absolute top-3 left-3 bg-[#122629]/85 border border-[#FDFBD4]/20 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-[#FDFBD4]">
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#391E25]/80 via-transparent to-transparent" />
+                        <span className="absolute top-3 left-3 bg-[#391E25]/85 border border-[#F0E4D2]/20 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-[#F0E4D2]">
                           0{idx + 1} · {project.year}
                         </span>
-                        <span className="absolute top-3 right-3 bg-[#FDFBD4] text-[#122629] px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.16em]">
+                        <span className="absolute top-3 right-3 bg-[#F0E4D2] text-[#391E25] px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.16em]">
                           {slides.length} Slides
                         </span>
                       </div>
 
                       <div className="flex-1 flex flex-col justify-between p-5 sm:p-6 space-y-4">
                         <div className="space-y-2">
-                          <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#D9D7B6]/75">
+                          <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#D9C0A8]/75">
                             {project.location}
                           </div>
-                          <h3 className="font-display text-2xl text-[#FDFBD4] group-hover:text-[#D9D7B6] transition-colors">
+                          <h3 className="font-display text-2xl text-[#F0E4D2] group-hover:text-[#D9C0A8] transition-colors">
                             {project.title}
                           </h3>
                           {project.tagline && (
-                            <p className="font-serif italic text-sm text-[#D9D7B6]">
+                            <p className="font-serif italic text-sm text-[#D9C0A8]">
                               “{project.tagline}”
                             </p>
                           )}
-                          <p className="text-xs sm:text-sm text-[#FDFBD4]/80 line-clamp-3 leading-relaxed pt-1">
+                          <p className="text-xs sm:text-sm text-[#F0E4D2]/80 line-clamp-3 leading-relaxed pt-1">
                             {project.summary}
                           </p>
                         </div>
 
-                        <div className="pt-4 border-t border-[#FDFBD4]/12 flex items-center justify-between gap-2">
-                          <span className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.16em] text-[#FDFBD4] font-semibold group-hover:translate-x-0.5 transition-transform">
-                            <span>Open Case Study</span>
+                        <div className="pt-4 border-t border-[#F0E4D2]/12 flex items-center justify-between gap-2">
+                          <span className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.16em] text-[#F0E4D2] font-semibold group-hover:translate-x-0.5 transition-transform">
+                            <span>Open the story</span>
                             <span>→</span>
                           </span>
                           {project.behanceUrl && (
@@ -767,7 +774,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
                               target="_blank"
                               rel="noopener noreferrer"
                               onClick={(e) => e.stopPropagation()}
-                              className="inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-[0.16em] text-[#D9D7B6] hover:text-[#FDFBD4] border border-[#FDFBD4]/20 px-2.5 py-1"
+                              className="inline-flex items-center gap-1 font-mono text-[10px] uppercase tracking-[0.16em] text-[#D9C0A8] hover:text-[#F0E4D2] border border-[#F0E4D2]/20 px-2.5 py-1"
                             >
                               <span>Behance</span>
                               <ArrowUpRight className="w-3 h-3" />
@@ -781,11 +788,11 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
               </div>
 
               {/* Complete Archival Index Ledger */}
-              <div className="mt-10 sm:mt-12 pt-8 border-t border-[#FDFBD4]/15">
-                <div className="font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-[#D9D7B6]/70 mb-4">
+              <div className="mt-10 sm:mt-12 pt-8 border-t border-[#F0E4D2]/15">
+                <div className="font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-[#D9C0A8]/70 mb-4">
                   CATALOGUED STUDIO INDEX
                 </div>
-                <div className="divide-y divide-[#FDFBD4]/12 border-t border-b border-[#FDFBD4]/12">
+                <div className="divide-y divide-[#F0E4D2]/12 border-t border-b border-[#F0E4D2]/12">
                   {ARCHIVE_INDEX.map((entry, idx) => {
                     const matchedProject = PORTFOLIO_PROJECTS[idx];
                     return (
@@ -797,18 +804,18 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
                             onSelectProject(matchedProject.id);
                           }
                         }}
-                        className="py-3.5 px-2 flex flex-wrap items-center justify-between gap-3 hover:bg-[#FDFBD4]/5 transition-colors cursor-pointer"
+                        className="py-3.5 px-2 flex flex-wrap items-center justify-between gap-3 hover:bg-[#F0E4D2]/5 transition-colors cursor-pointer"
                       >
                         <div className="flex items-center gap-4">
-                          <span className="font-mono text-xs text-[#D9D7B6]/70">{entry.code}</span>
-                          <span className="font-display text-base sm:text-lg text-[#FDFBD4]">
+                          <span className="font-mono text-xs text-[#D9C0A8]/70">{entry.code}</span>
+                          <span className="font-display text-base sm:text-lg text-[#F0E4D2]">
                             {entry.project}
                           </span>
                         </div>
-                        <div className="flex items-center gap-4 font-mono text-[11px] uppercase tracking-[0.16em] text-[#D9D7B6]">
+                        <div className="flex items-center gap-4 font-mono text-[11px] uppercase tracking-[0.16em] text-[#D9C0A8]">
                           <span className="hidden sm:inline">{entry.deliverable}</span>
                           <span>{entry.year}</span>
-                          <span className="text-[#FDFBD4]">View →</span>
+                          <span className="text-[#F0E4D2]">View →</span>
                         </div>
                       </div>
                     );
