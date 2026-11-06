@@ -157,7 +157,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
         id="services"
         data-editorial-services=""
         aria-label="Design Services"
-        className="relative pt-10 pb-20 md:pt-14 md:pb-24 bg-[#F0E4D2] text-[#5D182B] overflow-hidden"
+        className="tm-services relative pt-10 pb-20 md:pt-14 md:pb-24 bg-[#F0E4D2] text-[#5D182B] overflow-hidden"
       >
         {/* Continuous Vertical Architectural Studio Margin Lines */}
         <div
@@ -173,7 +173,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
         <div className="w-full max-w-[1280px] mx-auto px-5 sm:px-6 md:px-12 mb-8 sm:mb-10 md:mb-12">
           <div className="border-t border-b border-[#5D182B]/15 py-3 sm:py-3.5 flex items-center justify-between gap-2 text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.18em] sm:tracking-[0.22em] text-[#945640]">
             <div className="flex items-center gap-2.5 sm:gap-3">
-              <span className="font-semibold text-[#5D182B]">05 / 06</span>
+              <span className="font-semibold text-[#5D182B]">05 / AN INDEX OF POSSIBILITIES</span>
               <span className="h-3 w-px bg-[#5D182B]/20" />
               <span>THE COMMISSION INDEX</span>
             </div>
@@ -291,7 +291,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
         </div>
       </section>
 
-      {/* SECTION 06 · INITIATE A PROJECT & GRAND STUDIO COLOPHON (UNIFIED DEEP STUDIO FINALE) */}
+      {/* SECTION 06 / CORRESPONDENCE DESK & GRAND STUDIO COLOPHON (UNIFIED DEEP STUDIO FINALE) */}
       <section
         id="contact-form"
         data-editorial-contact=""
