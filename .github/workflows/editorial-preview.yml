@@ -1,0 +1,45 @@
+name: Editorial visual preview
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install site and browser dependencies
+        run: |
+          npm install --legacy-peer-deps --no-audit --no-fund
+          npm install --no-save --legacy-peer-deps --no-audit --no-fund playwright
+          npx playwright install --with-deps chromium
+      - name: Build preview
+        run: npm run build
+      - name: Serve preview
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 >/tmp/tumaneen-vite.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/tumaneen-vite.log
+          exit 1
+      - name: Verify and capture responsive editorial layouts
+        run: node scripts/verify-editorial.mjs
+      - name: Upload review screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: editorial-responsive-screenshots
+          path: editorial-snapshots/*.png
+          if-no-files-found: ignore
+          retention-days: 14
