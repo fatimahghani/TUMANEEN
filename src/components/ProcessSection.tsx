@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useMemo } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform, useMotionValueEvent } from 'motion/react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 
@@ -140,57 +140,6 @@ const INROOT_PROCESS_CARDS: InrootProcessCard[] = [
   },
 ];
 
-// Preload process images after critical above-the-fold hero & poster assets have started loading
-if (typeof window !== 'undefined') {
-  setTimeout(() => {
-    INROOT_PROCESS_CARDS.forEach((card) => {
-      const img = new Image();
-      img.decoding = 'async';
-      img.src = card.imageUrl;
-    });
-  }, 800);
-}
-
-/**
- * Generates a real 35mm analog color + silver-halide film grain tile on an offscreen canvas
- * so every process card has crisp, authentic vintage grain matching the main hero page.
- */
-function useVintageFilmGrainTile(): string {
-  return useMemo(() => {
-    if (typeof document === 'undefined') return '';
-    const size = 220;
-    const canvas = document.createElement('canvas');
-    canvas.width = size;
-    canvas.height = size;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return '';
-
-    const imgData = ctx.createImageData(size, size);
-    const data = imgData.data;
-
-    // Deterministic pseudo-random generator for rich 35mm color dye + luminance grain
-    let seed = 4219;
-    const rand = () => {
-      seed = (seed * 16807) % 2147483647;
-      return (seed - 1) / 2147483646;
-    };
-
-    for (let i = 0; i < data.length; i += 4) {
-      const luma = (rand() - 0.5) * 155;
-      const warmShift = (rand() - 0.46) * 42;
-      const tealShift = (rand() - 0.5) * 36;
-
-      data[i] = Math.min(255, Math.max(0, 128 + luma + warmShift)); // R (warm amber/cream grain)
-      data[i + 1] = Math.min(255, Math.max(0, 126 + luma)); // G
-      data[i + 2] = Math.min(255, Math.max(0, 122 + luma + tealShift)); // B (subtle cyan/teal shadow speckle)
-      data[i + 3] = 98; // Strong analog grain density
-    }
-
-    ctx.putImageData(imgData, 0, 0);
-    return canvas.toDataURL('image/png');
-  }, []);
-}
-
 export const ProcessSection: React.FC = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const trackWrapperRef = useRef<HTMLDivElement>(null);
@@ -198,7 +147,6 @@ export const ProcessSection: React.FC = () => {
 
   const [maxScrollX, setMaxScrollX] = useState<number>(1926);
   const [activeStepIndex, setActiveStepIndex] = useState<number>(0);
-  const grainTileUrl = useVintageFilmGrainTile();
 
   // Measure the exact horizontal travel distance so the last card aligns cleanly with the right edge of the 1100px frame
   useEffect(() => {
@@ -335,94 +283,21 @@ export const ProcessSection: React.FC = () => {
                 </div>
               </div>
 
-              {/* ITEMS 1..5: The 5 Horizontal Process Cards with Dreamy Vintage Grainy Courtyard Imagery */}
+              {/* ITEMS 1..5: Edition-style print plates following the five design stages */}
               {INROOT_PROCESS_CARDS.map((card, index) => (
                 <article
+                  data-step={card.number}
                   key={card.number}
                   onClick={() => scrollToCardIndex(index)}
                   className="tm-process-card group relative w-[calc(100vw-32px)] sm:w-[460px] md:w-[525px] h-[425px] sm:h-[510px] md:h-[548px] max-h-[calc(100svh-150px)] sm:max-h-[calc(100svh-135px)] shrink-0 overflow-hidden bg-[#8A795D] cursor-pointer shadow-[0_20px_50px_rgba(57,30,37,0.16)]"
                 >
-                  {/* 0. Instant Local Sunlit Studio Base Layer (Zero network delay, prevents any dark flash) */}
-                  <img
-                    src={`${import.meta.env.BASE_URL}assets/aistudio/retro_design_studio_poster.jpg`}
-                    alt=""
-                    aria-hidden="true"
-                    loading="eager"
-                    decoding="async"
-                    style={{ objectPosition: card.courtyardCropPosition }}
-                    className="
-                      absolute inset-0 w-full h-full object-cover
-                      scale-105 pointer-events-none
-                    "
-                  />
-
-                  {/* 1A. Primary Vintage Subject Photograph — Eagerly loaded with hardware-accelerated CSS color grade */}
-                  <img
-                    src={card.imageUrl}
-                    alt={`${card.centerWord} — ${card.subtitle}`}
-                    loading="eager"
-                    decoding="async"
-                    style={{ filter: 'sepia(0.22) contrast(1.05) brightness(1.04) saturate(1.14)' }}
-                    className="
-                      absolute inset-0 w-full h-full object-cover object-center
-                      scale-105 group-hover:scale-110
-                      transition-transform duration-1000 ease-out
-                    "
-                  />
-
-                  {/* 1B. Blended Main-Page Retro Studio Light & Grain Texture Layer */}
-                  <img
-                    src={`${import.meta.env.BASE_URL}assets/aistudio/retro_design_studio_poster.jpg`}
-                    alt=""
-                    aria-hidden="true"
-                    loading="eager"
-                    decoding="async"
-                    style={{ objectPosition: card.courtyardCropPosition }}
-                    className="
-                      absolute inset-0 w-full h-full object-cover
-                      opacity-45 mix-blend-soft-light
-                      scale-110 group-hover:scale-115
-                      transition-transform duration-1000 ease-out
-                      pointer-events-none
-                    "
-                  />
-
-                  {/* 2. Warm Sun-Drenched Amber & Deep Teal Courtyard Color Grading */}
-                  <div
-                    className="absolute inset-0 pointer-events-none mix-blend-multiply"
-                    style={{ background: card.sunbeamOverlay }}
-                  />
-
-                  {/* 3. Dappled Golden Sunbeams & Soft Analog Halation Glow */}
-                  <div
-                    className="absolute inset-0 pointer-events-none mix-blend-screen opacity-55"
-                    style={{
-                      background:
-                        'radial-gradient(ellipse at 78% 18%, rgba(253, 251, 212, 0.52) 0%, rgba(235, 168, 98, 0.28) 38%, transparent 72%)',
-                    }}
-                  />
-
-                  {/* 4. 35mm Analog Film Grain Layer (Matches main page grainy texture) */}
-                  {grainTileUrl && (
-                    <div
-                      aria-hidden="true"
-                      className="absolute inset-0 pointer-events-none mix-blend-overlay opacity-75"
-                      style={{
-                        backgroundImage: `url(${grainTileUrl})`,
-                        backgroundRepeat: 'repeat',
-                        backgroundSize: '180px 180px',
-                      }}
-                    />
-                  )}
-
-                  {/* 5. Subtle Vintage Film Frame Vignette */}
-                  <div
-                    aria-hidden="true"
-                    className="absolute inset-0 pointer-events-none"
-                    style={{
-                      boxShadow: 'inset 0 0 60px rgba(57, 30, 37, 0.38)',
-                    }}
-                  />
+                  {/* Original typographic print plate: no synthetic studio photography. */}
+                  <div className="tm-process-artboard" aria-hidden="true">
+                    <span className="tm-process-artboard-series">TUMANEEN / METHODS &amp; MARK-MAKING</span>
+                    <span className="tm-process-artboard-number">{card.number}</span>
+                    <span className="tm-process-artboard-sidenote">A SMALL CHAPTER IN THE MAKING OF THINGS</span>
+                    <span className="tm-process-artboard-registration">+&nbsp;&nbsp;&nbsp;&nbsp;+&nbsp;&nbsp;&nbsp;&nbsp;+</span>
+                  </div>
 
                   {/* 6. Top-Left & Top-Right Quiet Step Metadata */}
                   <div className="relative z-10 px-4 sm:px-6 pt-4 sm:pt-5 flex items-center justify-between gap-2 text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.12em] sm:tracking-[0.14em] text-[#F0E4D2] drop-shadow-[0_1px_4px_rgba(57,30,37,0.8)]">
@@ -456,7 +331,7 @@ export const ProcessSection: React.FC = () => {
                     </h3>
                   </div>
 
-                  {/* 8. Bottom-Right Frosted Translucent Info Box (Exact match to inrootdesign.com cards) */}
+                  {/* 8. Printed annotation at the foot of each process plate */}
                   <div
                     className="
                       absolute bottom-3.5 sm:bottom-5 right-3.5 sm:right-5 left-3.5 sm:left-[26%]
