@@ -10,157 +10,173 @@ interface ReadingNookHeroProps {
   onEmailClick?: () => void;
 }
 
-const NAV_ITEMS: { id: Section; label: string }[] = [
-  { id: 'home', label: 'Home' },
-  { id: 'posters', label: 'Posters' },
-  { id: 'project', label: 'Projects' },
-  { id: 'process', label: 'Process' },
-  { id: 'about', label: 'About' },
-  { id: 'services', label: 'Services' },
+const NAV_ITEMS: { section: Section; label: string; index: string }[] = [
+  { section: 'home', label: 'Index', index: '00' },
+  { section: 'posters', label: 'Posters', index: '01' },
+  { section: 'project', label: 'Projects', index: '02' },
+  { section: 'process', label: 'Process', index: '03' },
+  { section: 'about', label: 'About', index: '04' },
+  { section: 'services', label: 'Services', index: '05' },
 ];
 
-// Keep the artist's original Shanakht asset rather than replacing or modifying the work.
 const SHANAKHT_ARTWORK = import.meta.env.BASE_URL + 'assets/aistudio/shnakht_449796d0.jpg';
 
+/**
+ * TUMANEEN's opening page is deliberately composed as one magazine spread,
+ * not a collection of independent cards. The original Shanakht artwork is
+ * reproduced without cropping and the rest of the portfolio remains intact.
+ */
 export const ReadingNookHero: React.FC<ReadingNookHeroProps> = ({
   activeNav = 'home',
   onSelectNav,
   onEmailClick,
 }) => {
-  const navigate = (event: React.MouseEvent<HTMLAnchorElement>, section: Section) => {
-    if (onSelectNav) {
-      event.preventDefault();
-      onSelectNav(section);
-    }
+  const goTo = (event: React.MouseEvent<HTMLAnchorElement>, section: Section) => {
+    if (!onSelectNav) return;
+    event.preventDefault();
+    onSelectNav(section);
   };
 
   return (
     <section className="tm-hero" aria-labelledby="tm-hero-title">
-      <div className="tm-hero-paper" aria-hidden="true" />
-      <div className="tm-hero-page">
-        <div className="tm-edition-line" aria-label="Portfolio edition information">
-          <span>THE ART OF MAKING THINGS MEAN SOMETHING</span>
-          <span>AN INDEPENDENT DESIGN JOURNAL <span aria-hidden="true">✳</span> VOL. 01 / 2026</span>
+      <div className="tm-paper-grain" aria-hidden="true" />
+
+      <div className="tm-sheet">
+        <div className="tm-running">
+          <span>AN INDEPENDENT VISUAL NOTEBOOK</span>
+          <span className="tm-running-center">ART / TYPE / IDENTITY / ALL THE IN-BETWEEN</span>
+          <span>VOLUME I <span aria-hidden="true">—</span> 2026</span>
         </div>
 
-        <header className="tm-hero-header">
-          <div className="tm-masthead-row">
-            <p className="tm-masthead-side">A collection of<br />thoughtful visual things.</p>
-            <h1 id="tm-hero-title" className="tm-masthead">TUMANEEN<span className="tm-masthead-period">.</span></h1>
-            <div className="tm-masthead-stamp" aria-label="Independent design studio">
-              <span>EST.</span>
-              <strong>FG</strong>
-              <span>2026</span>
+        <header className="tm-header">
+          <div className="tm-masthead-wrap">
+            <div className="tm-masthead-aside" aria-hidden="true">
+              <span lang="ur" dir="rtl">دفترِ نقش</span>
+              <span>NOTES ON<br />MAKING &amp; MEANING</span>
+            </div>
+            <h1 id="tm-hero-title" className="tm-masthead">TUMANEEN<span aria-hidden="true">.</span></h1>
+            <div className="tm-masthead-signature">
+              <span>ISSUE Nº 001</span>
+              <strong>FG.</strong>
+              <span>A VISUAL DIARY</span>
             </div>
           </div>
 
-          <div className="tm-hero-navigation">
-            <span className="tm-nav-deck">FATIMAH GHANI <span aria-hidden="true">/</span> VISUAL DESIGNER</span>
-            <nav aria-label="Primary navigation" className="tm-nav-links">
-              {NAV_ITEMS.map((item) => (
+          <div className="tm-navigation">
+            <nav className="tm-nav-items" aria-label="Portfolio navigation">
+              {NAV_ITEMS.map(({ section, label, index }) => (
                 <a
-                  href={'#' + item.id}
-                  key={item.id}
-                  aria-current={activeNav === item.id ? 'page' : undefined}
-                  className={activeNav === item.id ? 'tm-nav-current' : undefined}
-                  onClick={(event) => navigate(event, item.id)}
+                  key={section}
+                  href={'#' + section}
+                  className={activeNav === section ? 'tm-nav-item tm-nav-active' : 'tm-nav-item'}
+                  aria-current={activeNav === section ? 'page' : undefined}
+                  onClick={(event) => goTo(event, section)}
                 >
-                  {item.label}
+                  <span className="tm-nav-index">{index}.</span> {label}
                 </a>
               ))}
             </nav>
-            <button className="tm-nav-contact" type="button" onClick={() => onEmailClick?.()}>
-              Let's talk <ArrowUpRight size={14} strokeWidth={1.7} aria-hidden="true" />
+            <button className="tm-contact-link" type="button" onClick={() => onEmailClick?.()}>
+              HAVE A PROJECT? <ArrowUpRight size={15} strokeWidth={1.8} aria-hidden="true" />
             </button>
           </div>
         </header>
 
-        <div className="tm-feature">
-          <div className="tm-story">
-            <div className="tm-story-kicker">
-              <span className="tm-story-star" aria-hidden="true">✳</span>
-              <span>FROM THE DESIGNER'S DESK</span>
-              <span className="tm-story-number">/ NO. 001</span>
+        <div className="tm-cover">
+          <span className="tm-cover-rail" aria-hidden="true">TUMANEEN / COVER STORY / 001</span>
+          <div className="tm-cover-inner">
+            <div className="tm-story">
+              <div className="tm-story-topline">
+                <span>THE COVER STORY</span>
+                <span className="tm-story-rule" aria-hidden="true" />
+                <span>02 / 08</span>
+              </div>
+
+              <div className="tm-cover-heading">
+                <p className="tm-heading-prefix">On belonging, memory &amp; a city.</p>
+                <h2>
+                  <span className="tm-heading-line-one">The address</span>
+                  <span className="tm-heading-line-two">changed.</span>
+                  <span className="tm-heading-line-three">Not the <em>identity.</em></span>
+                </h2>
+                <span className="tm-heading-mark" aria-hidden="true">“</span>
+              </div>
+
+              <p className="tm-story-urdu" lang="ur" dir="rtl">پتہ بدلا ہے، شناخت نہیں</p>
+
+              <div className="tm-story-end">
+                <p className="tm-story-essay">
+                  <span className="tm-essay-initial" aria-hidden="true">S</span>
+                  <span className="tm-essay-body">
+                    <strong>SHANAKHT / شناخت</strong>
+                    <span>A poster about identity and the streets of Androon Lahore.
+                      One of the pieces in my growing collection of visual notes.</span>
+                  </span>
+                </p>
+                <a href="#posters" onClick={(event) => goTo(event, 'posters')} className="tm-cover-link">
+                  SEE THE POSTER ARCHIVE <ArrowUpRight size={16} aria-hidden="true" />
+                </a>
+              </div>
             </div>
 
-            <div className="tm-story-headline">
-              <p className="tm-story-overline">ART, IDENTITY &amp; THE IN-BETWEEN</p>
-              <h2>Some things<br /><em>are felt.</em></h2>
-              <span className="tm-story-asterisk" aria-hidden="true">*</span>
-            </div>
-
-            <p className="tm-story-urdu" lang="ur" dir="rtl">
-              دل سے بنے، دل تک پہنچے
-            </p>
-            <p className="tm-story-description">
-              TUMANEEN is a little space for curious ideas, evocative identities
-              and design with a story to tell. Rooted in culture, shaped by
-              feeling, made to linger.
-            </p>
-
-            <div className="tm-story-actions">
-              <a href="#project" className="tm-story-primary" onClick={(event) => navigate(event, 'project')}>
-                Explore the work <ArrowUpRight size={16} strokeWidth={1.8} aria-hidden="true" />
-              </a>
-              <a href="#about" className="tm-story-secondary" onClick={(event) => navigate(event, 'about')}>
-                A note about me <span aria-hidden="true">↗</span>
-              </a>
-            </div>
-
-            <div className="tm-story-colophon">
-              <span className="tm-colophon-mark" aria-hidden="true">✳</span>
-              <p>For the things that deserve<br />to be remembered.</p>
-              <span className="tm-colophon-folio">T. / 01</span>
+            <div className="tm-picture-column">
+              <span className="tm-urdu-backdrop" lang="ur" dir="rtl" aria-hidden="true">شناخت</span>
+              <span className="tm-picture-notch tm-picture-notch-top" aria-hidden="true" />
+              <span className="tm-picture-notch tm-picture-notch-bottom" aria-hidden="true" />
+              <div className="tm-picture-underprint" aria-hidden="true" />
+              <figure className="tm-picture-print">
+                <img
+                  src={SHANAKHT_ARTWORK}
+                  alt="Shanakht — Fatimah Ghani's original cultural identity and Urdu typography poster set around Androon Lahore."
+                  loading="eager"
+                  decoding="async"
+                  fetchPriority="high"
+                />
+                <figcaption className="tm-picture-caption">
+                  <span>PLATE II</span>
+                  <span>SHANAKHT / ORIGINAL ARTWORK</span>
+                </figcaption>
+              </figure>
+              <div className="tm-picture-index" aria-hidden="true">II.</div>
+              <span className="tm-picture-vertical" aria-hidden="true">THE ADDRESS CHANGED / THE IDENTITY DID NOT</span>
             </div>
           </div>
 
-          <div className="tm-artwork">
-            <div className="tm-artwork-index">
-              <span>AN EDITORIAL FEATURE</span>
-              <span>PLATE 01 / ORIGINAL ARTWORK</span>
-            </div>
-
-            <div className="tm-artwork-stage">
-              <div className="tm-artwork-underprint" aria-hidden="true">
-                <span>THE<br />ARCHIVE</span>
-              </div>
-              <figure className="tm-artwork-print">
-                <div className="tm-artwork-print-inner">
-                  <img
-                    src={SHANAKHT_ARTWORK}
-                    alt="Shanakht, an original artwork by Fatimah Ghani, presented as the featured print."
-                    loading="eager"
-                    decoding="async"
-                  />
-                </div>
-                <figcaption className="tm-artwork-image-label">ORIGINAL WORK <span>© FATIMAH GHANI</span></figcaption>
-              </figure>
-              <div className="tm-artwork-seal" aria-hidden="true">
-                <span>THE</span>
-                <strong>TMN</strong>
-                <span>EDITION</span>
-              </div>
-              <span className="tm-artwork-side-note" aria-hidden="true">A STUDY IN SELF &amp; SYMBOL</span>
-            </div>
-
-            <div className="tm-artwork-caption">
-              <div>
-                <span className="tm-artwork-caption-label">FEATURED IN THE JOURNAL</span>
-                <h3>Shanakht <span lang="ur" dir="rtl">شناخت</span></h3>
-              </div>
-              <p>Identity, memory and the marks we carry.<br /><span>ARTWORK NO. 01 — FROM THE ARCHIVE</span></p>
-            </div>
+          <div className="tm-cover-baseline">
+            <span>FIG. 02 / CULTURAL IDENTITY · URDU TYPOGRAPHY</span>
+            <span>ANDROON LAHORE — PAKISTAN</span>
+            <span className="tm-cover-baseline-star" aria-hidden="true">✳</span>
           </div>
         </div>
 
-        <footer className="tm-hero-footer">
-          <span className="tm-footer-label">TUMANEEN — A VISUAL DIARY</span>
-          <span className="tm-footer-center" lang="ur" dir="rtl">تصویر، تہذیب، تخیل</span>
-          <a href="#posters" onClick={(event) => navigate(event, 'posters')}>
-            TURN THE PAGE <ArrowDownRight size={16} strokeWidth={1.8} aria-hidden="true" />
+        <div className="tm-afterword">
+          <div className="tm-afterword-number" aria-hidden="true">01<span>/</span></div>
+          <div className="tm-afterword-copy">
+            <span className="tm-label">FROM THE DESK OF FATIMAH GHANI</span>
+            <p>Things I made.<br /><em>Things I kept thinking about.</em></p>
+          </div>
+          <div className="tm-afterword-body">
+            <p>TUMANEEN is my ongoing index of posters, identities, experiments
+              and happy accidents. More sketchbook than showroom.</p>
+            <a href="#about" onClick={(event) => goTo(event, 'about')}>MEET THE DESIGNER <ArrowUpRight size={14} aria-hidden="true" /></a>
+          </div>
+          <div className="tm-contents">
+            <span className="tm-label">IN THIS EDITION</span>
+            <a href="#posters" onClick={(event) => goTo(event, 'posters')}><span>01</span> THE POSTER ARCHIVE <ArrowUpRight size={13} aria-hidden="true" /></a>
+            <a href="#project" onClick={(event) => goTo(event, 'project')}><span>02</span> SELECTED PROJECTS <ArrowUpRight size={13} aria-hidden="true" /></a>
+            <a href="#process" onClick={(event) => goTo(event, 'process')}><span>03</span> HOW I WORK <ArrowUpRight size={13} aria-hidden="true" /></a>
+          </div>
+        </div>
+
+        <footer className="tm-footer">
+          <span>FATIMAH GHANI / GRAPHIC DESIGN &amp; VISUAL IDENTITY</span>
+          <span lang="ur" dir="rtl">ایک بصری ڈائری</span>
+          <a href="#posters" onClick={(event) => goTo(event, 'posters')}>
+            TURN THE PAGE <ArrowDownRight size={15} strokeWidth={1.8} aria-hidden="true" />
           </a>
         </footer>
       </div>
+      <div className="tm-final-rule" aria-hidden="true" />
     </section>
   );
 };
