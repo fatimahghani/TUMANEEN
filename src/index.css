@@ -1,15 +1,15 @@
 @import "tailwindcss";
 
 @theme {
-  --font-display: "Cormorant Garamond", Georgia, serif;
-  --font-serif: "Cormorant Garamond", Georgia, serif;
-  --font-sans: "Archivo Narrow", "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono: "DM Mono", "JetBrains Mono", monospace;
+  --font-display: "Bodoni Moda", Georgia, serif;
+  --font-serif: "Instrument Serif", Georgia, serif;
+  --font-sans: "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: "DM Mono", monospace;
 
-  --color-canvas: #FDFBD4;
-  --color-beige: #D9D7B6;
-  --color-taupe: #878672;
-  --color-olive: #545333;
+  --color-canvas: #E9DCC5;
+  --color-beige: #D9C0A8;
+  --color-taupe: #A87B6C;
+  --color-olive: #5D182B;
 }
 
 @layer base {
@@ -18,8 +18,8 @@
   }
 
   body {
-    background-color: #FDFBD4;
-    color: #545333;
+    background-color: #E9DCC5;
+    color: #391E25;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
