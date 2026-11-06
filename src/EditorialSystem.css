@@ -19,7 +19,7 @@
   --tm-light-rule: rgba(240, 228, 210, .34);
   color: var(--tm-ink);
   background: var(--tm-paper);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   letter-spacing: .007em;
 }
 .tm-site ::selection { background: var(--tm-wine); color: var(--tm-paper-light); }
@@ -27,9 +27,9 @@
   outline: 2px solid var(--tm-red);
   outline-offset: 3px;
 }
-.tm-site .font-display { font-family: 'Bodoni Moda', Georgia, serif; }
-.tm-site .font-serif { font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; }
-.tm-site :is(.font-mono, [class*="font-mono"]) { font-family: 'DM Mono', monospace; }
+.tm-site .font-display { font-family: 'Fraunces', Georgia, serif; }
+.tm-site .font-serif { font-family: 'Fraunces', Georgia, serif; font-weight: 400; }
+.tm-site :is(.font-mono, [class*="font-mono"]) { font-family: 'Inter', sans-serif; }
 .tm-site :is(h1, h2, h3, h4) { text-wrap: balance; }
 .tm-page-turn-flash {
   background: linear-gradient(105deg, rgba(93, 24, 43, .94), rgba(160, 79, 59, .56) 52%, rgba(233, 220, 197, .12));
@@ -49,14 +49,14 @@
   max-width: 1440px;
 }
 .tm-site [data-editorial-nav] .tm-floating-surface > div:first-child > button:first-child > span:first-child {
-  font-family: 'Bodoni Moda', Georgia, serif;
+  font-family: 'Fraunces', Georgia, serif;
   font-weight: 700;
   font-size: clamp(24px, 2.4vw, 35px);
   text-transform: none;
   letter-spacing: -.06em;
 }
 .tm-site [data-editorial-nav] nav button {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 12px;
   font-weight: 600;
   letter-spacing: .035em;
@@ -92,11 +92,11 @@
   pointer-events: none; position: absolute; z-index: 500;
   right: 19px; top: 50%; writing-mode: vertical-rl;
   color: rgba(240, 228, 210, .48);
-  font: 500 9px/1 'DM Mono', monospace;
+  font: 500 9px/1 'Inter', sans-serif;
   letter-spacing: .16em;
 }
 .tm-site #posters .lb-word {
-  font-family: 'Bodoni Moda', Georgia, serif;
+  font-family: 'Fraunces', Georgia, serif;
   font-weight: 500;
   letter-spacing: -.065em;
   color: #f0e4d2;
@@ -111,7 +111,7 @@
   box-shadow: 10px 18px 35px rgba(27, 4, 13, .42), 0 0 0 1px rgba(255, 245, 225, .2);
 }
 .tm-site #posters .lb-hint-label {
-  font-family: 'DM Mono', monospace;
+  font-family: 'Inter', sans-serif;
   letter-spacing: .08em;
   color: rgba(240, 228, 210, .75);
   font-size: 9px;
@@ -119,11 +119,11 @@
 .tm-site #posters [data-lb-ui] { border-bottom: 1px solid rgba(240, 228, 210, .22); }
 .tm-site #posters [data-lb-ui] > div:first-child > span:first-child {
   color: #f0e4d2;
-  font: 500 10px/1.2 'DM Mono', monospace;
+  font: 500 10px/1.2 'Inter', sans-serif;
   letter-spacing: .05em;
 }
 .tm-site #posters [data-lb-ui] span.font-serif {
-  font: italic 19px/1.1 'Bodoni Moda', Georgia, serif;
+  font: italic 19px/1.1 'Fraunces', Georgia, serif;
   color: #d9c0a8;
 }
 .tm-site #posters [data-lb-ui] button {
@@ -133,8 +133,8 @@
   border-radius: 0;
 }
 .tm-site #posters [data-lb-ui] button:hover { background: #f0e4d2; color: #5d182b; }
-.tm-site #posters .lb-cardtitle { font-family: 'Bodoni Moda', Georgia, serif; }
-.tm-site #posters .lb-cap { font-family: 'Bodoni Moda', Georgia, serif; font-style: italic; }
+.tm-site #posters .lb-cardtitle { font-family: 'Fraunces', Georgia, serif; }
+.tm-site #posters .lb-cap { font-family: 'Fraunces', Georgia, serif; font-style: italic; }
 .tm-site #posters .lb-card + .lb-card { outline: 0; }
 
 /* A transition with editorial purpose, not a generic cinematic gradient. */
@@ -153,7 +153,7 @@
 .tm-bridge-running, .tm-bridge-footer {
   display: flex; justify-content: space-between; align-items: center; gap: 12px;
   border-top: 1px solid var(--tm-ink); border-bottom: 1px solid var(--tm-ink);
-  padding: 12px 0; font: 500 10px/1.3 'DM Mono', monospace;
+  padding: 12px 0; font: 500 10px/1.3 'Inter', sans-serif;
   letter-spacing: .06em;
 }
 .tm-bridge-running { margin-top: 0; border-top: 0; }
@@ -163,12 +163,12 @@
   gap: clamp(16px, 3.5vw, 54px);
   padding: clamp(52px, 7vw, 110px) 0 clamp(45px, 7vw, 95px);
 }
-.tm-bridge-issue { color: var(--tm-red); font: italic 500 clamp(100px, 11vw, 190px)/.7 'Bodoni Moda', Georgia, serif; letter-spacing: -.13em; }
+.tm-bridge-issue { color: var(--tm-red); font: italic 500 clamp(100px, 11vw, 190px)/.7 'Fraunces', Georgia, serif; letter-spacing: -.13em; }
 .tm-bridge-issue span { font-size: .7em; }
-.tm-bridge-kicker { display: block; padding-bottom: 14px; border-bottom: 1px solid var(--tm-soft-rule); font: 500 10px/1.4 'DM Mono', monospace; letter-spacing: .08em; }
+.tm-bridge-kicker { display: block; padding-bottom: 14px; border-bottom: 1px solid var(--tm-soft-rule); font: 500 10px/1.4 'Inter', sans-serif; letter-spacing: .08em; }
 .tm-bridge-statement h2 {
   margin: 18px 0 5px; color: var(--tm-wine);
-  font: 550 clamp(69px, 7.7vw, 130px)/.80 'Bodoni Moda', Georgia, serif;
+  font: 450 clamp(69px, 7.7vw, 130px)/.80 'Fraunces', Georgia, serif;
   letter-spacing: -.072em;
 }
 .tm-bridge-statement h2 em { color: var(--tm-red); font-weight: 400; }
@@ -177,17 +177,17 @@
 .tm-bridge-notes-top {
   display: flex; justify-content: space-between; align-items: center; border-top: 3px double var(--tm-ink);
   padding-top: 12px; margin-bottom: 32px; color: var(--tm-red);
-  font: 500 10px/1.3 'DM Mono', monospace;
+  font: 500 10px/1.3 'Inter', sans-serif;
 }
-.tm-bridge-notes p { margin: 0 0 19px; max-width: 325px; color: #53363b; font: 500 clamp(18px, 1.9vw, 26px)/1.22 'DM Sans', sans-serif; }
+.tm-bridge-notes p { margin: 0 0 19px; max-width: 325px; color: #53363b; font: 500 clamp(18px, 1.9vw, 26px)/1.22 'Inter', sans-serif; }
 .tm-bridge-notes p + p { font-size: clamp(15px, 1.3vw, 18px); line-height: 1.4; }
 .tm-bridge-notes button {
   display: inline-flex; align-items: center; justify-content: space-between; gap: 15px; width: 100%; max-width: 345px;
   background: var(--tm-wine); color: var(--tm-paper-light); border: 1px solid var(--tm-wine);
-  padding: 15px; font: 500 10px/1.3 'DM Mono', monospace; cursor: pointer; transition: background .2s;
+  padding: 15px; font: 500 10px/1.3 'Inter', sans-serif; cursor: pointer; transition: background .2s;
 }
 .tm-bridge-notes button:hover { background: var(--tm-ink); }
-.tm-bridge-small { display: block; margin-top: 15px; font: 500 9px/1.3 'DM Mono', monospace; color: var(--tm-rust); }
+.tm-bridge-small { display: block; margin-top: 15px; font: 500 9px/1.3 'Inter', sans-serif; color: var(--tm-rust); }
 
 /* 02 — the portfolio is a sequence of art-directed plates. */
 .tm-projects { background: var(--tm-wine); }
@@ -198,7 +198,7 @@
 .tm-projects-kicker {
   display: flex; justify-content: space-between; align-items: center; gap: 15px;
   border-top: 3px double var(--tm-ink); border-bottom: 1px solid var(--tm-ink);
-  padding: 12px 0; font: 500 10px/1.25 'DM Mono', monospace;
+  padding: 12px 0; font: 500 10px/1.25 'Inter', sans-serif;
 }
 .tm-projects-title-row {
   display: flex; justify-content: space-between; align-items: end; gap: 30px;
@@ -206,21 +206,21 @@
 }
 .tm-projects-title-row h2 {
   margin: 0; color: var(--tm-wine);
-  font: 550 clamp(80px, 11vw, 170px)/.76 'Bodoni Moda', Georgia, serif;
+  font: 450 clamp(80px, 11vw, 170px)/.76 'Fraunces', Georgia, serif;
   letter-spacing: -.07em;
 }
 .tm-projects-title-row h2 em { font-weight: 400; color: var(--tm-red); }
-.tm-projects-title-row p { margin: 0; max-width: 235px; font: italic 23px/1.08 'Bodoni Moda', Georgia, serif; }
-.tm-projects-title-row p span { display: block; padding-top: 17px; font: 500 9px/1.4 'DM Mono', monospace; color: var(--tm-rust); letter-spacing: .05em; }
+.tm-projects-title-row p { margin: 0; max-width: 235px; font: italic 23px/1.08 'Fraunces', Georgia, serif; }
+.tm-projects-title-row p span { display: block; padding-top: 17px; font: 500 9px/1.4 'Inter', sans-serif; color: var(--tm-rust); letter-spacing: .05em; }
 .tm-project-spread { background: var(--tm-wine); }
 .tm-project-spread::after {
   position: absolute; content: 'TUMANEEN / FOLIO 02'; pointer-events: none; z-index: 8;
   right: 13px; bottom: 105px; color: rgba(240,228,210,.55);
-  font: 500 9px/1 'DM Mono', monospace;
+  font: 500 9px/1 'Inter', sans-serif;
   letter-spacing: .13em; writing-mode: vertical-rl;
 }
 .tm-project-spread h3 {
-  font: 600 clamp(46px, 6vw, 104px)/.84 'Bodoni Moda', Georgia, serif;
+  font: 500 clamp(46px, 6vw, 104px)/.84 'Fraunces', Georgia, serif;
   letter-spacing: -.055em;
   text-shadow: 0 2px 12px rgba(35, 4, 14, .28);
 }
@@ -232,13 +232,13 @@
 }
 .tm-projects > div:nth-of-type(2) p.font-serif { font-size: clamp(19px, 2vw, 27px); }
 .tm-project-archive-dialog { background: rgba(57, 30, 37, .99); backdrop-filter: none; }
-.tm-project-archive-dialog h2 { font: 550 clamp(44px, 6vw, 88px)/.88 'Bodoni Moda', Georgia, serif; letter-spacing: -.04em; }
+.tm-project-archive-dialog h2 { font: 450 clamp(44px, 6vw, 88px)/.88 'Fraunces', Georgia, serif; letter-spacing: -.04em; }
 .tm-project-archive-dialog [role="button"] {
   border: 1px solid rgba(240,228,210,.35);
   background: rgba(240,228,210,.06);
   box-shadow: none;
 }
-.tm-project-archive-dialog [role="button"] h3 { font: 550 37px/.95 'Bodoni Moda', Georgia, serif; letter-spacing: -.035em; }
+.tm-project-archive-dialog [role="button"] h3 { font: 450 37px/.95 'Fraunces', Georgia, serif; letter-spacing: -.035em; }
 
 /* 03 — the process is a paper chapter with oversized print plates. */
 .tm-process { background: var(--tm-paper) !important; color: var(--tm-ink) !important; }
@@ -246,16 +246,16 @@
   content: 'THE MAKING OF / A VISUAL IDENTITY'; position: absolute;
   top: 16px; left: max(18px, calc((100vw - 1340px) / 2));
   pointer-events: none; color: var(--tm-rust);
-  font: 500 9px/1.2 'DM Mono', monospace; letter-spacing: .07em;
+  font: 500 9px/1.2 'Inter', sans-serif; letter-spacing: .07em;
 }
 .tm-process .sticky > div:first-child { border-bottom: 1px solid var(--tm-soft-rule); padding-bottom: 13px; }
 .tm-process .sticky > div:first-child > div > span:first-child {
-  font: 500 10px/1.4 'DM Mono', monospace;
+  font: 500 10px/1.4 'Inter', sans-serif;
   letter-spacing: .065em;
 }
 .tm-process .sticky p.font-display {
   color: var(--tm-wine);
-  font: 600 clamp(52px, 5.3vw, 81px)/.86 'Bodoni Moda', Georgia, serif;
+  font: 500 clamp(52px, 5.3vw, 81px)/.86 'Fraunces', Georgia, serif;
   letter-spacing: -.075em;
 }
 .tm-process .sticky p.font-display:first-child { font-style: italic; color: var(--tm-red); }
@@ -284,19 +284,19 @@
 }
 .tm-process-artboard-series {
   position: absolute; left: 26px; top: 58px;
-  font: 500 9px/1.4 'DM Mono', monospace; letter-spacing: .12em; opacity: .65;
+  font: 500 9px/1.4 'Inter', sans-serif; letter-spacing: .12em; opacity: .65;
 }
 .tm-process-artboard-number {
   position: absolute; bottom: 16%; right: -1%;
-  font: italic 600 clamp(240px, 27vw, 395px)/.65 'Bodoni Moda', Georgia, serif;
+  font: italic 600 clamp(240px, 27vw, 395px)/.65 'Fraunces', Georgia, serif;
   letter-spacing: -.13em; color: rgba(240,228,210,.14); transform: rotate(-10deg);
 }
 .tm-process-artboard-sidenote {
   position: absolute; right: 16px; top: 26%; writing-mode: vertical-rl;
-  font: 500 9px/1.4 'DM Mono', monospace; letter-spacing: .08em; opacity: .55;
+  font: 500 9px/1.4 'Inter', sans-serif; letter-spacing: .08em; opacity: .55;
 }
 .tm-process-artboard-registration {
-  position: absolute; bottom: 21%; left: 25px; font: 500 28px/1 'DM Mono', monospace;
+  position: absolute; bottom: 21%; left: 25px; font: 500 28px/1 'Inter', sans-serif;
   opacity: .8; letter-spacing: .1em;
 }
  .tm-process-card > div[class*="backdrop-blur"] {
@@ -309,11 +309,11 @@
 .tm-process-card h3 {
   -webkit-text-fill-color: var(--tm-paper-light) !important;
   color: var(--tm-paper-light) !important; background-image: none !important;
-  font: italic 550 clamp(53px, 6.4vw, 86px)/.9 'Bodoni Moda', Georgia, serif;
+  font: italic 550 clamp(53px, 6.4vw, 86px)/.9 'Fraunces', Georgia, serif;
   letter-spacing: -.055em;
   text-shadow: 1px 2px 0 #391e25;
 }
-.tm-process-card li { font-family: 'DM Sans', sans-serif; letter-spacing: .01em; }
+.tm-process-card li { font-family: 'Inter', sans-serif; letter-spacing: .01em; }
 .tm-process button { border-radius: 0 !important; }
 
 /* 04 — a designer's letter beside an actual piece from the archive. */
@@ -326,15 +326,15 @@
 .tm-about [class*="border-t"][class*="border-b"] { border-color: var(--tm-soft-rule); }
 .tm-about h2 {
   color: var(--tm-wine) !important;
-  font: 550 clamp(58px, 6.2vw, 101px)/.84 'Bodoni Moda', Georgia, serif;
+  font: 450 clamp(58px, 6.2vw, 101px)/.84 'Fraunces', Georgia, serif;
   letter-spacing: -.065em;
   max-width: 740px;
 }
 .tm-about h2 + div.font-serif {
-  font: italic 500 clamp(22px, 2.7vw, 38px)/1.02 'Bodoni Moda', Georgia, serif;
+  font: italic 500 clamp(22px, 2.7vw, 38px)/1.02 'Fraunces', Georgia, serif;
   color: var(--tm-red) !important;
 }
-.tm-about p.font-sans { max-width: 56ch; color: #65434a; font: 500 clamp(17px, 1.7vw, 23px)/1.38 'DM Sans', sans-serif; }
+.tm-about p.font-sans { max-width: 56ch; color: #65434a; font: 500 clamp(17px, 1.7vw, 23px)/1.38 'Inter', sans-serif; }
 .tm-about-plate {
   mask: none !important;
   -webkit-mask: none !important;
@@ -346,7 +346,7 @@
 .tm-about-plate::after {
   content: 'THE VISUAL NOTEBOOK';
   position: absolute; bottom: 8px; right: -23px; transform: rotate(-90deg) translateX(100%); transform-origin: right bottom;
-  color: var(--tm-rust); font: 500 9px/1 'DM Mono', monospace; letter-spacing: .08em;
+  color: var(--tm-rust); font: 500 9px/1 'Inter', sans-serif; letter-spacing: .08em;
 }
 .tm-about-artwork { display: flex; flex-direction: column; gap: 9px; margin: 0; }
 .tm-about-artwork-window {
@@ -356,7 +356,7 @@
 .tm-about-artwork img { display: block; width: 100%; height: 100%; object-fit: contain; }
 .tm-about-artwork figcaption {
   display: flex; justify-content: space-between; gap: 10px;
-  font: 500 9px/1.3 'DM Mono', monospace;
+  font: 500 9px/1.3 'Inter', sans-serif;
   letter-spacing: .07em; color: var(--tm-paper-light);
 }
 .tm-about button { border-radius: 0; }
@@ -374,10 +374,10 @@
 }
 .tm-services h2 {
   color: var(--tm-wine) !important;
-  font: 550 clamp(67px, 8vw, 128px)/.8 'Bodoni Moda', Georgia, serif;
+  font: 450 clamp(67px, 8vw, 128px)/.8 'Fraunces', Georgia, serif;
   letter-spacing: -.063em;
 }
-.tm-services h2 + div.font-serif { font: italic 500 clamp(24px, 2.5vw, 37px)/1 'Bodoni Moda', Georgia, serif; color: var(--tm-red) !important; }
+.tm-services h2 + div.font-serif { font: italic 500 clamp(24px, 2.5vw, 37px)/1 'Fraunces', Georgia, serif; color: var(--tm-red) !important; }
 .tm-services > div:last-child > div:nth-child(2) {
   border-top: 3px double var(--tm-wine);
   border-bottom: 3px double var(--tm-wine);
@@ -398,23 +398,23 @@
 .tm-service-card:hover, .tm-service-card:focus-within { background: #e4d0ba !important; }
 .tm-service-card h3 {
   color: var(--tm-wine);
-  font: 600 clamp(37px, 3.5vw, 59px)/.9 'Bodoni Moda', Georgia, serif;
+  font: 500 clamp(37px, 3.5vw, 59px)/.9 'Fraunces', Georgia, serif;
   letter-spacing: -.045em;
 }
 .tm-service-card p.font-serif {
   color: var(--tm-rust) !important;
-  font: italic 500 23px/1.04 'Bodoni Moda', Georgia, serif;
+  font: italic 500 23px/1.04 'Fraunces', Georgia, serif;
 }
-.tm-service-card ul { color: var(--tm-ink); font: 500 15px/1.3 'DM Sans', sans-serif; }
+.tm-service-card ul { color: var(--tm-ink); font: 500 15px/1.3 'Inter', sans-serif; }
 .tm-service-card [class*="font-mono"] { color: var(--tm-rust) !important; }
 .tm-service-card > div:first-child > div:first-child > span:first-child {
-  font: italic 600 52px/.8 'Bodoni Moda', Georgia, serif;
+  font: italic 600 52px/.8 'Fraunces', Georgia, serif;
   color: var(--tm-red) !important;
 }
 .tm-service-card button {
   color: var(--tm-wine) !important; background: transparent !important;
   border: 1px solid var(--tm-wine) !important;
-  font: 500 10px/1.2 'DM Mono', monospace;
+  font: 500 10px/1.2 'Inter', sans-serif;
   border-radius: 0;
 }
 .tm-service-card button:hover { background: var(--tm-wine) !important; color: var(--tm-paper-light) !important; }
@@ -429,11 +429,11 @@
 .tm-site [data-editorial-contact] > div[aria-hidden="true"] { opacity: .15; }
 .tm-site [data-editorial-contact] h2 {
   color: var(--tm-paper-light) !important;
-  font: 500 clamp(69px, 7vw, 110px)/.82 'Bodoni Moda', Georgia, serif;
+  font: 500 clamp(69px, 7vw, 110px)/.82 'Fraunces', Georgia, serif;
   letter-spacing: -.065em;
 }
 .tm-site [data-editorial-contact] h2 + div.font-serif {
-  font: italic 400 clamp(25px, 2.9vw, 40px)/1 'Bodoni Moda', Georgia, serif;
+  font: italic 400 clamp(25px, 2.9vw, 40px)/1 'Fraunces', Georgia, serif;
   color: #edbd9f !important;
 }
 .tm-site [data-editorial-contact] input,
@@ -442,7 +442,7 @@
   background: transparent; color: var(--tm-paper-light);
   border-radius: 0;
   padding: 16px 0 13px;
-  font: 500 19px/1.35 'DM Sans', sans-serif;
+  font: 500 19px/1.35 'Inter', sans-serif;
 }
 .tm-site [data-editorial-contact] input::placeholder,
 .tm-site [data-editorial-contact] textarea::placeholder { color: rgba(240,228,210,.72); }
@@ -452,7 +452,7 @@
   box-shadow: none;
 }
 .tm-site [data-editorial-contact] form > div > label {
-  font: 500 10px/1.4 'DM Mono', monospace;
+  font: 500 10px/1.4 'Inter', sans-serif;
   letter-spacing: .07em;
   color: #edbd9f !important;
 }
@@ -462,7 +462,7 @@
 }
 .tm-site [data-editorial-contact] form > button[type="submit"] {
   background: #f0e4d2; color: var(--tm-wine);
-  font: 500 11px/1.3 'DM Mono', monospace;
+  font: 500 11px/1.3 'Inter', sans-serif;
   letter-spacing: .06em; border: 1px solid #f0e4d2;
 }
 .tm-site [data-editorial-contact] form > button[type="submit"]:hover {
@@ -485,7 +485,7 @@
 .tm-case-modal > header [class*="backdrop-blur"] { backdrop-filter: none; }
 .tm-case-modal [class*="rounded-"] { border-radius: 0; }
 .tm-case-modal h3.font-display {
-  font: 600 clamp(48px, 6vw, 100px)/.9 'Bodoni Moda', Georgia, serif;
+  font: 500 clamp(48px, 6vw, 100px)/.9 'Fraunces', Georgia, serif;
   letter-spacing: -.05em;
 }
 
@@ -550,25 +550,25 @@
 
 /* Type system: Bodoni headlines, Instrument Serif notes, DM Sans text. */
 .tm-site :is(.tm-bridge-statement h2 em, .tm-projects-title-row h2 em, .tm-bridge-issue, .tm-projects-title-row p, .tm-project-spread .font-serif, .tm-about h2 + div.font-serif, .tm-services h2 + div.font-serif, [data-editorial-contact] h2 + div.font-serif) {
-  font-family: 'Instrument Serif', Georgia, serif; font-weight: 400;
+  font-family: 'Fraunces', Georgia, serif; font-weight: 400;
 }
 .tm-site .tm-bridge-statement h2 { font-size: clamp(54px, 6.3vw, 103px); line-height: 1.03; }
 .tm-site .tm-bridge-layout { padding-block: clamp(36px, 5vw, 72px); }
 .tm-site .tm-projects-title-row h2 { font-size: clamp(65px, 9.2vw, 145px); line-height: 1; }
 .tm-site .tm-project-spread h3 { line-height: 1.02; font-size: clamp(40px, 5.3vw, 87px); }
 .tm-site .tm-about h2 { font-size: clamp(48px, 5.6vw, 91px); line-height: 1.07; }
-.tm-site .tm-about p.font-sans { font: 400 clamp(16px, 1.4vw, 19px)/1.6 'DM Sans', sans-serif; }
+.tm-site .tm-about p.font-sans { font: 400 clamp(16px, 1.4vw, 19px)/1.6 'Inter', sans-serif; }
 .tm-site .tm-services h2 { font-size: clamp(53px, 7vw, 105px); line-height: 1.05; }
 .tm-site .tm-service-card { min-height: 350px; }
-.tm-site .tm-service-card ul { font: 400 13px/1.45 'DM Sans', sans-serif; }
-.tm-site .tm-service-card h3 { font: 500 clamp(30px, 2.9vw, 46px)/1.07 'Bodoni Moda', Georgia, serif; }
-.tm-site .tm-service-card p.font-serif { font: italic 400 22px/1.1 'Instrument Serif', Georgia, serif; }
-.tm-site #posters .lb-word { font: 500 clamp(65px, 10vw, 169px)/1 'Bodoni Moda', Georgia, serif; }
-.tm-site #posters .lb-word-l { font-family: 'Instrument Serif', Georgia, serif; font-style: italic; font-weight: 400; }
+.tm-site .tm-service-card ul { font: 400 13px/1.45 'Inter', sans-serif; }
+.tm-site .tm-service-card h3 { font: 500 clamp(30px, 2.9vw, 46px)/1.07 'Fraunces', Georgia, serif; }
+.tm-site .tm-service-card p.font-serif { font: italic 400 22px/1.1 'Fraunces', Georgia, serif; }
+.tm-site #posters .lb-word { font: 500 clamp(65px, 10vw, 169px)/1 'Fraunces', Georgia, serif; }
+.tm-site #posters .lb-word-l { font-family: 'Fraunces', Georgia, serif; font-style: italic; font-weight: 400; }
 .tm-site #posters .lb-word-r { font-weight: 500; }
-.tm-site #posters .lb-cap { font-family: 'Instrument Serif', Georgia, serif; }
+.tm-site #posters .lb-cap { font-family: 'Fraunces', Georgia, serif; }
 .tm-site [data-editorial-contact] h2 { font-size: clamp(53px, 6.2vw, 96px); line-height: 1.04; }
-.tm-site [data-editorial-contact] input, .tm-site [data-editorial-contact] textarea { font: 400 16px/1.45 'DM Sans', sans-serif; }
+.tm-site [data-editorial-contact] input, .tm-site [data-editorial-contact] textarea { font: 400 16px/1.45 'Inter', sans-serif; }
 @media(max-width:790px) {
   .tm-site .tm-bridge-statement h2 { font-size: clamp(52px, 8vw, 79px); }
   .tm-site .tm-projects-title-row h2 { font-size: 11vw; }
@@ -581,4 +581,50 @@
   .tm-site .tm-about h2 { font-size: clamp(44px, 10vw, 65px); }
   .tm-site .tm-services h2 { font-size: clamp(45px, 11vw, 67px); }
   .tm-site [data-editorial-contact] h2 { font-size: clamp(46px, 11vw, 72px); }
+}
+
+
+/* TUMANEEN / typography system: Fraunces editorial, Inter functional. */
+.tm-site {
+  font-family: 'Inter', sans-serif;
+}
+.tm-site :is(h1, h2, h3, h4, .font-display) {
+  font-family: 'Fraunces', Georgia, serif !important;
+  font-weight: 450 !important;
+  letter-spacing: -.035em !important;
+}
+.tm-site :is(h1, h2, h3, h4) em { font-style: italic; font-weight: 400 !important; }
+.tm-site :is(.font-serif, .font-serif.italic) {
+  font-family: 'Fraunces', Georgia, serif !important;
+  font-weight: 400;
+}
+.tm-site :is(p, li, a, button, label, input, textarea, figcaption, nav) {
+  font-family: 'Inter', sans-serif;
+}
+.tm-site :is(.font-mono, [class*="font-mono"]) {
+  font-family: 'Inter', sans-serif !important;
+  letter-spacing: .16em;
+}
+.tm-site :is(.tm-label, .tm-bridge-kicker, .tm-bridge-running, .tm-bridge-footer, .tm-projects-kicker, .tm-bridge-notes-top, .tm-nav-index) {
+  font-family: 'Inter', sans-serif !important;
+  letter-spacing: .16em !important;
+  font-weight: 500;
+}
+.tm-site .tm-floating-surface > div:first-child > button:first-child > span:first-child {
+  font: 450 clamp(21px, 2.1vw, 31px)/1 'Fraunces', Georgia, serif !important;
+  letter-spacing: -.035em !important;
+  text-transform: none !important;
+}
+.tm-site [data-editorial-contact] .tm-footer-logotype {
+  font: 450 clamp(36px, 5.5vw, 72px)/1.12 'Fraunces', Georgia, serif !important;
+  letter-spacing: -.035em !important;
+  text-transform: none;
+}
+.tm-site :is(.tm-bridge-statement h2, .tm-projects-title-row h2, .tm-process-card h3, .tm-about h2, .tm-services h2, .tm-service-card h3, [data-editorial-contact] h2, .tm-project-archive-dialog h2, .tm-case-modal h3) {
+  font-weight: 450 !important;
+  letter-spacing: -.035em !important;
+}
+.tm-site :is(.tm-bridge-statement h2 em, .tm-projects-title-row h2 em) {
+  font: italic 400 1em/1 'Fraunces', Georgia, serif !important;
+  letter-spacing: -.035em !important;
 }

@@ -546,8 +546,8 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
           {/* Grand Studio Colophon & Footer */}
           <div className="pt-12 flex flex-col md:flex-row items-start md:items-end justify-between gap-8">
             <div>
-              <div className="font-display text-3xl sm:text-4xl tracking-tight text-[#F0E4D2]">
-                TUMANEEN
+              <div className="tm-footer-logotype font-display text-3xl sm:text-4xl tracking-tight text-[#F0E4D2]">
+                tumaneen.
               </div>
               <p className="font-serif italic text-lg text-[#D9C0A8]/80 mt-1">
                 Brand worlds, tactile packaging, and visual storytelling by Fatimah Ghani.

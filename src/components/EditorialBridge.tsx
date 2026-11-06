@@ -15,7 +15,6 @@ export const EditorialBridge: React.FC<EditorialBridgeProps> = ({ projectCount, 
         <div className="tm-bridge-statement">
           <span className="tm-bridge-kicker">SELECTED WORK</span>
           <h2 id="tm-bridge-title">Some ideas<br />need more <em>room.</em></h2>
-          <div className="tm-bridge-urdu" lang="ur" dir="rtl">خیال سے تخلیق تک</div>
         </div>
         <div className="tm-bridge-notes">
           <div className="tm-bridge-notes-top"><span>A SMALL NOTE</span></div>
