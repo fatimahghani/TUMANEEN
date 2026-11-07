@@ -250,33 +250,7 @@
 .tm-projects-title-row h2 em { font-weight: 400; color: var(--tm-red); }
 .tm-projects-title-row p { margin: 0; max-width: 235px; font: italic 23px/1.08 'Fraunces', Georgia, serif; }
 .tm-projects-title-row p span { display: block; padding-top: 17px; font: 500 9px/1.4 'Inter', sans-serif; color: var(--tm-rust); letter-spacing: .05em; }
-.tm-project-spread { background: var(--tm-ivory); }
-.tm-project-spread::after {
-  position: absolute; content: 'TUMANEEN / FOLIO 02'; pointer-events: none; z-index: 8;
-  right: 13px; bottom: 105px; color: rgba(239,230,214,.55);
-  font: 500 9px/1 'Inter', sans-serif;
-  letter-spacing: .13em; writing-mode: vertical-rl;
-}
-.tm-project-spread h3 {
-  font: 500 clamp(46px, 6vw, 104px)/.84 'Fraunces', Georgia, serif;
-  letter-spacing: -.035em;
-  text-shadow: 0 2px 12px rgba(35, 4, 14, .28);
-}
-.tm-project-spread .font-serif { font-size: clamp(18px, 1.7vw, 26px); }
-.tm-project-spread [class*="rounded-"] { border-radius: 0; }
-.tm-project-spread [class*="backdrop-blur"] { backdrop-filter: none; }
-.tm-projects > div:nth-of-type(2) {
-  background: var(--tm-ink); border-top: 2px solid var(--tm-red);
-}
-.tm-projects > div:nth-of-type(2) p.font-serif { font-size: clamp(19px, 2vw, 27px); }
-.tm-project-archive-dialog { background: rgba(36, 32, 29, .99); backdrop-filter: none; }
-.tm-project-archive-dialog h2 { font: 450 clamp(44px, 6vw, 88px)/.88 'Fraunces', Georgia, serif; letter-spacing: -.04em; }
-.tm-project-archive-dialog [role="button"] {
-  border: 1px solid rgba(239,230,214,.35);
-  background: rgba(239,230,214,.06);
-  box-shadow: none;
-}
-.tm-project-archive-dialog [role="button"] h3 { font: 450 37px/.95 'Fraunces', Georgia, serif; letter-spacing: -.035em; }
+/* Selected Work project gallery styling lives in ProjectsSection.css. */
 
 /* 03 — the process is a paper chapter with oversized print plates. */
 .tm-process { background-color: var(--tm-ivory) !important; color: var(--tm-ink) !important; 
