@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { ArrowDownRight, ArrowUpRight, X } from 'lucide-react';
+import { ArrowUpRight, X } from 'lucide-react';
 import { PORTFOLIO_PROJECTS, type PortfolioProject } from '../data/portfolioData';
+import { LENS_BLOOM_POSTERS, type LensBloomPosterCard } from './PosterSection';
 import './ProjectsSection.css';
 
 interface ProjectsSectionProps {
@@ -11,13 +12,38 @@ interface ProjectsSectionProps {
   onCloseAllProjects?: () => void;
 }
 
-const imageFor = (project: PortfolioProject, position: number) =>
-  project.slides[position]?.imageUrl ??
-  project.slides.find((slide) => slide.imageUrl)?.imageUrl ??
-  '';
+type GalleryEntry =
+  | { kind: 'case'; project: PortfolioProject }
+  | { kind: 'poster'; poster: LensBloomPosterCard };
 
-const imageBackground = (project: PortfolioProject, position: number) =>
-  project.slides[position]?.bgHex ?? '#EFE6D6';
+// Edit the actual work, not a layer of decorative cards or filler images.
+const findCase = (id: string): GalleryEntry | undefined => {
+  const project = PORTFOLIO_PROJECTS.find((item) => item.id === id);
+  return project ? { kind: 'case', project } : undefined;
+};
+
+const findPoster = (name: string): GalleryEntry | undefined => {
+  const poster = LENS_BLOOM_POSTERS.find((item) => item.name.startsWith(name));
+  return poster ? { kind: 'poster', poster } : undefined;
+};
+
+const selectedEntries = [
+  findCase('lumera-candle-identity'),
+  findPoster('Shanakht'),
+  findCase('riwaq-fragrance-identity'),
+  findPoster('Wajood'),
+  findCase('roast-and-rhythm-cafe'),
+  findPoster('Chai'),
+].filter((entry): entry is GalleryEntry => Boolean(entry));
+
+const entryTitle = (entry: GalleryEntry) =>
+  entry.kind === 'case' ? entry.project.title : entry.poster.name;
+const entryCaption = (entry: GalleryEntry) =>
+  entry.kind === 'case' ? entry.project.location : entry.poster.project;
+const entryImage = (entry: GalleryEntry) =>
+  entry.kind === 'case'
+    ? entry.project.slides.find((slide) => slide.imageUrl)?.imageUrl || ''
+    : entry.poster.src;
 
 export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
   onSelectProject,
@@ -25,58 +51,61 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
   onOpenAllProjects,
   onCloseAllProjects,
 }) => {
-  const [localIndexOpen, setLocalIndexOpen] = useState(false);
-  const indexOpen = isAllProjectsOpen ?? localIndexOpen;
-  const closeButtonRef = useRef<HTMLButtonElement>(null);
-  const indexPanelRef = useRef<HTMLDivElement>(null);
-  const closeHandlerRef = useRef(onCloseAllProjects);
-  closeHandlerRef.current = onCloseAllProjects;
-
-  const openIndex = () => {
-    if (onOpenAllProjects) onOpenAllProjects();
-    else setLocalIndexOpen(true);
-  };
+  const [internalOpen, setInternalOpen] = useState(false);
+  const [activePoster, setActivePoster] = useState<LensBloomPosterCard | null>(null);
+  const isIndexOpen = isAllProjectsOpen ?? internalOpen;
+  const panelRef = useRef<HTMLDivElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const onCloseRef = useRef(onCloseAllProjects);
+  onCloseRef.current = onCloseAllProjects;
 
   const closeIndex = () => {
-    if (onCloseAllProjects) onCloseAllProjects();
-    else setLocalIndexOpen(false);
+    if (onCloseRef.current) onCloseRef.current();
+    else setInternalOpen(false);
+  };
+  const openIndex = () => {
+    if (onOpenAllProjects) onOpenAllProjects();
+    else setInternalOpen(true);
   };
 
-  const openProject = (project: PortfolioProject) => {
-    if (indexOpen) closeIndex();
-    onSelectProject(project.id);
+  const openEntry = (entry: GalleryEntry) => {
+    if (isIndexOpen) closeIndex();
+    if (entry.kind === 'case') {
+      setActivePoster(null);
+      onSelectProject(entry.project.id);
+    } else {
+      setActivePoster(entry.poster);
+    }
   };
 
+  // Keep both gallery dialogs above the fixed navigation and keyboard accessible.
   useEffect(() => {
-    if (!indexOpen) return;
-
-    const previouslyFocused = document.activeElement as HTMLElement | null;
-    const oldOverflow = document.body.style.overflow;
+    if (!isIndexOpen && !activePoster) return;
+    const priorFocus = document.activeElement as HTMLElement | null;
+    const priorOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    closeButtonRef.current?.focus();
+    closeRef.current?.focus();
 
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        event.preventDefault();
-        if (closeHandlerRef.current) closeHandlerRef.current();
-        else setLocalIndexOpen(false);
-      }
+    const escape = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      event.preventDefault();
+      if (activePoster) setActivePoster(null);
+      else if (onCloseRef.current) onCloseRef.current();
+      else setInternalOpen(false);
     };
-
-    window.addEventListener('keydown', handleEscape);
+    window.addEventListener('keydown', escape);
     return () => {
-      window.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = oldOverflow;
-      previouslyFocused?.focus();
+      window.removeEventListener('keydown', escape);
+      document.body.style.overflow = priorOverflow;
+      priorFocus?.focus();
     };
-  }, [indexOpen]);
+  }, [isIndexOpen, activePoster]);
 
-  const handleIndexTab = (event: React.KeyboardEvent<HTMLDivElement>) => {
+  const trapTab = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key !== 'Tab') return;
-    const items = indexPanelRef.current?.querySelectorAll<HTMLButtonElement>('button:not([disabled])');
-    if (!items?.length) return;
-    const first = items[0];
-    const last = items[items.length - 1];
+    const focusable = panelRef.current?.querySelectorAll<HTMLButtonElement>('button:not([disabled])');
+    if (!focusable?.length) return;
+    const first = focusable[0], last = focusable[focusable.length - 1];
     if (event.shiftKey && document.activeElement === first) {
       event.preventDefault();
       last.focus();
@@ -87,158 +116,109 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
   };
 
   return (
-    <section
-      id="project"
-      aria-labelledby="tm-project-gallery-title"
-      className="tm-projects tm-project-grid-section"
-    >
-      <div className="tm-project-gallery-shell">
-        <header className="tm-projects-intro tm-project-gallery-intro">
-          <div className="tm-projects-kicker">
-            <span>THE TUMANEEN JOURNAL / SELECTED WORK</span>
-            <span className="tm-project-gallery-kicker-right">EDITION NO. 02 · 2026</span>
-          </div>
-          <div className="tm-projects-title-row">
-            <h2 id="tm-project-gallery-title">Selected <em>work.</em></h2>
-            <div className="tm-project-gallery-intro-side">
-              <p>Identity · Print · Objects</p>
-              <span>{String(PORTFOLIO_PROJECTS.length).padStart(2, '0')} PROJECTS / 2026</span>
-            </div>
-          </div>
-        </header>
+    <section id="project" className="tm-projects tm-epok-gallery" aria-labelledby="tm-gallery-title">
+      <div className="tm-epok-shell">
+        <h2 id="tm-gallery-title" className="sr-only">Selected projects and posters</h2>
 
-        <div className="tm-project-gallery-folio" aria-hidden="true">
-          <span>THE STUDIO PORTFOLIO</span>
-          <span>THREE STORIES IN PRINT — 2026</span>
+        <div className="tm-epok-running" aria-label="Portfolio index">
+          <span>02 / WORK &amp; PRINT</span>
+          <span>TUMANEEN — 2026</span>
         </div>
-        <div className="tm-project-gallery" aria-label="Selected projects">
-          {PORTFOLIO_PROJECTS.map((project, index) => {
-            const number = String(index + 1).padStart(2, '0');
-            const detailPosition = project.slides[3]?.imageUrl ? 3 : 1;
 
+        <div className="tm-epok-grid" aria-label="Works by Fatimah Ghani">
+          {selectedEntries.map((entry, index) => {
+            const number = String(index + 1).padStart(2, '0');
+            const title = entryTitle(entry);
+            const image = entryImage(entry);
+            const isPoster = entry.kind === 'poster';
             return (
               <article
-                key={project.id}
-                data-project-id={project.id}
-                className={'tm-project-entry tm-project-entry--' + number}
+                key={entry.kind === 'case' ? entry.project.id : entry.poster.src}
+                className={'tm-epok-item tm-epok-item--' + number}
+                data-gallery-kind={entry.kind}
+                data-gallery-title={isPoster ? entry.poster.name.split(' ')[0] : title}
               >
                 <button
                   type="button"
-                  className="tm-project-entry-image tm-project-entry-cover"
-                  onClick={() => openProject(project)}
-                  aria-label={'Open ' + project.title + ' case study'}
-                  style={{ backgroundColor: imageBackground(project, 0) }}
+                  className="tm-epok-image"
+                  onClick={() => openEntry(entry)}
+                  aria-label={isPoster ? 'View ' + title + ' poster' : 'Open ' + title + ' case study'}
                 >
                   <img
-                    src={imageFor(project, 0)}
-                    alt={project.title + ' — featured brand artwork'}
+                    src={image}
+                    alt={title + (isPoster ? ' — original poster design' : ' — original identity design')}
                     loading={index === 0 ? 'eager' : 'lazy'}
                     decoding="async"
                   />
-                  <span className="tm-project-entry-image-action" aria-hidden="true">
-                    <ArrowUpRight size={20} strokeWidth={1.6} />
-                  </span>
+                  <span className="tm-epok-image-arrow" aria-hidden="true"><ArrowUpRight size={18} strokeWidth={1.6} /></span>
                 </button>
-
-                <div className="tm-project-entry-caption">
-                  <div className="tm-project-entry-caption-rule">
-                    <span>PLATE {number} / {project.year}</span>
-                    <span aria-hidden="true">TUMANEEN ARCHIVE</span>
+                <div className="tm-epok-caption">
+                  <div className="tm-epok-caption-heading">
+                    <button type="button" onClick={() => openEntry(entry)}>
+                      {title}
+                    </button>
+                    <span>{number}</span>
                   </div>
-                  <button
-                    type="button"
-                    className="tm-project-entry-title"
-                    onClick={() => openProject(project)}
-                    aria-label={'Read ' + project.title + ' case study'}
-                  >
-                    <span>{project.title}</span>
-                    <ArrowUpRight size={23} strokeWidth={1.4} aria-hidden="true" />
-                  </button>
-                  <p>{project.discipline}{project.tagline ? ' · ' + project.tagline : ''}</p>
+                  <p>{entryCaption(entry)}</p>
                 </div>
-
-                {imageFor(project, detailPosition) && (
-                  <button
-                    type="button"
-                    className="tm-project-entry-image tm-project-entry-detail"
-                    onClick={() => openProject(project)}
-                    aria-label={'Explore more of ' + project.title}
-                    style={{ backgroundColor: imageBackground(project, detailPosition) }}
-                  >
-                    <img
-                      src={imageFor(project, detailPosition)}
-                      alt={project.title + ' — additional original project artwork'}
-                      loading="lazy"
-                      decoding="async"
-                    />
-                    <span className="tm-project-entry-detail-note" aria-hidden="true">
-                      {number} / DETAIL
-                    </span>
-                    <span className="tm-project-entry-image-action" aria-hidden="true">
-                      <ArrowUpRight size={18} strokeWidth={1.6} />
-                    </span>
-                  </button>
-                )}
               </article>
             );
           })}
         </div>
 
-        <footer className="tm-project-gallery-footer">
-          <div>
-            <span className="tm-project-gallery-rule-label">END OF FEATURE / NO. 02</span>
-            <p>Further reading <em>in the archive.</em></p>
-          </div>
-          <button type="button" onClick={openIndex} className="tm-project-index-trigger">
-            ALL PROJECTS <span>{String(PORTFOLIO_PROJECTS.length).padStart(2, '0')}</span>
-            <ArrowDownRight size={18} strokeWidth={1.6} aria-hidden="true" />
+        <footer className="tm-epok-footer">
+          <span>FATIMAH GHANI / SELECTED WORK</span>
+          <button type="button" onClick={openIndex}>
+            VIEW INDEX <span>{String(selectedEntries.length).padStart(2, '0')}</span> <ArrowUpRight size={15} strokeWidth={1.6} aria-hidden="true" />
           </button>
         </footer>
       </div>
 
-      {indexOpen && createPortal(
-        <div
-          className="tm-project-index-overlay"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="tm-project-index-title"
-        >
-          <button
-            type="button"
-            className="tm-project-index-backdrop"
-            onClick={closeIndex}
-            aria-label="Close project index"
-            tabIndex={-1}
-          />
-          <div className="tm-project-index-panel" ref={indexPanelRef} onKeyDown={handleIndexTab}>
-            <div className="tm-project-index-head">
-              <span>02 / PROJECT INDEX</span>
-              <button
-                type="button"
-                ref={closeButtonRef}
-                onClick={closeIndex}
-                className="tm-project-index-close"
-              >
-                CLOSE <X size={19} aria-hidden="true" />
-              </button>
+      {isIndexOpen && createPortal(
+        <div className="tm-epok-overlay" role="dialog" aria-modal="true" aria-labelledby="tm-epok-index-title">
+          <button className="tm-epok-overlay-scrim" type="button" onClick={closeIndex} aria-label="Close works index" tabIndex={-1} />
+          <div className="tm-epok-overlay-panel" onKeyDown={trapTab} ref={panelRef}>
+            <div className="tm-epok-overlay-head">
+              <span>02 / THE INDEX</span>
+              <button type="button" onClick={closeIndex} ref={closeRef}>CLOSE <X size={17} aria-hidden="true" /></button>
             </div>
-            <h2 id="tm-project-index-title">The <em>index.</em></h2>
-            <div className="tm-project-index-list">
-              {PORTFOLIO_PROJECTS.map((project, index) => (
+            <h2 id="tm-epok-index-title">Works <em>&amp; posters</em></h2>
+            <div className="tm-epok-index-list">
+              {selectedEntries.map((entry, index) => (
                 <button
                   type="button"
-                  key={project.id}
-                  onClick={() => openProject(project)}
-                  className="tm-project-index-item"
+                  className="tm-epok-index-row"
+                  key={entry.kind === 'case' ? entry.project.id : entry.poster.src}
+                  onClick={() => openEntry(entry)}
                 >
                   <span>{String(index + 1).padStart(2, '0')}</span>
-                  <span className="tm-project-index-item-name">{project.title}</span>
-                  <span className="tm-project-index-item-discipline">{project.discipline}</span>
-                  <ArrowUpRight size={20} strokeWidth={1.5} aria-hidden="true" />
+                  <span className="tm-epok-index-name">{entryTitle(entry)}</span>
+                  <span className="tm-epok-index-type">{entry.kind === 'case' ? 'IDENTITY' : 'POSTER'}</span>
+                  <ArrowUpRight size={16} aria-hidden="true" />
                 </button>
               ))}
             </div>
-            <div className="tm-project-index-foot">TUMANEEN / SELECTED WORK / 2026</div>
+            <p className="tm-epok-overlay-foot">TUMANEEN / WORKS IN PRINT</p>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {activePoster && createPortal(
+        <div className="tm-epok-overlay tm-epok-poster-overlay" role="dialog" aria-modal="true" aria-labelledby="tm-epok-poster-title">
+          <button className="tm-epok-overlay-scrim" type="button" onClick={() => setActivePoster(null)} aria-label="Close poster" tabIndex={-1} />
+          <div className="tm-epok-poster-panel" onKeyDown={trapTab} ref={panelRef}>
+            <div className="tm-epok-overlay-head">
+              <span>POSTER / {activePoster.roman}</span>
+              <button type="button" ref={closeRef} onClick={() => setActivePoster(null)}>CLOSE <X size={17} aria-hidden="true" /></button>
+            </div>
+            <div className="tm-epok-poster-art">
+              <img src={activePoster.src} alt={activePoster.name + ' original poster artwork'} />
+            </div>
+            <div className="tm-epok-poster-foot">
+              <h2 id="tm-epok-poster-title">{activePoster.name}</h2>
+              <span>{activePoster.project}</span>
+            </div>
           </div>
         </div>,
         document.body

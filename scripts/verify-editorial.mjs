@@ -6,7 +6,7 @@ const browser = await chromium.launch({ headless: true });
 const base = 'http://127.0.0.1:4173/';
 const expected = [
   ['.tm-hero', 'rgb(75, 40, 48)'],
-  ['.tm-projects-intro', 'rgb(239, 230, 214)'],
+  ['#project', 'rgb(239, 230, 214)'],
   ['#posters', 'rgb(36, 32, 29)'],
   ['.tm-about', 'rgb(239, 230, 214)'],
   ['.tm-process', 'rgb(239, 230, 214)'],
@@ -35,16 +35,52 @@ try {
     if (!actual.masthead?.includes('TUMANEEN')) errors.push(width + ': masthead missing');
     await page.screenshot({ path: 'editorial-snapshots/hero-' + width + '.png', animations: 'disabled' });
 
-    // New staggered, Epok-inspired gallery: three original projects, no cropped artwork.
-    const gallery = page.locator('.tm-project-entry');
-    if (await gallery.count() !== 3) errors.push(width + ': expected three project entries');
-    for (const project of ['lumera-candle-identity', 'riwaq-fragrance-identity', 'roast-and-rhythm-cafe']) {
-      if (await page.locator('[data-project-id="' + project + '"]').count() !== 1) {
-        errors.push(width + ': project missing ' + project);
+    const gallery = page.locator('.tm-epok-item');
+    const expectedWorks = ['LUMERA','Shanakht','RIWAQ Fragrances','Wajood','Roast & Rhythm','Chai'];
+    if (await gallery.count() !== 6) errors.push(width + ': expected six mixed gallery works');
+    for (const title of expectedWorks) {
+      if (await page.locator('.tm-epok-item[data-gallery-title="' + title + '"]').count() !== 1) {
+        errors.push(width + ': missing original artwork ' + title);
       }
     }
+    if (await page.locator('.tm-epok-item[data-gallery-kind="poster"]').count() !== 3)
+      errors.push(width + ': missing featured posters');
+    if (await page.locator('.tm-epok-item[data-gallery-kind="case"]').count() !== 3)
+      errors.push(width + ': missing identity case studies');
+    if (await page.locator('.tm-projects-title-row').count() !== 0)
+      errors.push(width + ': oversized section title returned');
+    if (await page.locator('.tm-bridge').count() !== 0)
+      errors.push(width + ': separate featured project banner returned');
 
-    // Typography has a deliberately restrained scale: do not regress to billboard headings.
+    const columns = await page.locator('.tm-epok-grid').evaluate(el =>
+      getComputedStyle(el).gridTemplateColumns.split(' ').filter(Boolean).length
+    );
+    // Desktop uses twelve underlying tracks with three cards spanning four each.
+    const expectedTracks = width > 950 ? 12 : width > 580 ? 2 : 1;
+    if (columns !== expectedTracks) errors.push(width + ': unexpected grid track count ' + columns);
+    if (width > 950) {
+      const x = await gallery.evaluateAll(nodes => nodes.slice(0, 3).map(node => Math.round(node.getBoundingClientRect().left)));
+      if (new Set(x).size !== 3) errors.push(width + ': expected three visually distinct columns');
+    }
+
+    const images = page.locator('.tm-epok-image img');
+    for (let i = 0; i < await images.count(); i++) {
+      await images.nth(i).scrollIntoViewIfNeeded();
+      const data = await images.nth(i).evaluate(async img => {
+        try { await img.decode(); } catch {}
+        return {
+          loaded: img.naturalWidth > 0,
+          fit: getComputedStyle(img).objectFit,
+          filter: getComputedStyle(img).filter,
+          height: getComputedStyle(img).height,
+          background: getComputedStyle(img.parentElement).backgroundColor,
+        };
+      });
+      if (!data.loaded) errors.push(width + ': gallery artwork ' + i + ' failed to load');
+      if (data.fit !== 'contain' || data.filter !== 'none') errors.push(width + ': artwork was cropped or filtered');
+      if (data.background !== 'rgba(0, 0, 0, 0)') errors.push(width + ': colored placeholder behind art');
+    }
+
     const typeSizes = await page.evaluate(() => {
       const size = selector => {
         const el = document.querySelector(selector);
@@ -52,8 +88,7 @@ try {
       };
       return {
         masthead: size('.tm-masthead'),
-        projectHeading: size('.tm-projects-title-row h2'),
-        projectTitle: size('.tm-project-entry-title span'),
+        projectCaption: size('.tm-epok-caption-heading button'),
         aboutHeading: size('.tm-about h2'),
         servicesHeading: size('.tm-services h2'),
         contactHeading: size('#contact-form h2'),
@@ -64,42 +99,7 @@ try {
       if (!Number.isFinite(value)) errors.push(width + ': typography element missing ' + name);
       if (value > headingLimit) errors.push(width + ': oversized ' + name + ' at ' + value + 'px');
     }
-    if (typeSizes.projectHeading > (width <= 580 ? 56 : width <= 820 ? 80 : 84)) {
-      errors.push(width + ': project newspaper heading is oversized');
-    }
-
-    const newspaper = await page.locator('.tm-project-gallery').evaluate(element => {
-      const section = element.closest('.tm-project-grid-section');
-      return {
-        background: getComputedStyle(section).backgroundColor,
-        border: getComputedStyle(element).borderTopStyle,
-        paperTexture: getComputedStyle(section, '::before').backgroundImage,
-      };
-    });
-    if (newspaper.background !== 'rgb(239, 230, 214)') errors.push(width + ': incorrect newspaper paper tone');
-    if (newspaper.border !== 'solid') errors.push(width + ': newspaper rules missing');
-    if (newspaper.paperTexture === 'none') errors.push(width + ': background-only paper grain missing');
-
-    const covers = page.locator('.tm-project-entry-cover img');
-    for (let i = 0; i < await covers.count(); i++) {
-      await covers.nth(i).scrollIntoViewIfNeeded();
-      const data = await covers.nth(i).evaluate(async (img) => {
-        try { await img.decode(); } catch {}
-        return {
-          loaded: img.naturalWidth > 0,
-          fit: getComputedStyle(img).objectFit,
-          filter: getComputedStyle(img).filter,
-        };
-      });
-      if (!data.loaded) errors.push(width + ': project cover ' + i + ' did not load');
-      if (data.fit !== 'contain' || data.filter !== 'none') errors.push(width + ': project artwork display changed');
-    }
-
-    const columns = await gallery.evaluateAll(nodes =>
-      nodes.map(node => Math.round(node.getBoundingClientRect().left))
-    );
-    if (width >= 1100 && new Set(columns).size !== 3) errors.push(width + ': expected three columns');
-    if (width <= 580 && new Set(columns).size !== 1) errors.push(width + ': expected one column');
+    if (typeSizes.projectCaption > 26) errors.push(width + ': project caption title oversized');
 
     await page.locator('#project').screenshot({
       path: 'editorial-snapshots/project-gallery-' + width + '.png',
@@ -107,19 +107,25 @@ try {
     });
 
     if (width === 1440) {
+      // Identity items still open the existing case study, posters open their own full-art viewer.
       await page.getByRole('button', { name: 'Open LUMERA case study' }).click();
       await page.locator('.tm-case-modal').waitFor({ state: 'visible' });
       await page.keyboard.press('Escape');
       await page.locator('.tm-case-modal').waitFor({ state: 'hidden' });
 
-      await page.locator('.tm-project-index-trigger').click();
-      await page.locator('.tm-project-index-overlay').waitFor({ state: 'visible' });
+      for (const title of ['Shanakht','Wajood','Chai']) {
+        await page.locator('.tm-epok-item[data-gallery-title="' + title + '"] .tm-epok-image').click();
+        await page.locator('.tm-epok-poster-overlay').waitFor({ state: 'visible' });
+        const isUnfiltered = await page.locator('.tm-epok-poster-art img').evaluate(el => getComputedStyle(el).filter === 'none');
+        if (!isUnfiltered) errors.push('poster viewer modified artwork: ' + title);
+        await page.keyboard.press('Escape');
+        await page.locator('.tm-epok-poster-overlay').waitFor({ state: 'hidden' });
+      }
+      await page.getByRole('button', { name: /VIEW INDEX/i }).click();
+      await page.locator('.tm-epok-index-list .tm-epok-index-row').first().waitFor();
+      if (await page.locator('.tm-epok-index-row').count() !== 6) errors.push('index does not show all six entries');
       await page.keyboard.press('Escape');
-      await page.locator('.tm-project-index-overlay').waitFor({ state: 'hidden' });
-      await page.locator('.tm-project-index-trigger').click();
-      await page.locator('.tm-project-index-overlay').waitFor({ state: 'visible' });
-      await page.locator('.tm-project-index-backdrop').click({ position: { x: 4, y: 4 } });
-      await page.locator('.tm-project-index-overlay').waitFor({ state: 'hidden' });
+      await page.locator('.tm-epok-overlay').waitFor({ state: 'hidden' });
     }
 
     if (width === 1440) {
