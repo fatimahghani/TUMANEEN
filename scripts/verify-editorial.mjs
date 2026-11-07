@@ -55,8 +55,13 @@ try {
     const columns = await page.locator('.tm-epok-grid').evaluate(el =>
       getComputedStyle(el).gridTemplateColumns.split(' ').filter(Boolean).length
     );
-    const want = width > 950 ? 3 : width > 580 ? 2 : 1;
-    if (columns !== want) errors.push(width + ': expected ' + want + ' editorial columns, got ' + columns);
+    // Desktop uses twelve underlying tracks with three cards spanning four each.
+    const expectedTracks = width > 950 ? 12 : width > 580 ? 2 : 1;
+    if (columns !== expectedTracks) errors.push(width + ': unexpected grid track count ' + columns);
+    if (width > 950) {
+      const x = await gallery.evaluateAll(nodes => nodes.slice(0, 3).map(node => Math.round(node.getBoundingClientRect().left)));
+      if (new Set(x).size !== 3) errors.push(width + ': expected three visually distinct columns');
+    }
 
     const images = page.locator('.tm-epok-image img');
     for (let i = 0; i < await images.count(); i++) {
