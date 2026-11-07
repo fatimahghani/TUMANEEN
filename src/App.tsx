@@ -11,7 +11,6 @@ import {
 } from './data/portfolioData';
 import { CaseStudyModal } from './components/CaseStudyModal';
 import { ReadingNookHero } from './components/ReadingNookHero';
-import { EditorialBridge } from './components/EditorialBridge';
 import './EditorialSystem.css';
 import { ProcessSection } from './components/ProcessSection';
 import { ProjectsSection } from './components/ProjectsSection';
@@ -296,11 +295,6 @@ export default function App() {
         <div className={revealedSection?.id === 'posters' ? 'section-reveal-active' : undefined}>
           <PosterSection />
         </div>
-
-        <EditorialBridge
-          projectCount={PORTFOLIO_PROJECTS.length}
-          onOpenProjects={() => setIsAllProjectsOpen(true)}
-        />
 
         {/* 3. PROJECTS SECTION (02 · SELECTED CASE STUDIES) */}
         <div className={revealedSection?.id === 'project' ? 'section-reveal-active' : undefined}>
