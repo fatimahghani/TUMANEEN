@@ -1,57 +1,70 @@
-/* TUMANEEN / Work & print — image-led staggered gallery. */
+/*
+ * TUMANEEN / PROJECTS — the spatial rhythm of Epok's #gridproj.
+ *
+ * Three independently flowing vertical columns, not a conventional row grid:
+ * the second work begins as soon as its own column allows. The first two
+ * images align at the top; the third starts lower. Titles, slim right arrows
+ * and small descriptions sit below the images, not inside cards or overlays.
+ * Original work remains uncropped and unfiltered.
+ */
 .tm-projects.tm-epok-gallery {
   background: #EFE6D6;
   color: #24201D;
   overflow: clip;
 }
 .tm-epok-shell {
-  width: min(calc(100% - 80px), 1370px);
-  margin: 0 auto;
+  width: min(calc(100% - 64px), 1350px);
+  margin-inline: auto;
 }
 .tm-epok-running,
 .tm-epok-footer {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 20px;
-  border-bottom: 1px solid #24201D;
-  padding: 13px 0;
-  font: 500 10px/1.4 'Inter', sans-serif;
-  letter-spacing: .14em;
+  justify-content: space-between;
+  gap: 18px;
+  font: 500 9px/1.45 'Inter', sans-serif;
+  letter-spacing: .11em;
 }
-.tm-epok-running { padding-top: clamp(32px, 5vw, 70px); }
+.tm-epok-running {
+  border-bottom: 1px solid rgba(36,32,29,.33);
+  padding: clamp(20px, 2.5vw, 34px) 0 10px;
+}
 .tm-epok-grid {
   display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: clamp(30px, 4.2vw, 72px) clamp(18px, 3.2vw, 50px);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: clamp(12px, 1.9vw, 28px);
   align-items: start;
-  padding: clamp(33px, 5vw, 68px) 0 clamp(85px, 10vw, 146px);
+  padding: clamp(15px, 2vw, 28px) 0 clamp(45px, 5vw, 78px);
 }
-.tm-epok-item { grid-column: span 4; min-width: 0; }
-.tm-epok-item--01 { margin-top: 0; }
-.tm-epok-item--02 { margin-top: clamp(43px, 9vw, 150px); }
-.tm-epok-item--03 { margin-top: clamp(13px, 3vw, 50px); }
-.tm-epok-item--04 { margin-top: clamp(11px, 3vw, 42px); }
-.tm-epok-item--05 { margin-top: clamp(58px, 9vw, 143px); }
-.tm-epok-item--06 { margin-top: clamp(10px, 2vw, 28px); }
-
-.tm-epok-item--01 .tm-epok-image { width: 94%; }
-.tm-epok-item--02 .tm-epok-image { width: 87%; }
-.tm-epok-item--03 .tm-epok-image { width: 100%; }
-.tm-epok-item--04 .tm-epok-image { width: 82%; }
-.tm-epok-item--05 .tm-epok-image { width: 98%; }
-.tm-epok-item--06 .tm-epok-image { width: 90%; }
-
-.tm-epok-image {
-  position: relative;
-  display: block;
+.tm-epok-column {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+.tm-epok-column--01 { gap: clamp(17px, 2.2vw, 33px); }
+.tm-epok-column--02 { gap: clamp(29px, 4vw, 61px); }
+.tm-epok-column--03 { padding-top: clamp(23px, 3vw, 47px); }
+.tm-epok-item {
+  min-width: 0;
+  width: 100%;
   padding: 0;
   margin: 0;
-  text-align: left;
+}
+.tm-epok-image {
+  display: block;
+  width: 100%;
+  position: relative;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  color: inherit;
   border: 0;
-  background: none;
+  appearance: none;
+  text-align: left;
   cursor: pointer;
 }
+.tm-epok-image > img,
 .tm-epok-image img {
   display: block;
   width: 100%;
@@ -61,62 +74,77 @@
   filter: none;
   border: 0;
   box-shadow: none;
-  transition: transform .45s ease;
 }
-.tm-epok-image:hover img,
-.tm-epok-image:focus-visible img { transform: translateY(-3px); }
+.tm-epok-image > img {
+  transition: opacity .22s ease;
+}
+.tm-epok-image:hover > img,
+.tm-epok-image:focus-visible > img { opacity: .9; }
+
 .tm-epok-image-arrow {
-  position: absolute;
-  top: 10px;
-  right: 10px;
   display: grid;
   place-items: center;
-  width: 33px;
-  height: 33px;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 30px;
+  height: 30px;
   background: #EFE6D6;
   color: #24201D;
   opacity: 0;
   transform: translateY(4px);
-  transition: opacity .2s ease, transform .2s ease;
+  transition: opacity .22s ease, transform .22s ease;
   pointer-events: none;
 }
 .tm-epok-image:hover .tm-epok-image-arrow,
 .tm-epok-image:focus-visible .tm-epok-image-arrow {
-  opacity: 1; transform: none;
+  opacity: 1;
+  transform: none;
 }
-.tm-epok-caption { padding: 12px 0 0; }
-.tm-epok-caption-heading {
+/* The actual reference puts each project name beside a narrow line, with an
+ * arrow pointing toward the case study; no bold plate number or outer card. */
+.tm-epok-caption { padding: 9px 0 0; }
+.tm-epok-caption-heading button {
+  width: 100%;
   display: flex;
   align-items: baseline;
-  justify-content: space-between;
-  gap: 10px;
-}
-.tm-epok-caption-heading button {
+  gap: 6px;
+  background: none;
   border: 0;
   padding: 0;
-  background: none;
+  margin: 0;
   color: #24201D;
   cursor: pointer;
   text-align: left;
-  font: 450 clamp(17px, 1.55vw, 23px)/1.15 'Fraunces', Georgia, serif;
-  letter-spacing: -.035em;
+  font: 600 clamp(12px, 1.05vw, 15px)/1.25 'Inter', sans-serif;
+  letter-spacing: -.015em;
 }
-.tm-epok-caption-heading button:hover { color: #4B2830; }
-.tm-epok-caption-heading > span {
-  font: 500 9px/1.4 'Inter', sans-serif;
-  color: #75735B;
-  letter-spacing: .08em;
+.tm-epok-caption-dash {
+  flex: 0 0 auto;
+  font: 600 13px/1 'Inter', sans-serif;
+}
+.tm-epok-caption-name { flex: 1; min-width: 0; }
+.tm-epok-caption-arrow {
   flex-shrink: 0;
+  align-self: center;
+  margin-left: auto;
+  transition: transform .2s ease;
 }
+.tm-epok-caption-heading button:hover,
+.tm-epok-caption-heading button:focus-visible { color: #4B2830; }
+.tm-epok-caption-heading button:hover svg,
+.tm-epok-caption-heading button:focus-visible svg { transform: translate(3px, -2px); }
 .tm-epok-caption p {
-  margin: 5px 0 0;
-  color: #686258;
-  font: 400 10px/1.6 'Inter', sans-serif;
+  margin: 4px 0 0;
+  color: #59564d;
+  font: 400 clamp(9px, .75vw, 11px)/1.45 'Inter', sans-serif;
+  text-align: right;
+  min-height: 1.45em;
 }
 .tm-epok-footer {
-  border-top: 1px solid #24201D;
-  border-bottom: 0;
-  padding: 15px 0 clamp(60px, 8vw, 100px);
+  padding: 12px 0 clamp(45px, 6vw, 82px);
+  border-top: 1px solid rgba(36,32,29,.35);
+  color: #24201D;
 }
 .tm-epok-footer button,
 .tm-epok-overlay-head button {
@@ -133,6 +161,62 @@
 }
 .tm-epok-footer button:hover { color: #4B2830; }
 .tm-epok-footer button span { color: #75735B; }
+
+/* A blank future folio occupies one full project image position; it is not
+ * dressed up as a finished case study or given a fake placeholder picture. */
+.tm-epok-blank-leaf {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  aspect-ratio: 1 / .74;
+  min-height: 0;
+  padding: clamp(10px, 1.4vw, 20px);
+  border: 1px solid rgba(36,32,29,.22);
+  background: transparent;
+  color: #24201D;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color .2s ease;
+}
+.tm-epok-blank-leaf:hover,
+.tm-epok-blank-leaf:focus-visible { border-color: #4B2830; }
+.tm-epok-blank-overline,
+.tm-epok-blank-bottom {
+  display: block;
+  font: 500 9px/1.4 'Inter', sans-serif;
+  color: #75735B;
+  letter-spacing: .12em;
+}
+.tm-epok-blank-bottom { align-self: flex-end; }
+
+/* Poster Typography is one grouped study: its three originals are one
+ * deliberately simple image panel, never three independent gallery cards. */
+.tm-epok-poster-collage {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: center;
+  gap: clamp(6px, .85vw, 12px);
+  width: 100%;
+  padding: 6px 0 22px;
+}
+.tm-epok-image .tm-epok-poster-preview {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  filter: none;
+  box-shadow: 0 3px 8px rgba(36,32,29,.08);
+}
+.tm-epok-poster-preview--1 { transform: translateY(7%); }
+.tm-epok-poster-preview--2 { transform: translateY(-5%); }
+.tm-epok-poster-preview--3 { transform: translateY(9%); }
+.tm-epok-image:hover .tm-epok-poster-preview--1,
+.tm-epok-image:focus-visible .tm-epok-poster-preview--1 { transform: translateY(5%); }
+.tm-epok-image:hover .tm-epok-poster-preview--2,
+.tm-epok-image:focus-visible .tm-epok-poster-preview--2 { transform: translateY(-7%); }
+.tm-epok-image:hover .tm-epok-poster-preview--3,
+.tm-epok-image:focus-visible .tm-epok-poster-preview--3 { transform: translateY(7%); }
 
 .tm-epok-overlay {
   position: fixed;
@@ -244,131 +328,6 @@
 .tm-epok-poster-foot span { font: 400 10px/1.4 'Inter', sans-serif; color: #75735B; text-align: right; }
 .tm-epok-gallery :is(button):focus-visible,
 .tm-epok-overlay :is(button):focus-visible { outline: 2px solid #4B2830; outline-offset: 3px; }
-
-@media (max-width: 950px) {
-  .tm-epok-shell { width: calc(100% - 48px); }
-  .tm-epok-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .tm-epok-item { grid-column: auto; }
-  .tm-epok-item--02, .tm-epok-item--04, .tm-epok-item--06 { margin-top: 67px; }
-  .tm-epok-item--01, .tm-epok-item--03, .tm-epok-item--05 { margin-top: 0; }
-  .tm-epok-caption-heading button { font-size: clamp(17px, 2.4vw, 22px); }
-}
-@media (max-width: 580px) {
-  .tm-epok-shell { width: calc(100% - 34px); }
-  .tm-epok-running, .tm-epok-footer { font-size: 9px; }
-  .tm-epok-grid {
-    grid-template-columns: 1fr;
-    gap: 40px;
-    padding-top: 22px;
-    padding-bottom: 62px;
-  }
-  .tm-epok-item { grid-column: 1; margin-top: 0 !important; }
-  .tm-epok-item:nth-child(even) { margin-left: 11%; }
-  .tm-epok-item:nth-child(odd) { margin-right: 6%; }
-  .tm-epok-item .tm-epok-image { width: 100%; }
-  .tm-epok-caption-heading button { font-size: 20px; }
-  .tm-epok-image-arrow { opacity: 1; transform: none; width: 28px; height: 28px; }
-  .tm-epok-poster-foot { flex-direction: column; gap: 4px; }
-  .tm-epok-index-row { grid-template-columns: 22px minmax(0,1fr) 17px; }
-  .tm-epok-index-type { display: none; }
-  .tm-epok-index-name { font-size: 20px; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .tm-epok-gallery *, .tm-epok-gallery *::before, .tm-epok-gallery *::after {
-    animation: none !important; transition: none !important;
-  }
-}
-
-
-
-/* One case study for Shanakht, Wajood and Chai, aligned with the existing
-   Epok-inspired identity columns. Keep all original poster images unaltered. */
-.tm-epok-item--02 { margin-top: clamp(22px, 4.8vw, 72px); }
-.tm-epok-item--03 { margin-top: clamp(0px, 1.4vw, 24px); }
-.tm-epok-item--04 { margin-top: clamp(12px, 2vw, 32px); }
-.tm-epok-item--05 { margin-top: clamp(30px, 4.5vw, 64px); }
-.tm-epok-poster-collage {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  align-items: center;
-  gap: clamp(6px, .85vw, 12px);
-  width: 100%;
-  padding: 6px 0 22px;
-}
-.tm-epok-image .tm-epok-poster-preview {
-  display: block;
-  width: 100%;
-  height: auto;
-  object-fit: contain;
-  filter: none;
-  box-shadow: 0 3px 8px rgba(36,32,29,.08);
-}
-.tm-epok-poster-preview--1 { transform: translateY(7%); }
-.tm-epok-poster-preview--2 { transform: translateY(-5%); }
-.tm-epok-poster-preview--3 { transform: translateY(9%); }
-.tm-epok-image:hover .tm-epok-poster-preview--1,
-.tm-epok-image:focus-visible .tm-epok-poster-preview--1 { transform: translateY(5%); }
-.tm-epok-image:hover .tm-epok-poster-preview--2,
-.tm-epok-image:focus-visible .tm-epok-poster-preview--2 { transform: translateY(-7%); }
-.tm-epok-image:hover .tm-epok-poster-preview--3,
-.tm-epok-image:focus-visible .tm-epok-poster-preview--3 { transform: translateY(7%); }
-
-/* Empty folio is intentionally unfilled, not a fabricated or colored mockup. */
-.tm-epok-blank-leaf {
-  width: 100%;
-  min-height: clamp(270px, 31vw, 425px);
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  justify-content: space-between;
-  padding: clamp(15px, 2vw, 26px);
-  background: transparent;
-  color: #24201D;
-  border: 1px solid rgba(36,32,29,.37);
-  cursor: pointer;
-  text-align: left;
-  position: relative;
-  transition: background-color .2s, border-color .2s;
-}
-.tm-epok-blank-leaf::after {
-  content: '';
-  position: absolute;
-  inset: 9px;
-  border: 1px solid rgba(36,32,29,.12);
-  pointer-events: none;
-}
-.tm-epok-blank-leaf:hover,
-.tm-epok-blank-leaf:focus-visible {
-  border-color: #4B2830;
-  background: rgba(75,40,48,.025);
-}
-.tm-epok-blank-overline,
-.tm-epok-blank-bottom {
-  font: 500 9px/1.5 'Inter', sans-serif;
-  letter-spacing: .16em;
-  color: #75735B;
-  position: relative;
-  z-index: 1;
-}
-.tm-epok-blank-mark {
-  position: absolute;
-  top: 49%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font: 400 clamp(45px, 6vw, 90px)/1 'Fraunces', Georgia, serif;
-  color: rgba(75,40,48,.14);
-}
-.tm-epok-blank-center {
-  position: relative;
-  z-index: 1;
-  display: block;
-  font: italic 400 clamp(24px, 3vw, 43px)/1.1 'Fraunces', Georgia, serif;
-  letter-spacing: -.035em;
-  color: #4B2830;
-  align-self: center;
-  margin: auto 0;
-}
-.tm-epok-blank-center span { color: #B08A63; }
 
 /* A compact, navigable three-plate case study, not three gallery cards. */
 .tm-epok-study-panel {
@@ -511,13 +470,43 @@
   font: 400 13px/1.5 'Inter', sans-serif;
   color: #75735B;
 }
-@media(max-width:950px) {
-  .tm-epok-study-header h2 { font-size: clamp(32px, 5.3vw, 54px); }
-  .tm-epok-study-layout { grid-template-columns: minmax(0, 1fr) 220px; gap: 20px; }
+
+
+.tm-epok-gallery :is(button):focus-visible,
+.tm-epok-overlay :is(button):focus-visible {
+  outline: 2px solid #4B2830;
+  outline-offset: 3px;
 }
-@media(max-width:580px) {
-  .tm-epok-poster-collage { gap: 8px; padding-bottom: 16px; }
-  .tm-epok-blank-leaf { min-height: 270px; }
+@media (max-width: 950px) {
+  .tm-epok-shell { width: calc(100% - 46px); }
+  .tm-epok-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(23px, 3vw, 38px); }
+  .tm-epok-column--03 { grid-column: 2; padding-top: 0; }
+  .tm-epok-caption-heading button { font-size: clamp(12px, 1.6vw, 15px); }
+  .tm-epok-caption p { font-size: 10px; }
+}
+@media (max-width: 580px) {
+  .tm-epok-shell { width: calc(100% - 30px); }
+  .tm-epok-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 23px;
+    padding-top: 17px;
+    padding-bottom: 39px;
+  }
+  /* Display contents lets all case studies return to a logical sequential
+   * order in the one-column layout while preserving desktop masonry. */
+  .tm-epok-column { display: contents; }
+  .tm-epok-item { margin: 0; padding: 0; }
+  .tm-epok-item--01 { order: 1; }
+  .tm-epok-item--02 { order: 2; }
+  .tm-epok-item--03 { order: 3; }
+  .tm-epok-item--04 { order: 4; }
+  .tm-epok-item--05 { order: 5; }
+  .tm-epok-item:not(:first-child) { border-top: 1px solid rgba(36,32,29,.18); padding-top: 14px; }
+  .tm-epok-caption-heading button { font-size: 14px; }
+  .tm-epok-caption p { font-size: 10px; }
+  .tm-epok-image-arrow { opacity: 1; transform: none; width: 28px; height: 28px; }
+  .tm-epok-running, .tm-epok-footer { font-size: 9px; }
   .tm-epok-study-header { display: block; }
   .tm-epok-study-header p { margin-top: 8px; }
   .tm-epok-study-header h2 { font-size: clamp(30px, 8vw, 43px); }
@@ -526,7 +515,13 @@
   .tm-epok-study-meta h3 { margin-top: 12px; }
   .tm-epok-study-thumbnails { margin-top: 14px; }
   .tm-epok-study-thumbnails button { grid-template-rows: 80px auto; }
+  .tm-epok-index-row { grid-template-columns: 22px minmax(0,1fr) 17px; }
+  .tm-epok-index-type { display: none; }
+  .tm-epok-index-name { font-size: 20px; }
 }
-@media(prefers-reduced-motion:reduce) {
-  .tm-epok-gallery .tm-epok-poster-preview { transition: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  .tm-epok-gallery *, .tm-epok-gallery *::before, .tm-epok-gallery *::after,
+  .tm-epok-overlay *, .tm-epok-overlay *::before, .tm-epok-overlay *::after {
+    transition: none !important; animation: none !important;
+  }
 }
