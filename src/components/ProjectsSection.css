@@ -278,3 +278,255 @@
     animation: none !important; transition: none !important;
   }
 }
+
+
+
+/* One case study for Shanakht, Wajood and Chai, aligned with the existing
+   Epok-inspired identity columns. Keep all original poster images unaltered. */
+.tm-epok-item--02 { margin-top: clamp(22px, 4.8vw, 72px); }
+.tm-epok-item--03 { margin-top: clamp(0px, 1.4vw, 24px); }
+.tm-epok-item--04 { margin-top: clamp(12px, 2vw, 32px); }
+.tm-epok-item--05 { margin-top: clamp(30px, 4.5vw, 64px); }
+.tm-epok-poster-collage {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: center;
+  gap: clamp(6px, .85vw, 12px);
+  width: 100%;
+  padding: 6px 0 22px;
+}
+.tm-epok-image .tm-epok-poster-preview {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  filter: none;
+  box-shadow: 0 3px 8px rgba(36,32,29,.08);
+}
+.tm-epok-poster-preview--1 { transform: translateY(7%); }
+.tm-epok-poster-preview--2 { transform: translateY(-5%); }
+.tm-epok-poster-preview--3 { transform: translateY(9%); }
+.tm-epok-image:hover .tm-epok-poster-preview--1,
+.tm-epok-image:focus-visible .tm-epok-poster-preview--1 { transform: translateY(5%); }
+.tm-epok-image:hover .tm-epok-poster-preview--2,
+.tm-epok-image:focus-visible .tm-epok-poster-preview--2 { transform: translateY(-7%); }
+.tm-epok-image:hover .tm-epok-poster-preview--3,
+.tm-epok-image:focus-visible .tm-epok-poster-preview--3 { transform: translateY(7%); }
+
+/* Empty folio is intentionally unfilled, not a fabricated or colored mockup. */
+.tm-epok-blank-leaf {
+  width: 100%;
+  min-height: clamp(270px, 31vw, 425px);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: space-between;
+  padding: clamp(15px, 2vw, 26px);
+  background: transparent;
+  color: #24201D;
+  border: 1px solid rgba(36,32,29,.37);
+  cursor: pointer;
+  text-align: left;
+  position: relative;
+  transition: background-color .2s, border-color .2s;
+}
+.tm-epok-blank-leaf::after {
+  content: '';
+  position: absolute;
+  inset: 9px;
+  border: 1px solid rgba(36,32,29,.12);
+  pointer-events: none;
+}
+.tm-epok-blank-leaf:hover,
+.tm-epok-blank-leaf:focus-visible {
+  border-color: #4B2830;
+  background: rgba(75,40,48,.025);
+}
+.tm-epok-blank-overline,
+.tm-epok-blank-bottom {
+  font: 500 9px/1.5 'Inter', sans-serif;
+  letter-spacing: .16em;
+  color: #75735B;
+  position: relative;
+  z-index: 1;
+}
+.tm-epok-blank-mark {
+  position: absolute;
+  top: 49%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font: 400 clamp(45px, 6vw, 90px)/1 'Fraunces', Georgia, serif;
+  color: rgba(75,40,48,.14);
+}
+.tm-epok-blank-center {
+  position: relative;
+  z-index: 1;
+  display: block;
+  font: italic 400 clamp(24px, 3vw, 43px)/1.1 'Fraunces', Georgia, serif;
+  letter-spacing: -.035em;
+  color: #4B2830;
+  align-self: center;
+  margin: auto 0;
+}
+.tm-epok-blank-center span { color: #B08A63; }
+
+/* A compact, navigable three-plate case study, not three gallery cards. */
+.tm-epok-study-panel {
+  width: min(100%, 1050px);
+  max-height: min(94svh, 960px);
+  overflow-y: auto;
+  position: relative;
+  z-index: 1;
+  background: #EFE6D6;
+  color: #24201D;
+  padding: clamp(20px, 3.6vw, 50px);
+}
+.tm-epok-study-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 20px;
+  padding: clamp(17px, 3vw, 33px) 0 clamp(19px, 3vw, 32px);
+}
+.tm-epok-study-header h2 {
+  margin: 0;
+  font: 450 clamp(34px, 4.8vw, 67px)/1.1 'Fraunces', Georgia, serif;
+  letter-spacing: -.035em;
+}
+.tm-epok-study-header h2 em {
+  font-weight: 400;
+  color: #4B2830;
+}
+.tm-epok-study-header p {
+  max-width: 235px;
+  margin: 0 0 4px;
+  font: 400 12px/1.5 'Inter', sans-serif;
+  color: #75735B;
+}
+.tm-epok-study-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(230px, .75fr);
+  gap: clamp(22px, 4vw, 56px);
+  align-items: stretch;
+  border-top: 1px solid #24201D;
+  padding-top: 23px;
+}
+.tm-epok-study-art {
+  min-width: 0;
+  display: grid;
+  place-items: center;
+}
+.tm-epok-study-art img {
+  width: auto;
+  max-width: 100%;
+  max-height: min(52svh, 570px);
+  height: auto;
+  object-fit: contain;
+  filter: none;
+}
+.tm-epok-study-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+.tm-epok-study-counter {
+  font: 500 9px/1.4 'Inter', sans-serif;
+  letter-spacing: .16em;
+  color: #75735B;
+}
+.tm-epok-study-meta h3 {
+  margin: 22px 0 10px;
+  font: 450 clamp(24px, 2.7vw, 37px)/1.16 'Fraunces', Georgia, serif;
+  letter-spacing: -.035em;
+}
+.tm-epok-study-meta > p {
+  margin: 0;
+  font: 400 13px/1.65 'Inter', sans-serif;
+  color: #5b544e;
+}
+.tm-epok-study-actions {
+  display: flex;
+  gap: 8px;
+  margin: 23px 0;
+}
+.tm-epok-study-actions button {
+  width: 39px;
+  height: 39px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #24201D;
+  background: transparent;
+  color: #24201D;
+  cursor: pointer;
+}
+.tm-epok-study-actions button:hover { background: #24201D; color: #EFE6D6; }
+.tm-epok-study-thumbnails {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 9px;
+  margin-top: auto;
+  border-top: 1px solid rgba(36,32,29,.22);
+  padding-top: 16px;
+  width: 100%;
+}
+.tm-epok-study-thumbnails button {
+  border: 1px solid transparent;
+  padding: 5px 3px;
+  background: none;
+  cursor: pointer;
+  display: grid;
+  grid-template-rows: minmax(80px, 115px) auto;
+  justify-items: center;
+  gap: 7px;
+}
+.tm-epok-study-thumbnails button[aria-pressed="true"] { border-color: #4B2830; }
+.tm-epok-study-thumbnails img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: none;
+}
+.tm-epok-study-thumbnails span {
+  font: 500 9px/1.2 'Inter', sans-serif;
+  letter-spacing: .1em;
+}
+.tm-epok-empty-panel { max-width: 750px; }
+.tm-epok-empty-detail { padding: clamp(35px, 8vw, 95px) 0; }
+.tm-epok-empty-detail > span {
+  font: 500 9px/1.3 'Inter', sans-serif;
+  letter-spacing: .16em;
+  color: #75735B;
+}
+.tm-epok-empty-detail h2 {
+  font: italic 400 clamp(37px, 7vw, 75px)/1.2 'Fraunces', Georgia, serif;
+  letter-spacing: -.035em;
+  color: #4B2830;
+  margin: 14px 0 42px;
+}
+.tm-epok-empty-detail h2 span { color: #B08A63; }
+.tm-epok-empty-rule { height: 1px; width: 100%; background: rgba(36,32,29,.3); }
+.tm-epok-empty-detail p {
+  margin: 16px 0 0;
+  font: 400 13px/1.5 'Inter', sans-serif;
+  color: #75735B;
+}
+@media(max-width:950px) {
+  .tm-epok-study-header h2 { font-size: clamp(32px, 5.3vw, 54px); }
+  .tm-epok-study-layout { grid-template-columns: minmax(0, 1fr) 220px; gap: 20px; }
+}
+@media(max-width:580px) {
+  .tm-epok-poster-collage { gap: 8px; padding-bottom: 16px; }
+  .tm-epok-blank-leaf { min-height: 270px; }
+  .tm-epok-study-header { display: block; }
+  .tm-epok-study-header p { margin-top: 8px; }
+  .tm-epok-study-header h2 { font-size: clamp(30px, 8vw, 43px); }
+  .tm-epok-study-layout { display: flex; flex-direction: column; }
+  .tm-epok-study-art img { max-height: 45svh; }
+  .tm-epok-study-meta h3 { margin-top: 12px; }
+  .tm-epok-study-thumbnails { margin-top: 14px; }
+  .tm-epok-study-thumbnails button { grid-template-rows: 80px auto; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .tm-epok-gallery .tm-epok-poster-preview { transition: none !important; }
+}
