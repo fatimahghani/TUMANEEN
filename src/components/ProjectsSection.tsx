@@ -162,7 +162,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
         <div className="tm-epok-grid" aria-label="Case studies by Fatimah Ghani">
           {[[0, 3], [1, 4], [2]].map((indexes, columnIndex) => (
             <div
-              className={'tm-epok-column tm-epok-column--' + (columnIndex + 1)}
+              className={'tm-epok-column tm-epok-column--' + String(columnIndex + 1).padStart(2, '0')}
               data-gallery-column={columnIndex + 1}
               key={columnIndex}
             >
