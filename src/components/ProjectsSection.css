@@ -534,3 +534,7 @@
   .tm-project-grid-section .tm-project-gallery-folio { font-size: 9px; }
   .tm-project-grid-section .tm-project-gallery-folio > span:last-child { display:none; }
 }
+
+/* The index is portaled to document.body so the sticky header cannot intercept its backdrop. */
+.tm-project-index-overlay { z-index: 1000; }
+.tm-project-index-panel button:focus-visible { outline: 2px solid #4B2830; outline-offset: 3px; }

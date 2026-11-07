@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { ArrowDownRight, ArrowUpRight, X } from 'lucide-react';
 import { PORTFOLIO_PROJECTS, type PortfolioProject } from '../data/portfolioData';
 import './ProjectsSection.css';
@@ -195,7 +196,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
         </footer>
       </div>
 
-      {indexOpen && (
+      {indexOpen && createPortal(
         <div
           className="tm-project-index-overlay"
           role="dialog"
@@ -239,7 +240,8 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
             </div>
             <div className="tm-project-index-foot">TUMANEEN / SELECTED WORK / 2026</div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </section>
   );
