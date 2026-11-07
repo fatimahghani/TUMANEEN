@@ -61,17 +61,66 @@ try {
     if (await page.locator('.tm-epok-blank-leaf img').count() !== 0)
       errors.push(width + ': empty folio contains fake project imagery');
 
-    const columns = await page.locator('.tm-epok-grid').evaluate(el =>
-      getComputedStyle(el).gridTemplateColumns.split(' ').filter(Boolean).length
+    const columnGroups = page.locator('.tm-epok-column');
+    if (await columnGroups.count() !== 3) errors.push(width + ': expected three independent masonry columns');
+    const itemsPerColumn = await columnGroups.evaluateAll(nodes =>
+      nodes.map(node => node.querySelectorAll('.tm-epok-item').length)
     );
-    const expectedTracks = width > 950 ? 12 : width > 580 ? 2 : 1;
-    if (columns !== expectedTracks) errors.push(width + ': unexpected gallery track count ' + columns);
+    if (JSON.stringify(itemsPerColumn) !== JSON.stringify([2,2,1]))
+      errors.push(width + ': unexpected masonry distribution ' + itemsPerColumn);
+
+    const layout = await page.locator('.tm-epok-grid').evaluate(element => ({
+      display: getComputedStyle(element).display,
+      tracks: getComputedStyle(element).gridTemplateColumns.split(' ').filter(Boolean).length,
+    }));
+    if (width > 950 && (layout.display !== 'grid' || layout.tracks !== 3))
+      errors.push(width + ': desktop requires three equal grid columns');
+    if (width > 580 && width <= 950 && (layout.display !== 'grid' || layout.tracks !== 2))
+      errors.push(width + ': tablet requires two columns');
+    if (width <= 580 && layout.display !== 'flex')
+      errors.push(width + ': mobile requires one ordered column');
+
+    // Reference-specific composition: first two covers start level, third
+    // is offset below, and each column flows independently of the others.
     if (width > 950) {
-      const x = await gallery.evaluateAll(nodes =>
-        nodes.slice(0, 3).map(node => Math.round(node.getBoundingClientRect().left))
+      const geometry = await columnGroups.evaluateAll(nodes =>
+        nodes.map(node => {
+          const first = node.querySelector('.tm-epok-item');
+          const items = [...node.querySelectorAll('.tm-epok-item')];
+          const column = node.getBoundingClientRect();
+          return {
+            left: Math.round(column.left),
+            width: Math.round(column.width),
+            top: Math.round(first.getBoundingClientRect().top),
+            next: items[1] ? items[1].getBoundingClientRect().top : null,
+            bottom: first.getBoundingClientRect().bottom,
+          };
+        })
       );
-      if (new Set(x).size !== 3) errors.push(width + ': three brand projects did not align to distinct grid columns');
+      if (new Set(geometry.map(c => c.left)).size !== 3)
+        errors.push(width + ': three masonry columns not visually distinct');
+      if (Math.max(...geometry.map(c => c.width)) - Math.min(...geometry.map(c => c.width)) > 3)
+        errors.push(width + ': reference uses equal column widths');
+      if (Math.abs(geometry[0].top - geometry[1].top) > 4)
+        errors.push(width + ': first two columns must align at top');
+      if (geometry[2].top - geometry[0].top < 16)
+        errors.push(width + ': third column must start lower');
+      if (!geometry[0].next || geometry[0].next <= geometry[0].bottom)
+        errors.push(width + ': first column does not flow independently');
+      if (!geometry[1].next || geometry[1].next <= geometry[1].bottom)
+        errors.push(width + ': second column does not flow independently');
     }
+
+    const captionStyles = await page.locator('.tm-epok-caption-heading button').first().evaluate(el => {
+      const cs = getComputedStyle(el);
+      return { size: parseFloat(cs.fontSize), display: cs.display };
+    });
+    if (captionStyles.size > 16)
+      errors.push(width + ': project caption should be small like the reference');
+    if (await page.locator('.tm-epok-caption-dash').count() !== 5)
+      errors.push(width + ': missing fine dash prefixes beside project titles');
+    if (await page.locator('.tm-epok-caption-arrow').count() !== 5)
+      errors.push(width + ': missing inline project arrows');
 
     const images = page.locator('.tm-epok-image img');
     if (await images.count() !== 6) errors.push(width + ': expected three brands and three posters inside one grouped preview');
