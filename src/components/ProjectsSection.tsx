@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { ArrowDownRight, ArrowUpRight, X } from 'lucide-react';
 import { PORTFOLIO_PROJECTS, type PortfolioProject } from '../data/portfolioData';
 import './ProjectsSection.css';
@@ -94,18 +95,22 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
       <div className="tm-project-gallery-shell">
         <header className="tm-projects-intro tm-project-gallery-intro">
           <div className="tm-projects-kicker">
-            <span>02 / SELECTED WORK</span>
-            <span>TUMANEEN / VOL. I</span>
+            <span>THE TUMANEEN JOURNAL / SELECTED WORK</span>
+            <span className="tm-project-gallery-kicker-right">EDITION NO. 02 · 2026</span>
           </div>
           <div className="tm-projects-title-row">
             <h2 id="tm-project-gallery-title">Selected <em>work.</em></h2>
             <div className="tm-project-gallery-intro-side">
-              <p>Identity, print &amp; objects.</p>
+              <p>Identity · Print · Objects</p>
               <span>{String(PORTFOLIO_PROJECTS.length).padStart(2, '0')} PROJECTS / 2026</span>
             </div>
           </div>
         </header>
 
+        <div className="tm-project-gallery-folio" aria-hidden="true">
+          <span>THE STUDIO PORTFOLIO</span>
+          <span>THREE STORIES IN PRINT — 2026</span>
+        </div>
         <div className="tm-project-gallery" aria-label="Selected projects">
           {PORTFOLIO_PROJECTS.map((project, index) => {
             const number = String(index + 1).padStart(2, '0');
@@ -137,8 +142,8 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
 
                 <div className="tm-project-entry-caption">
                   <div className="tm-project-entry-caption-rule">
-                    <span>{number} / {project.year}</span>
-                    <span aria-hidden="true">—</span>
+                    <span>PLATE {number} / {project.year}</span>
+                    <span aria-hidden="true">TUMANEEN ARCHIVE</span>
                   </div>
                   <button
                     type="button"
@@ -149,7 +154,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
                     <span>{project.title}</span>
                     <ArrowUpRight size={23} strokeWidth={1.4} aria-hidden="true" />
                   </button>
-                  <p>{project.discipline}{project.tagline ? ' / ' + project.tagline : ''}</p>
+                  <p>{project.discipline}{project.tagline ? ' · ' + project.tagline : ''}</p>
                 </div>
 
                 {imageFor(project, detailPosition) && (
@@ -181,8 +186,8 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
 
         <footer className="tm-project-gallery-footer">
           <div>
-            <span className="tm-project-gallery-rule-label">THE PROJECT INDEX</span>
-            <p>More than an image. <em>Explore the story.</em></p>
+            <span className="tm-project-gallery-rule-label">END OF FEATURE / NO. 02</span>
+            <p>Further reading <em>in the archive.</em></p>
           </div>
           <button type="button" onClick={openIndex} className="tm-project-index-trigger">
             ALL PROJECTS <span>{String(PORTFOLIO_PROJECTS.length).padStart(2, '0')}</span>
@@ -191,7 +196,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
         </footer>
       </div>
 
-      {indexOpen && (
+      {indexOpen && createPortal(
         <div
           className="tm-project-index-overlay"
           role="dialog"
@@ -235,7 +240,8 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
             </div>
             <div className="tm-project-index-foot">TUMANEEN / SELECTED WORK / 2026</div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </section>
   );

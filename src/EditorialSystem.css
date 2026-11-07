@@ -59,7 +59,7 @@
 }
 .tm-site [data-editorial-nav] .tm-floating-surface > div:first-child > button:first-child > span:first-child,
 .tm-site [data-editorial-contact] .tm-footer-logotype {
-  font: 450 clamp(24px, 3vw, 42px)/1.1 var(--tm-font-display) !important;
+  font: 450 clamp(18px, 1.7vw, 26px)/1.1 var(--tm-font-display) !important;
   text-transform: none !important;
   letter-spacing: -.035em !important;
 }
@@ -87,7 +87,7 @@
 .tm-site [data-editorial-nav] .tm-floating-surface > div:first-child > button:first-child > span:first-child {
   font-family: 'Fraunces', Georgia, serif;
   font-weight: 700;
-  font-size: clamp(24px, 2.4vw, 35px);
+  font-size: clamp(18px, 1.7vw, 26px);
   text-transform: none;
   letter-spacing: -.035em;
 }
@@ -136,7 +136,7 @@
   font-weight: 400;
   letter-spacing: -.035em;
   color: var(--tm-ivory);
-  font-size: clamp(72px, 12vw, 210px);
+  font-size: clamp(46px, 8vw, 120px);
   line-height: .79;
 }
 .tm-site #posters .lb-word-l { font-style: italic; }
@@ -198,12 +198,12 @@
   gap: clamp(16px, 3.5vw, 54px);
   padding: clamp(52px, 7vw, 110px) 0 clamp(45px, 7vw, 95px);
 }
-.tm-bridge-issue { color: var(--tm-red); font: italic 500 clamp(100px, 11vw, 190px)/.7 'Fraunces', Georgia, serif; letter-spacing: -.13em; }
+.tm-bridge-issue { color: var(--tm-red); font: italic 450 clamp(66px, 8vw, 118px)/.85 'Fraunces', Georgia, serif; letter-spacing: -.13em; }
 .tm-bridge-issue span { font-size: .7em; }
 .tm-bridge-kicker { display: block; padding-bottom: 14px; border-bottom: 1px solid var(--tm-soft-rule); font: 500 10px/1.4 'Inter', sans-serif; letter-spacing: .08em; }
 .tm-bridge-statement h2 {
   margin: 18px 0 5px; color: var(--tm-wine);
-  font: 450 clamp(69px, 7.7vw, 130px)/.80 'Fraunces', Georgia, serif;
+  font: 450 clamp(43px, 4.7vw, 78px)/1.05 'Fraunces', Georgia, serif;
   letter-spacing: -.035em;
 }
 .tm-bridge-statement h2 em { color: var(--tm-red); font-weight: 400; }
@@ -214,7 +214,7 @@
   padding-top: 12px; margin-bottom: 32px; color: var(--tm-red);
   font: 500 10px/1.3 'Inter', sans-serif;
 }
-.tm-bridge-notes p { margin: 0 0 19px; max-width: 325px; color: var(--tm-ink); font: 500 clamp(18px, 1.9vw, 26px)/1.22 'Inter', sans-serif; }
+.tm-bridge-notes p { margin: 0 0 19px; max-width: 325px; color: var(--tm-ink); font: 400 clamp(14px, 1.25vw, 18px)/1.55 'Inter', sans-serif; }
 .tm-bridge-notes p + p { font-size: clamp(15px, 1.3vw, 18px); line-height: 1.4; }
 .tm-bridge-notes button {
   display: inline-flex; align-items: center; justify-content: space-between; gap: 15px; width: 100%; max-width: 345px;
@@ -244,11 +244,11 @@
 }
 .tm-projects-title-row h2 {
   margin: 0; color: var(--tm-ink);
-  font: 450 clamp(80px, 11vw, 170px)/.76 'Fraunces', Georgia, serif;
+  font: 450 clamp(45px, 5.1vw, 78px)/1.08 'Fraunces', Georgia, serif;
   letter-spacing: -.035em;
 }
 .tm-projects-title-row h2 em { font-weight: 400; color: var(--tm-red); }
-.tm-projects-title-row p { margin: 0; max-width: 235px; font: italic 23px/1.08 'Fraunces', Georgia, serif; }
+.tm-projects-title-row p { margin: 0; max-width: 235px; font: italic 17px/1.2 'Fraunces', Georgia, serif; }
 .tm-projects-title-row p span { display: block; padding-top: 17px; font: 500 9px/1.4 'Inter', sans-serif; color: var(--tm-rust); letter-spacing: .05em; }
 /* Selected Work project gallery styling lives in ProjectsSection.css. */
 
@@ -270,7 +270,7 @@
 }
 .tm-process .sticky p.font-display {
   color: var(--tm-wine);
-  font: 500 clamp(52px, 5.3vw, 81px)/.86 'Fraunces', Georgia, serif;
+  font: 450 clamp(34px, 3.55vw, 53px)/1.05 'Fraunces', Georgia, serif;
   letter-spacing: -.035em;
 }
 .tm-process .sticky p.font-display:first-child { font-style: italic; color: var(--tm-red); }
@@ -303,7 +303,7 @@
 }
 .tm-process-artboard-number {
   position: absolute; bottom: 16%; right: -1%;
-  font: italic 600 clamp(240px, 27vw, 395px)/.65 'Fraunces', Georgia, serif;
+  font: italic 500 clamp(165px, 19vw, 260px)/.75 'Fraunces', Georgia, serif;
   letter-spacing: -.13em; color: rgba(239,230,214,.14); transform: rotate(-10deg);
 }
 .tm-process-artboard-sidenote {
@@ -325,7 +325,7 @@
 .tm-process-card h3 {
   -webkit-text-fill-color: var(--tm-paper-light) !important;
   color: var(--tm-paper-light) !important; background-image: none !important;
-  font: italic 550 clamp(53px, 6.4vw, 86px)/.9 'Fraunces', Georgia, serif;
+  font: italic 450 clamp(33px, 4.35vw, 61px)/1.0 'Fraunces', Georgia, serif;
   letter-spacing: -.035em;
   text-shadow: 1px 2px 0 var(--tm-ink);
 }
@@ -346,15 +346,15 @@
 .tm-about [class*="border-t"][class*="border-b"] { border-color: var(--tm-soft-rule); }
 .tm-about h2 {
   color: var(--tm-burgundy) !important;
-  font: 450 clamp(58px, 6.2vw, 101px)/.84 'Fraunces', Georgia, serif;
+  font: 450 clamp(38px, 4.2vw, 66px)/1.05 'Fraunces', Georgia, serif;
   letter-spacing: -.035em;
   max-width: 740px;
 }
 .tm-about h2 + div.font-serif {
-  font: italic 500 clamp(22px, 2.7vw, 38px)/1.02 'Fraunces', Georgia, serif;
+  font: italic 400 clamp(17px, 1.85vw, 27px)/1.2 'Fraunces', Georgia, serif;
   color: var(--tm-red) !important;
 }
-.tm-about p.font-sans { max-width: 56ch; color: var(--tm-ink); font: 500 clamp(17px, 1.7vw, 23px)/1.38 'Inter', sans-serif; }
+.tm-about p.font-sans { max-width: 56ch; color: var(--tm-ink); font: 400 clamp(14px, 1.2vw, 17px)/1.7 'Inter', sans-serif; }
 .tm-about-plate {
   mask: none !important;
   -webkit-mask: none !important;
@@ -397,10 +397,10 @@
 }
 .tm-services h2 {
   color: var(--tm-wine) !important;
-  font: 450 clamp(67px, 8vw, 128px)/.8 'Fraunces', Georgia, serif;
+  font: 450 clamp(40px, 4.6vw, 72px)/1.05 'Fraunces', Georgia, serif;
   letter-spacing: -.063em;
 }
-.tm-services h2 + div.font-serif { font: italic 500 clamp(24px, 2.5vw, 37px)/1 'Fraunces', Georgia, serif; color: var(--tm-red) !important; }
+.tm-services h2 + div.font-serif { font: italic 400 clamp(17px, 1.7vw, 24px)/1.22 'Fraunces', Georgia, serif; color: var(--tm-red) !important; }
 .tm-services > div:last-child > div:nth-child(2) {
   border-top: 3px double var(--tm-wine);
   border-bottom: 3px double var(--tm-wine);
@@ -422,18 +422,18 @@
 .tm-service-card[data-selected="true"] { border-top: 3px solid var(--tm-olive); background: rgba(117, 115, 91, .08) !important; }
 .tm-service-card h3 {
   color: var(--tm-wine);
-  font: 500 clamp(37px, 3.5vw, 59px)/.9 'Fraunces', Georgia, serif;
+  font: 450 clamp(27px, 2.5vw, 39px)/1.08 'Fraunces', Georgia, serif;
   letter-spacing: -.045em;
 }
 .tm-service-card p.font-serif {
   color: var(--tm-rust) !important;
-  font: italic 500 23px/1.04 'Fraunces', Georgia, serif;
+  font: italic 400 17px/1.25 'Fraunces', Georgia, serif;
 }
-.tm-service-card ul { color: var(--tm-ink); font: 500 15px/1.3 'Inter', sans-serif; }
+.tm-service-card ul { color: var(--tm-ink); font: 400 13px/1.5 'Inter', sans-serif; }
 .tm-service-card [class*="font-mono"] { color: var(--tm-rust) !important; }
 .tm-service-card > div:first-child > div:first-child > span:first-child {
   color: var(--tm-olive) !important;
-  font: italic 600 52px/.8 'Fraunces', Georgia, serif;
+  font: italic 450 34px/1.0 'Fraunces', Georgia, serif;
   color: var(--tm-red) !important;
 }
 .tm-service-card button {
@@ -457,11 +457,11 @@
 .tm-site [data-editorial-contact] > div[aria-hidden="true"] { opacity: .15; }
 .tm-site [data-editorial-contact] h2 {
   color: var(--tm-paper-light) !important;
-  font: 500 clamp(69px, 7vw, 110px)/.82 'Fraunces', Georgia, serif;
+  font: 450 clamp(41px, 4.5vw, 72px)/1.06 'Fraunces', Georgia, serif;
   letter-spacing: -.035em;
 }
 .tm-site [data-editorial-contact] h2 + div.font-serif {
-  font: italic 400 clamp(25px, 2.9vw, 40px)/1 'Fraunces', Georgia, serif;
+  font: italic 400 clamp(17px, 1.85vw, 25px)/1.22 'Fraunces', Georgia, serif;
   color: var(--tm-ivory) !important;
 }
 .tm-site [data-editorial-contact] input,
@@ -470,7 +470,7 @@
   background: transparent; color: var(--tm-paper-light);
   border-radius: 0;
   padding: 16px 0 13px;
-  font: 500 19px/1.35 'Inter', sans-serif;
+  font: 400 15px/1.5 'Inter', sans-serif;
 }
 .tm-site [data-editorial-contact] input::placeholder,
 .tm-site [data-editorial-contact] textarea::placeholder { color: rgba(239,230,214,.72); }
@@ -501,7 +501,7 @@
 .tm-site [data-editorial-contact] [class*="shadow-"] { box-shadow: none; }
 .tm-site [data-editorial-contact] a { text-decoration-thickness: 1px; text-underline-offset: 5px; }
 .tm-site [data-editorial-contact] > div:last-child > div:last-child > div:first-child .font-display {
-  font-size: clamp(65px, 8.7vw, 145px);
+  font-size: clamp(42px, 5vw, 78px);
   line-height: .8;
   font-weight: 600;
   letter-spacing: -.085em;
@@ -513,7 +513,7 @@
 .tm-case-modal > header [class*="backdrop-blur"] { backdrop-filter: none; }
 .tm-case-modal [class*="rounded-"] { border-radius: 0; }
 .tm-case-modal h3.font-display {
-  font: 500 clamp(48px, 6vw, 100px)/.9 'Fraunces', Georgia, serif;
+  font: 450 clamp(32px, 4vw, 60px)/1.05 'Fraunces', Georgia, serif;
   letter-spacing: -.05em;
 }
 
@@ -521,53 +521,53 @@
 @media (max-width: 1100px) {
   .tm-bridge-inner { width: calc(100% - 58px); }
   .tm-bridge-layout { grid-template-columns: 70px 1fr 1fr; gap: 18px; }
-  .tm-bridge-statement h2 { font-size: clamp(65px, 8vw, 105px); }
+  .tm-bridge-statement h2 { font-size: clamp(43px, 5vw, 70px); }
   .tm-projects-intro { padding-left: 29px; padding-right: 29px; }
   .tm-service-card { min-height: 435px; }
 }
 @media (max-width: 790px) {
   .tm-bridge-inner { width: calc(100% - 34px); }
   .tm-bridge-layout { grid-template-columns: 1fr 1fr; gap: 20px; padding: 47px 0; }
-  .tm-bridge-issue { grid-column: 1 / -1; font-size: 88px; }
-  .tm-bridge-statement h2 { font-size: clamp(63px, 10vw, 95px); }
+  .tm-bridge-issue { grid-column: 1 / -1; font-size: 58px; }
+  .tm-bridge-statement h2 { font-size: clamp(36px, 6.6vw, 59px); }
   .tm-bridge-notes { padding-top: 0; }
   .tm-projects-intro { padding: 19px 17px 60px; }
   .tm-projects-title-row { gap: 20px; }
-  .tm-projects-title-row h2 { font-size: 13vw; }
-  .tm-projects-title-row p { font-size: 19px; }
+  .tm-projects-title-row h2 { font-size: 8vw; }
+  .tm-projects-title-row p { font-size: 16px; }
   .tm-about .lg\:col-span-7 { padding-left: 0; }
-  .tm-about h2 { font-size: clamp(58px, 9vw, 85px); }
-  .tm-services h2 { font-size: clamp(60px, 10vw, 96px); }
+  .tm-about h2 { font-size: clamp(36px, 6.6vw, 59px); }
+  .tm-services h2 { font-size: clamp(38px, 7vw, 65px); }
   .tm-service-card:nth-child(2n) { border-right: 0; }
-  .tm-site #posters .lb-word { font-size: clamp(56px, 12vw, 102px); }
+  .tm-site #posters .lb-word { font-size: clamp(40px, 8vw, 75px); }
   .tm-site #posters .lb-card { border-width: 4px; }
   .tm-site #posters[data-lens-bloom]::after { display: none; }
 }
 @media (max-width: 550px) {
   .tm-bridge-layout { display: block; padding: 27px 0 45px; }
   .tm-bridge-running, .tm-bridge-footer { font-size: 8px; }
-  .tm-bridge-issue { font-size: 82px; margin: 14px 0 35px; }
-  .tm-bridge-statement h2 { font-size: clamp(48px, 10vw, 70px); }
+  .tm-bridge-issue { font-size: 55px; margin: 14px 0 22px; }
+  .tm-bridge-statement h2 { font-size: clamp(31px, 7.2vw, 46px); }
   .tm-bridge-urdu { margin: 11px 0 28px; }
   .tm-bridge-notes p { max-width: 100%; }
   .tm-bridge-notes button { max-width: none; }
   .tm-projects-kicker { font-size: 8px; }
   .tm-projects-kicker span:last-child { display: none; }
   .tm-projects-title-row { display: block; }
-  .tm-projects-title-row h2 { font-size: clamp(52px, 12vw, 76px); }
+  .tm-projects-title-row h2 { font-size: clamp(34px, 9vw, 54px); }
   .tm-projects-title-row p { margin-top: 27px; max-width: 250px; }
   .tm-project-spread h3 { font-size: clamp(46px, 11vw, 70px); }
   .tm-process-card { border-width: 5px; box-shadow: 5px 5px 0 rgba(75,40,48,.25); }
-  .tm-process-card h3 { font-size: clamp(52px, 11vw, 67px); }
+  .tm-process-card h3 { font-size: clamp(31px, 7vw, 46px); }
   .tm-about { padding-top: 60px; padding-bottom: 80px; }
-  .tm-about h2 { font-size: clamp(44px, 10vw, 66px); }
+  .tm-about h2 { font-size: clamp(32px, 7.8vw, 48px); }
   .tm-about-plate { margin-right: 13px; }
   .tm-services { padding: 68px 0 85px; }
-  .tm-services h2 { font-size: clamp(46px, 11vw, 68px); }
+  .tm-services h2 { font-size: clamp(33px, 8vw, 49px); }
   .tm-service-card { border-right: 0; min-height: 0; padding: 22px 8px 30px; }
   .tm-site [data-editorial-contact] { padding-top: 72px; }
-  .tm-site [data-editorial-contact] h2 { font-size: clamp(46px, 11vw, 73px); }
-  .tm-site #posters .lb-word { font-size: clamp(52px, 12vw, 68px); }
+  .tm-site [data-editorial-contact] h2 { font-size: clamp(32px, 8vw, 52px); }
+  .tm-site #posters .lb-word { font-size: clamp(32px, 8vw, 50px); }
 }
 @media (prefers-reduced-motion: reduce) {
   .tm-site *,
