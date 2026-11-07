@@ -97,6 +97,7 @@ try {
           };
         })
       );
+      console.log('REFERENCE_GEOMETRY', width, JSON.stringify(geometry));
       if (new Set(geometry.map(c => c.left)).size !== 3)
         errors.push(width + ': three masonry columns not visually distinct');
       if (Math.max(...geometry.map(c => c.width)) - Math.min(...geometry.map(c => c.width)) > 3)
