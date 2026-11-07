@@ -27,6 +27,9 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
   const [localIndexOpen, setLocalIndexOpen] = useState(false);
   const indexOpen = isAllProjectsOpen ?? localIndexOpen;
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const indexPanelRef = useRef<HTMLDivElement>(null);
+  const closeHandlerRef = useRef(onCloseAllProjects);
+  closeHandlerRef.current = onCloseAllProjects;
 
   const openIndex = () => {
     if (onOpenAllProjects) onOpenAllProjects();
@@ -54,7 +57,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         event.preventDefault();
-        if (onCloseAllProjects) onCloseAllProjects();
+        if (closeHandlerRef.current) closeHandlerRef.current();
         else setLocalIndexOpen(false);
       }
     };
@@ -65,7 +68,22 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
       document.body.style.overflow = oldOverflow;
       previouslyFocused?.focus();
     };
-  }, [indexOpen, onCloseAllProjects]);
+  }, [indexOpen]);
+
+  const handleIndexTab = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== 'Tab') return;
+    const items = indexPanelRef.current?.querySelectorAll<HTMLButtonElement>('button:not([disabled])');
+    if (!items?.length) return;
+    const first = items[0];
+    const last = items[items.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  };
 
   return (
     <section
@@ -187,7 +205,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
             aria-label="Close project index"
             tabIndex={-1}
           />
-          <div className="tm-project-index-panel">
+          <div className="tm-project-index-panel" ref={indexPanelRef} onKeyDown={handleIndexTab}>
             <div className="tm-project-index-head">
               <span>02 / PROJECT INDEX</span>
               <button

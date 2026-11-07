@@ -34,6 +34,54 @@ try {
     if (!actual.artLoaded) errors.push(width + ': Shanakht did not load');
     if (!actual.masthead?.includes('TUMANEEN')) errors.push(width + ': masthead missing');
     await page.screenshot({ path: 'editorial-snapshots/hero-' + width + '.png', animations: 'disabled' });
+
+    // New staggered, Epok-inspired gallery: three original projects, no cropped artwork.
+    const gallery = page.locator('.tm-project-entry');
+    if (await gallery.count() !== 3) errors.push(width + ': expected three project entries');
+    for (const project of ['lumera-candle-identity', 'riwaq-fragrance-identity', 'roast-and-rhythm-cafe']) {
+      if (await page.locator('[data-project-id="' + project + '"]').count() !== 1) {
+        errors.push(width + ': project missing ' + project);
+      }
+    }
+
+    const covers = page.locator('.tm-project-entry-cover img');
+    for (let i = 0; i < await covers.count(); i++) {
+      await covers.nth(i).scrollIntoViewIfNeeded();
+      const data = await covers.nth(i).evaluate(async (img) => {
+        try { await img.decode(); } catch {}
+        return {
+          loaded: img.naturalWidth > 0,
+          fit: getComputedStyle(img).objectFit,
+          filter: getComputedStyle(img).filter,
+        };
+      });
+      if (!data.loaded) errors.push(width + ': project cover ' + i + ' did not load');
+      if (data.fit !== 'contain' || data.filter !== 'none') errors.push(width + ': project artwork display changed');
+    }
+
+    const columns = await gallery.evaluateAll(nodes =>
+      nodes.map(node => Math.round(node.getBoundingClientRect().left))
+    );
+    if (width >= 1100 && new Set(columns).size !== 3) errors.push(width + ': expected three columns');
+    if (width <= 580 && new Set(columns).size !== 1) errors.push(width + ': expected one column');
+
+    await page.locator('#project').screenshot({
+      path: 'editorial-snapshots/project-gallery-' + width + '.png',
+      animations: 'disabled',
+    });
+
+    if (width === 1440) {
+      await page.getByRole('button', { name: 'Open LUMERA case study' }).click();
+      await page.locator('.tm-case-modal').waitFor({ state: 'visible' });
+      await page.keyboard.press('Escape');
+      await page.locator('.tm-case-modal').waitFor({ state: 'hidden' });
+
+      await page.locator('.tm-project-index-trigger').click();
+      await page.locator('.tm-project-index-overlay').waitFor({ state: 'visible' });
+      await page.keyboard.press('Escape');
+      await page.locator('.tm-project-index-overlay').waitFor({ state: 'hidden' });
+    }
+
     if (width === 1440) {
       for (const [selector, color] of expected) {
         const element = page.locator(selector).first();
