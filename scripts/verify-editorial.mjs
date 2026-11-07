@@ -44,6 +44,42 @@ try {
       }
     }
 
+    // Typography has a deliberately restrained scale: do not regress to billboard headings.
+    const typeSizes = await page.evaluate(() => {
+      const size = selector => {
+        const el = document.querySelector(selector);
+        return el ? parseFloat(getComputedStyle(el).fontSize) : NaN;
+      };
+      return {
+        masthead: size('.tm-masthead'),
+        projectHeading: size('.tm-projects-title-row h2'),
+        projectTitle: size('.tm-project-entry-title span'),
+        aboutHeading: size('.tm-about h2'),
+        servicesHeading: size('.tm-services h2'),
+        contactHeading: size('#contact-form h2'),
+      };
+    });
+    const headingLimit = width <= 580 ? 58 : width <= 820 ? 83 : 120;
+    for (const [name, value] of Object.entries(typeSizes)) {
+      if (!Number.isFinite(value)) errors.push(width + ': typography element missing ' + name);
+      if (value > headingLimit) errors.push(width + ': oversized ' + name + ' at ' + value + 'px');
+    }
+    if (typeSizes.projectHeading > (width <= 580 ? 56 : width <= 820 ? 80 : 84)) {
+      errors.push(width + ': project newspaper heading is oversized');
+    }
+
+    const newspaper = await page.locator('.tm-project-gallery').evaluate(element => {
+      const section = element.closest('.tm-project-grid-section');
+      return {
+        background: getComputedStyle(section).backgroundColor,
+        border: getComputedStyle(element).borderTopStyle,
+        paperTexture: getComputedStyle(section, '::before').backgroundImage,
+      };
+    });
+    if (newspaper.background !== 'rgb(239, 230, 214)') errors.push(width + ': incorrect newspaper paper tone');
+    if (newspaper.border !== 'solid') errors.push(width + ': newspaper rules missing');
+    if (newspaper.paperTexture === 'none') errors.push(width + ': background-only paper grain missing');
+
     const covers = page.locator('.tm-project-entry-cover img');
     for (let i = 0; i < await covers.count(); i++) {
       await covers.nth(i).scrollIntoViewIfNeeded();
