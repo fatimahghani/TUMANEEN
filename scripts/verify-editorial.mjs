@@ -80,6 +80,10 @@ try {
       await page.locator('.tm-project-index-overlay').waitFor({ state: 'visible' });
       await page.keyboard.press('Escape');
       await page.locator('.tm-project-index-overlay').waitFor({ state: 'hidden' });
+      await page.locator('.tm-project-index-trigger').click();
+      await page.locator('.tm-project-index-overlay').waitFor({ state: 'visible' });
+      await page.locator('.tm-project-index-backdrop').click({ position: { x: 4, y: 4 } });
+      await page.locator('.tm-project-index-overlay').waitFor({ state: 'hidden' });
     }
 
     if (width === 1440) {
