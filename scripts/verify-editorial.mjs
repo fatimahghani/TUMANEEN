@@ -6,7 +6,7 @@ const browser = await chromium.launch({ headless: true });
 const base = 'http://127.0.0.1:4173/';
 const expected = [
   ['.tm-hero', 'rgb(75, 40, 48)'],
-  ['#project', 'rgb(239, 230, 214)'],
+  ['#project', 'rgb(217, 214, 210)'],
   ['#posters', 'rgb(36, 32, 29)'],
   ['.tm-about', 'rgb(239, 230, 214)'],
   ['.tm-process', 'rgb(239, 230, 214)'],
@@ -35,210 +35,106 @@ try {
     if (!actual.masthead?.includes('TUMANEEN')) errors.push(width + ': masthead missing');
     await page.screenshot({ path: 'editorial-snapshots/hero-' + width + '.png', animations: 'disabled' });
 
-    const gallery = page.locator('.tm-epok-item');
-    const expectedWorks = ['LUMERA', 'RIWAQ Fragrances', 'Roast & Rhythm', 'Poster Typography', 'Untitled'];
-    if (await gallery.count() !== 5) errors.push(width + ': expected five aligned study slots');
-
-    for (const title of expectedWorks) {
-      if (await page.locator('.tm-epok-item[data-gallery-title="' + title + '"]').count() !== 1) {
-        errors.push(width + ': missing case study ' + title);
-      }
-    }
-    if (await page.locator('.tm-epok-item[data-gallery-kind="case"]').count() !== 3)
-      errors.push(width + ': expected three brand identities');
-    if (await page.locator('.tm-epok-item[data-gallery-kind="poster-series"]').count() !== 1)
+    // Four case studies, each hung on two thin wires and black binder clips.
+    // At every breakpoint they must stay in one horizontal line.
+    const studies = page.locator('.tm-hung-study');
+    if (await studies.count() !== 4) errors.push(width + ': expected exactly four hanging studies');
+    if (await page.locator('.tm-epok-item').count() !== 0)
+      errors.push(width + ': outdated masonry cards still present');
+    if (await page.locator('.tm-museum-frame').count() !== 0)
+      errors.push(width + ': ornate picture frames should be removed');
+    if (await page.locator('.tm-hung-wire').count() !== 8)
+      errors.push(width + ': each poster requires two hanging wires');
+    if (await page.locator('.tm-hung-clip').count() !== 8)
+      errors.push(width + ': each poster requires two black binder clips');
+    if (await page.locator('.tm-hung-paper').count() !== 4)
+      errors.push(width + ': expected four paper sheets');
+    if (await page.locator('.tm-hung-label').count() !== 4)
+      errors.push(width + ': expected one small caption per case study');
+    if (await page.locator('[data-gallery-kind="poster-series"]').count() !== 1)
       errors.push(width + ': poster typography should be a single case study');
-    if (await page.locator('.tm-epok-item[data-gallery-kind="empty"]').count() !== 1)
-      errors.push(width + ': one reserved case study should fill the layout');
-    for (const title of ['Shanakht', 'Wajood', 'Chai']) {
-      if (await page.locator('.tm-epok-item[data-gallery-title="' + title + '"]').count() !== 0)
-        errors.push(width + ': ' + title + ' incorrectly appears as separate case study');
+    if (await page.locator('[data-gallery-kind="empty"]').count() !== 0)
+      errors.push(width + ': empty fifth study must be removed');
+
+    for (const title of ['LUMERA', 'RIWAQ Fragrances', 'Roast & Rhythm', 'Poster Typography']) {
+      if (await page.locator('.tm-hung-study[data-gallery-title="' + title + '"]').count() !== 1)
+        errors.push(width + ': missing ' + title);
     }
-    if (await page.locator('.tm-projects-title-row').count() !== 0)
-      errors.push(width + ': oversized section heading returned');
-    if (await page.locator('.tm-bridge').count() !== 0)
-      errors.push(width + ': featured banner returned');
-    if (await page.locator('.tm-epok-blank-leaf img').count() !== 0)
-      errors.push(width + ': empty folio contains fake project imagery');
 
-    const columnGroups = page.locator('.tm-epok-column');
-    if (await columnGroups.count() !== 3) errors.push(width + ': expected three independent masonry columns');
-    const itemsPerColumn = await columnGroups.evaluateAll(nodes =>
-      nodes.map(node => node.querySelectorAll('.tm-epok-item').length)
-    );
-    if (JSON.stringify(itemsPerColumn) !== JSON.stringify([2,2,1]))
-      errors.push(width + ': unexpected masonry distribution ' + itemsPerColumn);
-
-    const layout = await page.locator('.tm-epok-grid').evaluate(element => ({
-      display: getComputedStyle(element).display,
-      tracks: getComputedStyle(element).gridTemplateColumns.split(' ').filter(Boolean).length,
+    const strip = page.locator('.tm-hung-strip');
+    const geometry = await studies.evaluateAll(nodes => nodes.map(el => {
+      const r = el.getBoundingClientRect();
+      const paper = el.querySelector('.tm-hung-paper').getBoundingClientRect();
+      return { x:r.left, y:r.top, bottom:r.bottom, width:r.width, paperY:paper.top };
     }));
-    if (width > 950 && (layout.display !== 'grid' || layout.tracks !== 3))
-      errors.push(width + ': desktop requires three equal grid columns');
-    if (width > 580 && width <= 950 && (layout.display !== 'grid' || layout.tracks !== 2))
-      errors.push(width + ': tablet requires two columns');
-    if (width <= 580 && layout.display !== 'flex')
-      errors.push(width + ': mobile requires one ordered column');
-
-    // Reference-specific composition: first two covers start level, third
-    // is offset below, and each column flows independently of the others.
-    if (width > 950) {
-      const geometry = await columnGroups.evaluateAll(nodes =>
-        nodes.map(node => {
-          const first = node.querySelector('.tm-epok-item');
-          const items = [...node.querySelectorAll('.tm-epok-item')];
-          const column = node.getBoundingClientRect();
-          return {
-            left: Math.round(column.left),
-            width: Math.round(column.width),
-            top: Math.round(first.getBoundingClientRect().top),
-            next: items[1] ? items[1].getBoundingClientRect().top : null,
-            bottom: first.getBoundingClientRect().bottom,
-          };
-        })
-      );
-      if (new Set(geometry.map(c => c.left)).size !== 3)
-        errors.push(width + ': three masonry columns not visually distinct');
-      if (Math.max(...geometry.map(c => c.width)) - Math.min(...geometry.map(c => c.width)) > 3)
-        errors.push(width + ': reference uses equal column widths');
-      if (Math.abs(geometry[0].top - geometry[1].top) > 4)
-        errors.push(width + ': first two columns must align at top');
-      if (geometry[2].top - geometry[0].top < 16)
-        errors.push(width + ': third column must start lower');
-      if (!geometry[0].next || geometry[0].next <= geometry[0].bottom)
-        errors.push(width + ': first column does not flow independently');
-      if (!geometry[1].next || geometry[1].next <= geometry[1].bottom)
-        errors.push(width + ': second column does not flow independently');
+    if (geometry.length === 4) {
+      if (Math.max(...geometry.map(g => g.paperY)) - Math.min(...geometry.map(g => g.paperY)) > 2)
+        errors.push(width + ': hanging poster top edges must align horizontally');
+      if (geometry.some((g,i) => i > 0 && g.x <= geometry[i-1].x))
+        errors.push(width + ': case studies are not arranged left-to-right in one row');
     }
-
-    const captionStyles = await page.locator('.tm-epok-caption-heading button').first().evaluate(el => {
-      const cs = getComputedStyle(el);
-      return { size: parseFloat(cs.fontSize), display: cs.display };
-    });
-    if (captionStyles.size > 20)
-      errors.push(width + ': museum plaque heading too large');
-    if (await page.locator('.tm-museum-hanging').count() !== 5)
-      errors.push(width + ': all five case studies must hang on the wall');
-    if (await page.locator('.tm-museum-frame').count() !== 5)
-      errors.push(width + ': missing physical artwork frames');
-    if (await page.locator('.tm-museum-mat').count() !== 5)
-      errors.push(width + ': museum matting missing');
-    if (await page.locator('.tm-museum-wire').count() !== 5)
-      errors.push(width + ': missing hanging wire details');
-    if (await page.locator('.tm-museum-label-number').count() !== 5)
-      errors.push(width + ': missing exhibit accession labels');
-    if (await page.locator('.tm-epok-caption-arrow').count() !== 5)
-      errors.push(width + ': exhibit labels must still open their case studies');
-
-    const museumWall = await page.locator('#project').evaluate(el => {
-      const wall = getComputedStyle(el);
-      const frame = getComputedStyle(el.querySelector('.tm-museum-frame'));
-      const mat = getComputedStyle(el.querySelector('.tm-museum-mat'));
-      const hook = el.querySelector('.tm-museum-wire');
+    const arrangement = await strip.evaluate(el => {
+      const style = getComputedStyle(el);
       return {
-        background: wall.backgroundColor,
-        texture: wall.backgroundImage,
-        frameShadow: frame.boxShadow,
-        matBackground: mat.backgroundColor,
-        hookPresent: Boolean(hook && hook.getBoundingClientRect().height > 12),
+        display:style.display,
+        columns:style.gridTemplateColumns.split(' ').filter(Boolean).length,
+        scrollWidth:el.scrollWidth,
+        clientWidth:el.clientWidth,
+        wrap:style.flexWrap,
       };
     });
-    if (museumWall.background !== 'rgb(239, 230, 214)')
-      errors.push(width + ': incorrect archival museum wall color');
-    if (museumWall.texture === 'none')
-      errors.push(width + ': museum wall texture missing');
-    if (museumWall.frameShadow === 'none')
-      errors.push(width + ': museum artwork frame lacks dimensional depth');
-    if (museumWall.matBackground !== 'rgb(245, 240, 231)')
-      errors.push(width + ': museum frame matting is missing');
-    if (!museumWall.hookPresent)
-      errors.push(width + ': framed artwork does not visibly hang');
+    if (width > 1050 && (arrangement.display !== 'grid' || arrangement.columns !== 4))
+      errors.push(width + ': desktop must use a four-column single-row grid');
+    if (width <= 1050 && (arrangement.display !== 'flex' || arrangement.wrap !== 'nowrap'))
+      errors.push(width + ': smaller screens must use a single nowrap horizontal carousel');
+    if (width <= 580 && arrangement.scrollWidth <= arrangement.clientWidth + 40)
+      errors.push(width + ': mobile gallery needs horizontal overflow for all four studies');
 
-    const plaqueSizes = await page.locator('.tm-museum-label-number').evaluateAll(elements =>
-      elements.map(el => parseFloat(getComputedStyle(el).fontSize))
-    );
-    if (plaqueSizes.some(size => size > 11))
-      errors.push(width + ': gallery labels should remain discreet');
-
-    const images = page.locator('.tm-epok-image img');
-    if (await images.count() !== 6) errors.push(width + ': expected three brands and three posters inside one grouped preview');
-    for (let i = 0; i < await images.count(); i++) {
-      await images.nth(i).scrollIntoViewIfNeeded();
-      const data = await images.nth(i).evaluate(async img => {
-        try { await img.decode(); } catch {}
-        return {
-          loaded: img.naturalWidth > 0,
-          fit: getComputedStyle(img).objectFit,
-          filter: getComputedStyle(img).filter,
-          background: getComputedStyle(img.parentElement).backgroundColor,
-        };
+    // Only gallery chrome may have texture/shadows, never the source artwork.
+    const photos = page.locator('.tm-hung-paper img');
+    for (let i=0; i<await photos.count(); i++) {
+      await photos.nth(i).scrollIntoViewIfNeeded();
+      const data = await photos.nth(i).evaluate(async el => {
+        try { await el.decode(); } catch {}
+        const style = getComputedStyle(el);
+        return { loaded:el.naturalWidth>0, fit:style.objectFit, filter:style.filter };
       });
-      if (!data.loaded) errors.push(width + ': gallery artwork ' + i + ' failed to load');
+      if (!data.loaded) errors.push(width + ': hanging art ' + i + ' not loaded');
       if (data.fit !== 'contain' || data.filter !== 'none')
-        errors.push(width + ': original artwork was cropped or filtered');
-      if (i < 3 && data.background !== 'rgba(0, 0, 0, 0)')
-        errors.push(width + ': colored project placeholder returned');
+        errors.push(width + ': hanging original art is cropped or filtered');
     }
-
-    const typeSizes = await page.evaluate(() => {
-      const size = selector => {
-        const el = document.querySelector(selector);
-        return el ? parseFloat(getComputedStyle(el).fontSize) : NaN;
-      };
-      return {
-        masthead: size('.tm-masthead'),
-        projectCaption: size('.tm-epok-caption-heading button'),
-        aboutHeading: size('.tm-about h2'),
-        servicesHeading: size('.tm-services h2'),
-        contactHeading: size('#contact-form h2'),
-      };
-    });
-    const headingLimit = width <= 580 ? 58 : width <= 820 ? 83 : 120;
-    for (const [name, value] of Object.entries(typeSizes)) {
-      if (!Number.isFinite(value)) errors.push(width + ': typography element missing ' + name);
-      if (value > headingLimit) errors.push(width + ': oversized ' + name + ' at ' + value + 'px');
-    }
-    if (typeSizes.projectCaption > 26) errors.push(width + ': project caption oversized');
-
     await page.locator('#project').screenshot({
       path: 'editorial-snapshots/project-gallery-' + width + '.png',
       animations: 'disabled',
     });
 
     if (width === 1440) {
-      await page.getByRole('button', { name: 'Open LUMERA case study' }).click();
-      await page.locator('.tm-case-modal').waitFor({ state: 'visible' });
+      await page.getByRole('button', { name:'Open LUMERA case study' }).click();
+      await page.locator('.tm-case-modal').waitFor({ state:'visible' });
       await page.keyboard.press('Escape');
-      await page.locator('.tm-case-modal').waitFor({ state: 'hidden' });
+      await page.locator('.tm-case-modal').waitFor({ state:'hidden' });
 
-      await page.getByRole('button', { name: 'Open Poster Typography case study' }).click();
-      await page.locator('.tm-epok-study-overlay').waitFor({ state: 'visible' });
+      await page.getByRole('button', { name:'Open Poster Typography case study' }).click();
+      await page.locator('.tm-epok-study-overlay').waitFor({ state:'visible' });
       if (await page.locator('.tm-epok-study-thumbnails button').count() !== 3)
-        errors.push('poster typography case study must hold three posters');
+        errors.push('Poster Typography must retain three original plates');
       if (!(await page.locator('.tm-epok-study-meta h3').textContent())?.includes('Shanakht'))
-        errors.push('poster case should open on Shanakht');
-      await page.getByRole('button', { name: 'Next poster' }).click();
+        errors.push('grouped poster study should start on Shanakht');
+      await page.getByRole('button', { name:'Next poster' }).click();
       if (!(await page.locator('.tm-epok-study-meta h3').textContent())?.includes('Wajood'))
-        errors.push('next poster should show Wajood');
-      await page.getByRole('button', { name: /View Chai.*plate/i }).click();
+        errors.push('Poster Typography next action should show Wajood');
+      await page.getByRole('button', { name:/View Chai.*plate/i }).click();
       if (!(await page.locator('.tm-epok-study-meta h3').textContent())?.includes('Chai'))
-        errors.push('poster series should include Chai');
-      const posterFilter = await page.locator('.tm-epok-study-art img').evaluate(el => getComputedStyle(el).filter);
-      if (posterFilter !== 'none') errors.push('poster case study filters the original artwork');
+        errors.push('Poster Typography must retain Chai');
       await page.keyboard.press('Escape');
-      await page.locator('.tm-epok-study-overlay').waitFor({ state: 'hidden' });
+      await page.locator('.tm-epok-study-overlay').waitFor({ state:'hidden' });
 
-      await page.getByRole('button', { name: 'Open empty Untitled case study' }).click();
-      await page.locator('.tm-epok-empty-panel').waitFor({ state: 'visible' });
+      await page.getByRole('button', { name:/VIEW INDEX/i }).click();
+      await page.locator('.tm-epok-index-row').first().waitFor();
+      if (await page.locator('.tm-epok-index-row').count() !== 4)
+        errors.push('index should show four case studies');
       await page.keyboard.press('Escape');
-      await page.locator('.tm-epok-empty-panel').waitFor({ state: 'hidden' });
-
-      await page.getByRole('button', { name: /VIEW INDEX/i }).click();
-      await page.locator('.tm-epok-index-list .tm-epok-index-row').first().waitFor();
-      if (await page.locator('.tm-epok-index-row').count() !== 5)
-        errors.push('index does not show all five studies');
-      await page.keyboard.press('Escape');
-      await page.locator('.tm-epok-overlay').waitFor({ state: 'hidden' });
+      await page.locator('.tm-epok-overlay').waitFor({ state:'hidden' });
     }
 
     if (width === 1440) {

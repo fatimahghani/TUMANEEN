@@ -19,8 +19,7 @@ const POSTER_SERIES = ['Shanakht', 'Wajood', 'Chai']
 
 type GalleryEntry =
   | { kind: 'case'; project: PortfolioProject }
-  | { kind: 'poster-series'; id: 'poster-typography' }
-  | { kind: 'empty'; id: 'untitled-case-study' };
+  | { kind: 'poster-series'; id: 'poster-typography' };
 
 const featuredIds = [
   'lumera-candle-identity',
@@ -34,18 +33,13 @@ const galleryEntries: GalleryEntry[] = [
     return project ? [{ kind: 'case', project }] : [];
   }),
   { kind: 'poster-series', id: 'poster-typography' },
-  { kind: 'empty', id: 'untitled-case-study' },
 ];
 
-const entryTitle = (entry: GalleryEntry): string => {
-  if (entry.kind === 'case') return entry.project.title;
-  return entry.kind === 'poster-series' ? 'Poster Typography' : 'Untitled';
-};
+const entryTitle = (entry: GalleryEntry): string =>
+  entry.kind === 'case' ? entry.project.title : 'Poster Typography';
 
-const entryCaption = (entry: GalleryEntry): string => {
-  if (entry.kind === 'case') return entry.project.location;
-  return entry.kind === 'poster-series' ? 'Shanakht · Wajood · Chai' : 'Reserved for a future case study';
-};
+const entryCaption = (entry: GalleryEntry): string =>
+  entry.kind === 'case' ? entry.project.location : 'Shanakht · Wajood · Chai';
 
 export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
   onSelectProject,
@@ -56,10 +50,9 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
   const [localIndexOpen, setLocalIndexOpen] = useState(false);
   const [posterStudyOpen, setPosterStudyOpen] = useState(false);
   const [posterSlide, setPosterSlide] = useState(0);
-  const [emptyStudyOpen, setEmptyStudyOpen] = useState(false);
 
   const isIndexOpen = isAllProjectsOpen ?? localIndexOpen;
-  const isAnyDialogOpen = isIndexOpen || posterStudyOpen || emptyStudyOpen;
+  const isAnyDialogOpen = isIndexOpen || posterStudyOpen;
   const panelRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const lastTrigger = useRef<HTMLElement | null>(null);
@@ -73,7 +66,6 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
 
   const closeDialogs = () => {
     if (posterStudyOpen) setPosterStudyOpen(false);
-    else if (emptyStudyOpen) setEmptyStudyOpen(false);
     else closeIndex();
   };
 
@@ -95,9 +87,6 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
         setPosterSlide(0);
         setPosterStudyOpen(true);
         break;
-      case 'empty':
-        setEmptyStudyOpen(true);
-        break;
     }
   };
 
@@ -111,7 +100,6 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
       if (event.key === 'Escape') {
         event.preventDefault();
         if (posterStudyOpen) setPosterStudyOpen(false);
-        else if (emptyStudyOpen) setEmptyStudyOpen(false);
         else if (onCloseRef.current) onCloseRef.current();
         else setLocalIndexOpen(false);
       }
@@ -130,7 +118,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
       document.body.style.overflow = priorOverflow;
       lastTrigger.current?.focus();
     };
-  }, [isAnyDialogOpen, posterStudyOpen, emptyStudyOpen]);
+  }, [isAnyDialogOpen, posterStudyOpen]);
 
   const handlePanelTab = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key !== 'Tab') return;
@@ -149,119 +137,83 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
   const activePoster = POSTER_SERIES[posterSlide];
 
   return (
-    <section id="project" className="tm-projects tm-epok-gallery" aria-labelledby="tm-gallery-title">
-      <div className="tm-epok-shell">
+    <section id="project" className="tm-projects tm-epok-gallery tm-hanging-gallery" aria-labelledby="tm-gallery-title">
+      <div className="tm-epok-shell tm-hung-shell">
         <h2 id="tm-gallery-title" className="sr-only">Selected design projects</h2>
-        <div className="tm-epok-running">
+        <div className="tm-hung-running">
           <span>02 / SELECTED PROJECTS</span>
-          <span>TUMANEEN — 2026</span>
+          <span>TUMANEEN — A VISUAL NOTEBOOK</span>
         </div>
 
-        {/* Independent columns: the second project in one column never waits
-            for the tallest artwork in another (as in the Epok grid). */}
-        <div className="tm-epok-grid" aria-label="Case studies by Fatimah Ghani">
-          {[[0, 3], [1, 4], [2]].map((indexes, columnIndex) => (
-            <div
-              className={'tm-epok-column tm-epok-column--' + String(columnIndex + 1).padStart(2, '0')}
-              data-gallery-column={columnIndex + 1}
-              key={columnIndex}
-            >
-              {indexes.map((entryIndex) => {
-                const entry = galleryEntries[entryIndex];
-                const number = String(entryIndex + 1).padStart(2, '0');
-                const title = entryTitle(entry);
-                const key = entry.kind === 'case' ? entry.project.id : entry.id;
+        {/* Four original case studies share one continuous horizontal hanging rail.
+            On narrow screens the row scrolls, rather than wrapping into cards. */}
+        <div
+          className="tm-hung-strip"
+          role="region"
+          aria-label="Four horizontally arranged hanging case studies"
+          tabIndex={0}
+        >
+          {galleryEntries.map((entry, index) => {
+            const title = entryTitle(entry);
+            const number = String(index + 1).padStart(2, '0');
+            const isPoster = entry.kind === 'poster-series';
+            const image = isPoster
+              ? POSTER_SERIES[0]?.src || ''
+              : entry.project.slides.find((slide) => slide.imageUrl)?.imageUrl || '';
 
-                return (
-                  <article
-                    key={key}
-                    className={'tm-epok-item tm-epok-item--' + number}
-                    data-gallery-kind={entry.kind}
-                    data-gallery-title={title}
+            return (
+              <article
+                key={entry.kind === 'case' ? entry.project.id : entry.id}
+                className="tm-hung-study"
+                data-gallery-kind={entry.kind}
+                data-gallery-title={title}
+              >
+                <div className="tm-hung-piece">
+                  <div className="tm-hung-hardware" aria-hidden="true">
+                    <span className="tm-hung-anchor tm-hung-anchor--left">
+                      <span className="tm-hung-wire" />
+                      <span className="tm-hung-clip" />
+                    </span>
+                    <span className="tm-hung-anchor tm-hung-anchor--right">
+                      <span className="tm-hung-wire" />
+                      <span className="tm-hung-clip" />
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    className="tm-hung-paper"
+                    onClick={() => openEntry(entry)}
+                    aria-label={isPoster
+                      ? 'Open Poster Typography case study'
+                      : 'Open ' + title + ' case study'}
                   >
-                    <div className="tm-museum-hanging">
-                      <svg
-                        className="tm-museum-wire"
-                        viewBox="0 0 100 28"
-                        preserveAspectRatio="none"
-                        aria-hidden="true"
-                      >
-                        <path d="M13 28 L50 3 L87 28" />
-                        <circle cx="50" cy="3" r="1.5" />
-                      </svg>
-                      <div className="tm-museum-frame">
-                        <div className="tm-museum-mat">
-                          {entry.kind === 'empty' ? (
-                            <button
-                              type="button"
-                              className="tm-epok-blank-leaf"
-                              onClick={() => openEntry(entry)}
-                              aria-label="Open empty Untitled case study"
-                            >
-                              <span className="tm-epok-blank-overline">A PAGE TO COME</span>
-                              <span className="tm-epok-blank-bottom">CASE STUDY RESERVED</span>
-                            </button>
-                          ) : (
-                            <button
-                              type="button"
-                              className="tm-epok-image"
-                              onClick={() => openEntry(entry)}
-                              aria-label={entry.kind === 'poster-series'
-                                ? 'Open Poster Typography case study'
-                                : 'Open ' + title + ' case study'}
-                            >
-                              {entry.kind === 'poster-series' ? (
-                                <span className="tm-epok-poster-collage" aria-hidden="true">
-                                  {POSTER_SERIES.map((poster, i) => (
-                                    <img
-                                      key={poster.src}
-                                      src={poster.src}
-                                      alt=""
-                                      data-poster-preview={poster.name.split(' ')[0]}
-                                      loading="lazy"
-                                      decoding="async"
-                                      className={'tm-epok-poster-preview tm-epok-poster-preview--' + (i + 1)}
-                                    />
-                                  ))}
-                                </span>
-                              ) : (
-                                <img
-                                  src={entry.project.slides.find((slide) => slide.imageUrl)?.imageUrl || ''}
-                                  alt={title + ' original brand identity artwork'}
-                                  loading={entryIndex === 0 ? 'eager' : 'lazy'}
-                                  decoding="async"
-                                />
-                              )}
-                              <span className="tm-epok-image-arrow" aria-hidden="true">
-                                <ArrowUpRight size={18} strokeWidth={1.6} />
-                              </span>
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="tm-epok-caption">
-                      <span className="tm-museum-label-number">EXHIBIT {number}</span>
-                      <div className="tm-epok-caption-heading">
-                        <button
-                          type="button"
-                          onClick={() => openEntry(entry)}
-                          aria-label={'View ' + title}
-                        >
-                          <span className="tm-epok-caption-name">{title}</span>
-                          <ArrowUpRight className="tm-epok-caption-arrow" size={14} strokeWidth={1.7} aria-hidden="true" />
-                        </button>
-                      </div>
-                      <p>{entryCaption(entry)}</p>
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
-          ))}
+                    <img
+                      src={image}
+                      alt={isPoster
+                        ? 'Shanakht — cover of the Shanakht, Wajood and Chai typography case study'
+                        : title + ' original project artwork'}
+                      loading={index === 0 ? 'eager' : 'lazy'}
+                      decoding="async"
+                    />
+                    <span className="tm-hung-open" aria-hidden="true">
+                      <ArrowUpRight size={17} strokeWidth={1.6} />
+                    </span>
+                  </button>
+                </div>
+                <div className="tm-hung-label">
+                  <span className="tm-hung-label-folio">{number} / 04</span>
+                  <button type="button" onClick={() => openEntry(entry)} aria-label={'View ' + title}>
+                    {title} <ArrowUpRight size={14} strokeWidth={1.5} aria-hidden="true" />
+                  </button>
+                  <p>{entryCaption(entry)}</p>
+                </div>
+              </article>
+            );
+          })}
         </div>
+        <div className="tm-hung-mobile-cue" aria-hidden="true">SWIPE TO VIEW ALL FOUR STUDIES <span>→</span></div>
 
-        <footer className="tm-epok-footer">
+        <footer className="tm-epok-footer tm-hung-footer">
           <span>FATIMAH GHANI / SELECTED CASE STUDIES</span>
           <button type="button" onClick={openIndex}>
             VIEW INDEX <span>{String(galleryEntries.length).padStart(2, '0')}</span>
@@ -292,7 +244,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
                   <span>{String(index + 1).padStart(2, '0')}</span>
                   <span className="tm-epok-index-name">{entryTitle(entry)}</span>
                   <span className="tm-epok-index-type">
-                    {entry.kind === 'case' ? 'IDENTITY' : entry.kind === 'poster-series' ? 'PRINT' : 'UPCOMING'}
+                    {entry.kind === 'case' ? 'IDENTITY' : 'PRINT'}
                   </span>
                   <ArrowUpRight size={16} aria-hidden="true" />
                 </button>
@@ -363,27 +315,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
         document.body
       )}
 
-      {emptyStudyOpen && createPortal(
-        <div className="tm-epok-overlay" role="dialog" aria-modal="true" aria-labelledby="tm-epok-empty-title">
-          <button className="tm-epok-overlay-scrim" type="button" onClick={closeDialogs} aria-label="Close empty case study" tabIndex={-1} />
-          <div className="tm-epok-overlay-panel tm-epok-empty-panel" onKeyDown={handlePanelTab} ref={panelRef}>
-            <div className="tm-epok-overlay-head">
-              <span>05 / CASE STUDY RESERVED</span>
-              <button type="button" ref={closeRef} onClick={closeDialogs}>
-                CLOSE <X size={17} aria-hidden="true" />
-              </button>
-            </div>
-            <div className="tm-epok-empty-detail">
-              <span>STUDY NO. 05</span>
-              <h2 id="tm-epok-empty-title">Untitled<span aria-hidden="true">.</span></h2>
-              <div className="tm-epok-empty-rule" aria-hidden="true" />
-              <p>A blank page for the next project.</p>
-            </div>
-            <p className="tm-epok-overlay-foot">TUMANEEN / OPEN EDITION</p>
-          </div>
-        </div>,
-        document.body
-      )}
+
     </section>
   );
 };
