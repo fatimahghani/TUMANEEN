@@ -5,6 +5,8 @@
  * V-shaped picture hooks, framed mats, or oversized typography.
  */
 .tm-projects.tm-epok-gallery.tm-hanging-gallery {
+  position: relative;
+  isolation: isolate;
   background: #d9d6d2;
   color: #272321;
   overflow: hidden;
@@ -17,6 +19,52 @@
   width: min(calc(100% - 68px), 1510px);
   margin-inline: auto;
 }
+
+/* Subtle archival botanical silhouettes in the unused plaster margins.
+   These sit BEHIND the hanging prints, never on the source artwork. */
+.tm-projects.tm-epok-gallery.tm-hanging-gallery::before,
+.tm-projects.tm-epok-gallery.tm-hanging-gallery::after {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  width: clamp(160px, 18vw, 280px);
+  height: clamp(280px, 32vw, 450px);
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20320%20540%22%3E%0A%20%20%3Cg%20fill%3D%22none%22%20stroke%3D%22%236d665d%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%0A%20%20%20%20%3Cpath%20stroke-width%3D%223%22%20d%3D%22M72%20529%20C83%20467%2046%20434%2097%20373%20S97%20260%20147%20206%20S142%20116%20215%2031%22%2F%3E%0A%20%20%20%20%3Cpath%20stroke-width%3D%222%22%20d%3D%22M86%20458%20C40%20425%2036%20397%2014%20374%20M94%20391%20C153%20353%20159%20326%20176%20301%20M110%20314%20C64%20281%2057%20244%2039%20216%20M149%20213%20C200%20198%20225%20166%20248%20145%20M170%20155%20C126%20113%20131%2081%20114%2053%22%2F%3E%0A%20%20%3C%2Fg%3E%0A%20%20%3Cg%20fill%3D%22%236f6559%22%20opacity%3D%22.63%22%3E%0A%20%20%20%20%3Cpath%20d%3D%22M85%20455%20C44%20450%2018%20425%2014%20374%20C56%20386%2076%20413%2085%20455Z%22%2F%3E%0A%20%20%20%20%3Cpath%20d%3D%22M93%20392%20C112%20348%20143%20324%20176%20301%20C178%20350%20147%20379%2093%20392Z%22%2F%3E%0A%20%20%20%20%3Cpath%20d%3D%22M110%20314%20C67%20306%2043%20264%2039%20216%20C82%20237%20109%20273%20110%20314Z%22%2F%3E%0A%20%20%20%20%3Cpath%20d%3D%22M149%20213%20C177%20167%20218%20157%20248%20145%20C239%20190%20205%20208%20149%20213Z%22%2F%3E%0A%20%20%20%20%3Cpath%20d%3D%22M169%20157%20C126%20138%20112%20101%20114%2053%20C150%2075%20174%20112%20169%20157Z%22%2F%3E%0A%20%20%20%20%3Cpath%20d%3D%22M211%2036%20C207%2010%20239%20-7%20259%208%20C257%2027%20239%2042%20211%2036Z%22%2F%3E%0A%20%20%3C%2Fg%3E%0A%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  background-size: contain;
+  opacity: .105;
+  filter: blur(1.5px);
+}
+.tm-projects.tm-epok-gallery.tm-hanging-gallery::before {
+  left: max(-155px, calc((100vw - 1510px) / 2 - 175px));
+  top: 18%;
+  transform: rotate(-12deg);
+}
+.tm-projects.tm-epok-gallery.tm-hanging-gallery::after {
+  right: max(-160px, calc((100vw - 1510px) / 2 - 175px));
+  bottom: 5%;
+  transform: scaleX(-1) rotate(-9deg);
+}
+.tm-hung-shell {
+  position: relative;
+  z-index: 1;
+}
+@media (max-width: 1050px) {
+  .tm-projects.tm-epok-gallery.tm-hanging-gallery::before,
+  .tm-projects.tm-epok-gallery.tm-hanging-gallery::after {
+    opacity: .045;
+    width: 130px;
+    height: 240px;
+  }
+}
+@media (max-width: 580px) {
+  .tm-projects.tm-epok-gallery.tm-hanging-gallery::before,
+  .tm-projects.tm-epok-gallery.tm-hanging-gallery::after {
+    display: none;
+  }
+}
+
 .tm-hung-running,
 .tm-hung-footer {
   display: flex;
