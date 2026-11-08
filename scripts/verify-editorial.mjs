@@ -61,6 +61,27 @@ try {
         errors.push(width + ': missing ' + title);
     }
 
+
+    const backgroundAccents = await page.locator('#project').evaluate(el => {
+      const a = getComputedStyle(el, '::before');
+      const b = getComputedStyle(el, '::after');
+      const shell = getComputedStyle(el.querySelector('.tm-hung-shell'));
+      return {
+        left: a.backgroundImage,
+        right: b.backgroundImage,
+        leftPointerEvents: a.pointerEvents,
+        rightPointerEvents: b.pointerEvents,
+        leftZIndex: a.zIndex,
+        shellZIndex: shell.zIndex,
+      };
+    });
+    if (backgroundAccents.left === 'none' || backgroundAccents.right === 'none')
+      errors.push(width + ': archival wall details are missing');
+    if (backgroundAccents.leftPointerEvents !== 'none' || backgroundAccents.rightPointerEvents !== 'none')
+      errors.push(width + ': background accents intercept gallery interactions');
+    if (backgroundAccents.leftZIndex !== '0' || backgroundAccents.shellZIndex !== '1')
+      errors.push(width + ': wall accents must stay behind the artwork');
+
     const strip = page.locator('.tm-hung-strip');
     const geometry = await studies.evaluateAll(nodes => nodes.map(el => {
       const r = el.getBoundingClientRect();
