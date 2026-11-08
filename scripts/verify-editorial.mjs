@@ -115,12 +115,50 @@ try {
       const cs = getComputedStyle(el);
       return { size: parseFloat(cs.fontSize), display: cs.display };
     });
-    if (captionStyles.size > 16)
-      errors.push(width + ': project caption should be small like the reference');
-    if (await page.locator('.tm-epok-caption-dash').count() !== 5)
-      errors.push(width + ': missing fine dash prefixes beside project titles');
+    if (captionStyles.size > 20)
+      errors.push(width + ': museum plaque heading too large');
+    if (await page.locator('.tm-museum-hanging').count() !== 5)
+      errors.push(width + ': all five case studies must hang on the wall');
+    if (await page.locator('.tm-museum-frame').count() !== 5)
+      errors.push(width + ': missing physical artwork frames');
+    if (await page.locator('.tm-museum-mat').count() !== 5)
+      errors.push(width + ': museum matting missing');
+    if (await page.locator('.tm-museum-wire').count() !== 5)
+      errors.push(width + ': missing hanging wire details');
+    if (await page.locator('.tm-museum-label-number').count() !== 5)
+      errors.push(width + ': missing exhibit accession labels');
     if (await page.locator('.tm-epok-caption-arrow').count() !== 5)
-      errors.push(width + ': missing inline project arrows');
+      errors.push(width + ': exhibit labels must still open their case studies');
+
+    const museumWall = await page.locator('#project').evaluate(el => {
+      const wall = getComputedStyle(el);
+      const frame = getComputedStyle(el.querySelector('.tm-museum-frame'));
+      const mat = getComputedStyle(el.querySelector('.tm-museum-mat'));
+      const hook = el.querySelector('.tm-museum-wire');
+      return {
+        background: wall.backgroundColor,
+        texture: wall.backgroundImage,
+        frameShadow: frame.boxShadow,
+        matBackground: mat.backgroundColor,
+        hookPresent: Boolean(hook && hook.getBoundingClientRect().height > 12),
+      };
+    });
+    if (museumWall.background !== 'rgb(239, 230, 214)')
+      errors.push(width + ': incorrect archival museum wall color');
+    if (museumWall.texture === 'none')
+      errors.push(width + ': museum wall texture missing');
+    if (museumWall.frameShadow === 'none')
+      errors.push(width + ': museum artwork frame lacks dimensional depth');
+    if (museumWall.matBackground !== 'rgb(245, 240, 231)')
+      errors.push(width + ': museum frame matting is missing');
+    if (!museumWall.hookPresent)
+      errors.push(width + ': framed artwork does not visibly hang');
+
+    const plaqueSizes = await page.locator('.tm-museum-label-number').evaluateAll(elements =>
+      elements.map(el => parseFloat(getComputedStyle(el).fontSize))
+    );
+    if (plaqueSizes.some(size => size > 11))
+      errors.push(width + ': gallery labels should remain discreet');
 
     const images = page.locator('.tm-epok-image img');
     if (await images.count() !== 6) errors.push(width + ': expected three brands and three posters inside one grouped preview');

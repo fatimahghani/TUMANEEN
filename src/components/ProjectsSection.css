@@ -525,3 +525,225 @@
     transition: none !important; animation: none !important;
   }
 }
+
+
+/*
+ * MUSEUM WALL / COLLECTION OF FIVE
+ * Warm plaster, authentic layered picture frames and discreet accession labels.
+ * Only gallery chrome is styled: original art remains unfiltered and unaltered.
+ */
+.tm-projects.tm-epok-gallery {
+  background-color: #EFE6D6;
+  background-image:
+    radial-gradient(ellipse 70% 46% at 52% 4%, rgba(255,255,249,.45), transparent 85%),
+    linear-gradient(90deg, rgba(93,78,60,.025), transparent 25%, transparent 76%, rgba(93,78,60,.025)),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' opacity='.035' filter='url(%23grain)'/%3E%3C/svg%3E");
+  background-size: 100% 100%, 100% 100%, 180px 180px;
+}
+.tm-epok-running {
+  border-color: rgba(68,52,38,.24);
+  color: #686050;
+}
+.tm-epok-grid {
+  column-gap: clamp(24px, 3.7vw, 65px);
+  padding-top: clamp(46px, 6vw, 88px);
+  padding-bottom: clamp(85px, 9vw, 125px);
+}
+.tm-epok-column--01 { gap: clamp(76px, 10vw, 143px); }
+.tm-epok-column--02 { gap: clamp(90px, 11vw, 160px); }
+.tm-epok-column--03 { padding-top: clamp(48px, 7.7vw, 111px); }
+.tm-epok-item--01 .tm-museum-hanging { width: 94%; margin-inline: 0 auto; }
+.tm-epok-item--02 .tm-museum-hanging { width: 91%; margin-inline: auto 0; }
+.tm-epok-item--03 .tm-museum-hanging { width: 96%; margin-inline: auto; }
+.tm-epok-item--04 .tm-museum-hanging { width: 89%; margin-inline: auto; }
+.tm-epok-item--05 .tm-museum-hanging { width: 90%; margin-inline: auto; }
+
+/* The slender nail and two hanging wires are decorative, not a fake overlay
+   on any artwork; the entire framed print remains a real linked image. */
+.tm-museum-hanging {
+  position: relative;
+  padding-top: clamp(26px, 3vw, 43px);
+  margin-bottom: 0;
+}
+.tm-museum-wire {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: clamp(26px, 3vw, 43px);
+  overflow: visible;
+  pointer-events: none;
+}
+.tm-museum-wire path {
+  stroke: rgba(94,76,55,.53);
+  stroke-width: .7;
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: round;
+  fill: none;
+}
+.tm-museum-wire circle {
+  fill: #997f5c;
+  stroke: rgba(53,42,31,.35);
+  stroke-width: .5;
+  vector-effect: non-scaling-stroke;
+}
+.tm-museum-frame {
+  --museum-frame-top: #ad916e;
+  --museum-frame-mid: #806345;
+  --museum-frame-edge: #574332;
+  position: relative;
+  padding: clamp(6px, .75vw, 11px);
+  border: 1px solid var(--museum-frame-edge);
+  background:
+    linear-gradient(132deg, rgba(255,255,255,.23) 0%, transparent 18%, rgba(20,10,2,.2) 100%),
+    linear-gradient(90deg, var(--museum-frame-edge), var(--museum-frame-top) 18%, var(--museum-frame-mid) 54%, var(--museum-frame-edge) 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,243,205,.28),
+    inset 0 0 0 4px rgba(45,28,13,.25),
+    0 2px 1px rgba(31,23,17,.25),
+    3px 10px 13px rgba(31,23,17,.15),
+    9px 21px 22px rgba(31,23,17,.09);
+}
+.tm-museum-frame::after {
+  content: '';
+  position: absolute;
+  inset: clamp(6px, .75vw, 11px);
+  border: 1px solid rgba(39,31,24,.18);
+  pointer-events: none;
+}
+.tm-museum-mat {
+  position: relative;
+  background: #F5F0E7;
+  padding: clamp(11px, 1.4vw, 21px);
+  box-shadow:
+    inset 0 0 0 1px rgba(81,65,44,.16),
+    inset 0 1px 4px rgba(49,34,19,.09);
+}
+.tm-epok-item--01 .tm-museum-frame {
+  --museum-frame-top: #88705a;
+  --museum-frame-mid: #554032;
+  --museum-frame-edge: #372b23;
+}
+.tm-epok-item--02 .tm-museum-frame {
+  --museum-frame-top: #b89b69;
+  --museum-frame-mid: #8f734e;
+  --museum-frame-edge: #624b35;
+}
+.tm-epok-item--03 .tm-museum-frame {
+  --museum-frame-top: #65554b;
+  --museum-frame-mid: #3b3330;
+  --museum-frame-edge: #272421;
+}
+.tm-epok-item--04 .tm-museum-frame {
+  --museum-frame-top: #8b645e;
+  --museum-frame-mid: #614044;
+  --museum-frame-edge: #452d32;
+}
+.tm-epok-item--05 .tm-museum-frame {
+  --museum-frame-top: #aa9575;
+  --museum-frame-mid: #86765c;
+  --museum-frame-edge: #6d604a;
+}
+
+/* The wall label is independent of the frame, like a small museum placard. */
+.tm-epok-caption {
+  width: min(89%, 260px);
+  margin: clamp(24px, 2.8vw, 39px) auto 0;
+  padding: 10px 14px 12px;
+  background: rgba(249,244,235,.86);
+  color: #24201D;
+  border-top: 1px solid rgba(89,68,46,.35);
+  border-bottom: 1px solid rgba(89,68,46,.19);
+  box-shadow: 0 2px 5px rgba(60,43,27,.07);
+  text-align: center;
+}
+.tm-museum-label-number {
+  display: block;
+  margin-bottom: 4px;
+  font: 500 8px/1.3 'Inter', sans-serif;
+  letter-spacing: .17em;
+  color: #85755e;
+}
+.tm-epok-caption-heading button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: baseline;
+  width: auto;
+  max-width: 100%;
+  margin: 0 auto;
+  font: 450 clamp(14px, 1.35vw, 19px)/1.18 'Fraunces', Georgia, serif;
+  letter-spacing: -.025em;
+}
+.tm-epok-caption-name { flex: 0 1 auto; }
+.tm-epok-caption-arrow {
+  margin-left: 2px;
+  color: #806c51;
+}
+.tm-epok-caption p {
+  margin-top: 5px;
+  min-height: 0;
+  font: 400 9px/1.45 'Inter', sans-serif;
+  text-align: center;
+  color: #6a6256;
+}
+.tm-epok-image,
+.tm-epok-blank-leaf {
+  background: transparent;
+}
+.tm-epok-image img {
+  filter: none;
+  object-fit: contain;
+  border: 0;
+}
+.tm-epok-image:hover > img,
+.tm-epok-image:focus-visible > img { opacity: 1; }
+.tm-epok-image-arrow {
+  width: 30px;
+  height: 30px;
+  background: #F5F0E7;
+  border: 1px solid rgba(75,40,48,.15);
+}
+.tm-epok-blank-leaf {
+  aspect-ratio: 1 / .91;
+  background: #F5F0E7;
+  border: 1px solid rgba(98,79,54,.19);
+  min-height: 0;
+  padding: clamp(12px, 1.5vw, 20px);
+  color: #655743;
+}
+.tm-epok-blank-overline,
+.tm-epok-blank-bottom {
+  font-size: 9px;
+  color: #857966;
+}
+.tm-epok-poster-collage { padding: 4px 1px 14px; }
+.tm-epok-poster-preview--1,
+.tm-epok-poster-preview--2,
+.tm-epok-poster-preview--3 {
+  box-shadow: 0 2px 5px rgba(44,32,22,.10) !important;
+}
+.tm-epok-footer { border-color: rgba(68,52,38,.25); color: #756b5b; }
+
+@media (max-width: 950px) {
+  .tm-epok-grid { gap: clamp(18px, 3vw, 31px); }
+  .tm-epok-column--03 { padding-top: clamp(15px, 4.5vw, 44px); }
+  .tm-epok-column--01,
+  .tm-epok-column--02 { gap: clamp(47px, 7vw, 85px); }
+  .tm-epok-caption-heading button { font-size: clamp(14px, 1.8vw, 17px); }
+}
+@media (max-width: 580px) {
+  .tm-epok-grid { gap: 36px; padding-top: 19px; padding-bottom: 50px; }
+  .tm-epok-item { border: none !important; padding: 0 !important; }
+  .tm-epok-item .tm-museum-hanging { width: min(92%, 430px); margin-inline: auto; }
+  .tm-museum-hanging { padding-top: 31px; }
+  .tm-museum-wire { height: 31px; }
+  .tm-museum-mat { padding: 13px; }
+  .tm-museum-frame { padding: 7px; }
+  .tm-museum-frame::after { inset: 7px; }
+  .tm-epok-caption { width: min(84%, 290px); margin-top: 22px; padding: 9px 12px 11px; }
+  .tm-epok-caption-heading button { font-size: 16px; }
+  .tm-epok-caption p { font-size: 9px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tm-museum-frame, .tm-museum-wire { transition: none; }
+}

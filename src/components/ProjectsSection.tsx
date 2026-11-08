@@ -179,62 +179,77 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
                     data-gallery-kind={entry.kind}
                     data-gallery-title={title}
                   >
-                    {entry.kind === 'empty' ? (
-                      <button
-                        type="button"
-                        className="tm-epok-blank-leaf"
-                        onClick={() => openEntry(entry)}
-                        aria-label="Open empty Untitled case study"
+                    <div className="tm-museum-hanging">
+                      <svg
+                        className="tm-museum-wire"
+                        viewBox="0 0 100 28"
+                        preserveAspectRatio="none"
+                        aria-hidden="true"
                       >
-                        <span className="tm-epok-blank-overline">05 / RESERVED</span>
-                        <span className="tm-epok-blank-bottom">A PROJECT YET TO COME</span>
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        className="tm-epok-image"
-                        onClick={() => openEntry(entry)}
-                        aria-label={entry.kind === 'poster-series'
-                          ? 'Open Poster Typography case study'
-                          : 'Open ' + title + ' case study'}
-                      >
-                        {entry.kind === 'poster-series' ? (
-                          <span className="tm-epok-poster-collage" aria-hidden="true">
-                            {POSTER_SERIES.map((poster, i) => (
-                              <img
-                                key={poster.src}
-                                src={poster.src}
-                                alt=""
-                                data-poster-preview={poster.name.split(' ')[0]}
-                                loading="lazy"
-                                decoding="async"
-                                className={'tm-epok-poster-preview tm-epok-poster-preview--' + (i + 1)}
-                              />
-                            ))}
-                          </span>
-                        ) : (
-                          <img
-                            src={entry.project.slides.find((slide) => slide.imageUrl)?.imageUrl || ''}
-                            alt={title + ' original brand identity artwork'}
-                            loading={entryIndex === 0 ? 'eager' : 'lazy'}
-                            decoding="async"
-                          />
-                        )}
-                        <span className="tm-epok-image-arrow" aria-hidden="true">
-                          <ArrowUpRight size={18} strokeWidth={1.6} />
-                        </span>
-                      </button>
-                    )}
+                        <path d="M13 28 L50 3 L87 28" />
+                        <circle cx="50" cy="3" r="1.5" />
+                      </svg>
+                      <div className="tm-museum-frame">
+                        <div className="tm-museum-mat">
+                          {entry.kind === 'empty' ? (
+                            <button
+                              type="button"
+                              className="tm-epok-blank-leaf"
+                              onClick={() => openEntry(entry)}
+                              aria-label="Open empty Untitled case study"
+                            >
+                              <span className="tm-epok-blank-overline">A PAGE TO COME</span>
+                              <span className="tm-epok-blank-bottom">CASE STUDY RESERVED</span>
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              className="tm-epok-image"
+                              onClick={() => openEntry(entry)}
+                              aria-label={entry.kind === 'poster-series'
+                                ? 'Open Poster Typography case study'
+                                : 'Open ' + title + ' case study'}
+                            >
+                              {entry.kind === 'poster-series' ? (
+                                <span className="tm-epok-poster-collage" aria-hidden="true">
+                                  {POSTER_SERIES.map((poster, i) => (
+                                    <img
+                                      key={poster.src}
+                                      src={poster.src}
+                                      alt=""
+                                      data-poster-preview={poster.name.split(' ')[0]}
+                                      loading="lazy"
+                                      decoding="async"
+                                      className={'tm-epok-poster-preview tm-epok-poster-preview--' + (i + 1)}
+                                    />
+                                  ))}
+                                </span>
+                              ) : (
+                                <img
+                                  src={entry.project.slides.find((slide) => slide.imageUrl)?.imageUrl || ''}
+                                  alt={title + ' original brand identity artwork'}
+                                  loading={entryIndex === 0 ? 'eager' : 'lazy'}
+                                  decoding="async"
+                                />
+                              )}
+                              <span className="tm-epok-image-arrow" aria-hidden="true">
+                                <ArrowUpRight size={18} strokeWidth={1.6} />
+                              </span>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
                     <div className="tm-epok-caption">
+                      <span className="tm-museum-label-number">EXHIBIT {number}</span>
                       <div className="tm-epok-caption-heading">
                         <button
                           type="button"
                           onClick={() => openEntry(entry)}
                           aria-label={'View ' + title}
                         >
-                          <span className="tm-epok-caption-dash" aria-hidden="true">—</span>
                           <span className="tm-epok-caption-name">{title}</span>
-                          <ArrowUpRight className="tm-epok-caption-arrow" size={17} strokeWidth={2} aria-hidden="true" />
+                          <ArrowUpRight className="tm-epok-caption-arrow" size={14} strokeWidth={1.7} aria-hidden="true" />
                         </button>
                       </div>
                       <p>{entryCaption(entry)}</p>
