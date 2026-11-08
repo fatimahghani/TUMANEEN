@@ -6,7 +6,7 @@ const browser = await chromium.launch({ headless: true });
 const base = 'http://127.0.0.1:4173/';
 const expected = [
   ['.tm-hero', 'rgb(75, 40, 48)'],
-  ['#project', 'rgb(239, 230, 214)'],
+  ['#project', 'rgb(217, 214, 210)'],
   ['#posters', 'rgb(36, 32, 29)'],
   ['.tm-about', 'rgb(239, 230, 214)'],
   ['.tm-process', 'rgb(239, 230, 214)'],
