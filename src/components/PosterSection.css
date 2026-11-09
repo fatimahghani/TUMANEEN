@@ -21,7 +21,7 @@
 }
 .tm-ma-running-head > span { padding-bottom:4px; }
 .tm-ma-running-heading h2 { margin:4px 0 0; font:450 clamp(24px,2.6vw,37px)/1.13 'Fraunces',Georgia,serif; letter-spacing:-.035em; }
-.tm-ma-exhibition { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:clamp(25px,3vw,46px) clamp(17px,2.3vw,36px); padding:clamp(24px,3vw,45px) 0 6px; }
+.tm-ma-exhibition { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:clamp(28px,3.4vw,52px) clamp(24px,3vw,44px); padding:clamp(24px,3vw,45px) 0 6px; }
 .tm-ma-exhibit { position:relative; min-width:0; padding-top:2px; }
 .tm-ma-stage { height:clamp(370px,31.5vw,480px); position:relative; }
 .tm-ma-number-plaque {
@@ -77,37 +77,26 @@
 }
 .tm-ma-clip-set--small { top:-42px; height:42px; transform:scale(.76); transform-origin:bottom center; }
 
-/* Small detail crops and decorative line studies, behind the original posters. */
+/* One small companion paper next to just three featured prints. */
 .tm-ma-study-group {
-  position:absolute; z-index:2; right:1%; top:22%; width:31%; height:67%;
-  pointer-events:none;
+  position:absolute; z-index:2; right:4%; top:31%;
+  width:21%; height:30%; pointer-events:none;
 }
 .tm-ma-study-sheet {
-  position:absolute; width:92%; padding:6px; background:#e8d8c1;
-  box-shadow:2px 5px 9px rgba(42,32,23,.2);
+  width:100%; height:100%; padding:4px;
+  background:#e9dcca;
+  box-shadow:2px 5px 8px rgba(42,32,23,.13);
 }
-.tm-ma-study-sheet--a { top:0; right:2%; height:44%; }
-.tm-ma-study-sheet--a img { display:block; width:100%; height:100%; object-fit:cover; filter:none; opacity:.78; }
-.tm-ma-study-sheet--b { right:0; bottom:2%; height:43%; color:#867966; background:#e1d1ba; }
-.tm-ma-study-sheet--b svg { display:block; width:100%; height:100%; }
-.tm-ma-study-registration { position:absolute; bottom:-7%; right:2%; color:rgba(61,49,40,.7); font:400 10px/1 'Inter',sans-serif; white-space:nowrap; }
-.tm-ma-exhibit--archival .tm-ma-primary { left:15%; width:61%; }
-.tm-ma-exhibit--archival .tm-ma-study-group { top:26%; }
-.tm-ma-exhibit--calligraphy .tm-ma-primary { left:17%; width:59%; top:14%; }
-.tm-ma-exhibit--calligraphy .tm-ma-study-group { top:19%; }
-.tm-ma-exhibit--calligraphy .tm-ma-study-sheet--b { height:32%; bottom:12%; }
-.tm-ma-exhibit--moodboard .tm-ma-primary { left:36%; width:53%; top:18%; }
-.tm-ma-exhibit--moodboard .tm-ma-study-group { left:2%; right:auto; width:39%; top:31%; }
-.tm-ma-exhibit--moodboard .tm-ma-study-sheet--a { height:60%; }
-.tm-ma-exhibit--moodboard .tm-ma-study-sheet--b { height:32%; width:62%; right:6%; bottom:0; }
-.tm-ma-exhibit--geometry .tm-ma-primary { left:15%; width:62%; top:15%; }
-.tm-ma-exhibit--geometry .tm-ma-study-group { top:31%; }
-.tm-ma-exhibit--geometry .tm-ma-study-sheet--b { height:48%; }
-.tm-ma-exhibit--collage .tm-ma-primary { left:22%; width:66%; top:15%; }
-.tm-ma-exhibit--collage .tm-ma-study-group { left:0; right:auto; top:34%; width:33%; height:52%; }
-.tm-ma-exhibit--collage .tm-ma-study-sheet--a { height:56%; }
-.tm-ma-exhibit--collage .tm-ma-study-sheet--b { height:39%; }
-.tm-ma-scrap-label { position:absolute; right:1%; bottom:4%; color:#44362d; font:500 8px/1.3 'Inter',sans-serif; letter-spacing:.1em; }
+.tm-ma-study-sheet img {
+  display:block; width:100%; height:100%;
+  object-fit:cover; filter:none; opacity:.82;
+}
+.tm-ma-exhibit--archival .tm-ma-primary { left:17%; width:62%; }
+.tm-ma-exhibit--calligraphy .tm-ma-primary { left:17%; width:62%; top:16%; }
+.tm-ma-exhibit--moodboard .tm-ma-primary { left:35%; width:53%; top:18%; }
+.tm-ma-exhibit--moodboard .tm-ma-study-group { left:9%; right:auto; top:35%; width:22%; }
+.tm-ma-exhibit--geometry .tm-ma-primary { left:19%; width:62%; top:16%; }
+.tm-ma-exhibit--collage .tm-ma-primary { left:19%; width:62%; top:16%; }
 
 /* Triptych: Chill & Mix, Retro Horizon, Reality; all three can open. */
 .tm-ma-exhibit--triptych .tm-ma-primary { left:1%; top:22%; width:33%; }
@@ -115,17 +104,6 @@
 .tm-ma-secondary--2 { left:66%; top:22%; width:33%; }
 .tm-ma-secondary-paper { padding:3px; }
 .tm-ma-secondary img { filter:none; }
-.tm-ma-color-chips {
-  position:absolute; z-index:5; right:3%; top:27%; display:flex; flex-direction:column; gap:7px;
-  padding:7px 5px; background:#ddc8b0; box-shadow:2px 5px 8px rgba(48,34,25,.18);
-  pointer-events:none;
-}
-.tm-ma-color-chips span { display:block; width:clamp(12px,1.4vw,20px); height:clamp(12px,1.4vw,20px); border-radius:50%; }
-.tm-ma-color-chips span:nth-child(1){background:#4B2830;}
-.tm-ma-color-chips span:nth-child(2){background:#B68A76;}
-.tm-ma-color-chips span:nth-child(3){background:#24201D;}
-.tm-ma-pressed-flower { position:absolute; left:6%; bottom:5%; width:17%; height:38%; filter:drop-shadow(2px 3px 2px rgba(35,29,22,.18)); pointer-events:none; }
-
 .tm-ma-exhibit-caption {
   position:relative; z-index:6;
   min-height:39px; display:flex; align-items:baseline; flex-wrap:wrap; justify-content:space-between;
@@ -139,42 +117,13 @@
 .tm-ma-exhibit-caption button:hover { color:#4B2830; }
 .tm-ma-exhibit-caption > span { text-align:right; font:400 9px/1.5 'Inter',sans-serif; color:#584a3f; }
 
-/* Museum-shelf vitrine and paper swatches, all decorative CSS. */
-.tm-ma-shelf-scene { position:relative; width:min(92%,1210px); height:clamp(125px,13vw,185px); margin:clamp(18px,2vw,35px) auto 0; }
-.tm-ma-shelf-base {
-  position:absolute; bottom:8px; left:0; right:0; height:26px;
-  border-top:3px solid #e6d9c5; background:linear-gradient(#cbb6a0,#a9917c 35%,#8c7666 88%,#7c6958);
-  box-shadow:3px 9px 15px rgba(40,30,24,.25);
+/* A simple folio rule closes the exhibition, without extra display props. */
+.tm-ma-footer {
+  display:flex; justify-content:space-between; align-items:center; gap:15px;
+  border-top:1px solid var(--ma-rule); color:#594c3e;
+  padding:14px 0 clamp(35px,4vw,60px);
+  margin-top:clamp(16px,2vw,30px);
 }
-.tm-ma-glass-case {
-  position:absolute; left:6%; bottom:33px; width:40%; height:70%;
-  border:2px solid rgba(97,81,70,.47); border-bottom:0;
-  background:linear-gradient(125deg,rgba(255,255,255,.14),transparent 42%,rgba(255,255,255,.05));
-  box-shadow:inset 2px 0 rgba(255,255,255,.19);
-}
-.tm-ma-glass-case::before {
-  content:''; position:absolute; inset:0 10px; border-left:1px solid rgba(255,255,255,.25); border-right:1px solid rgba(255,255,255,.14);
-}
-.tm-ma-glass-glint { position:absolute; top:5%; right:14%; width:18%; height:85%; background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent); transform:skewX(-13deg); }
-.tm-ma-ledger-open {
-  position:absolute; bottom:3px; left:23%; width:55%; height:75%; display:flex; perspective:200px;
-  filter:drop-shadow(3px 4px 3px rgba(38,29,23,.23));
-}
-.tm-ma-ledger-page {
-  display:block; width:50%; height:100%; border:1px solid #bcaa92;
-  background:repeating-linear-gradient(0deg,transparent 0 12px,rgba(80,66,54,.18) 13px,transparent 14px),#eaddc5;
-}
-.tm-ma-ledger-page--left { transform:rotateY(13deg); transform-origin:right; border-radius:8px 1px 1px 2px; }
-.tm-ma-ledger-page--right { transform:rotateY(-13deg); transform-origin:left; border-radius:1px 8px 2px 1px; }
-.tm-ma-ledger-spine { position:absolute; z-index:1; left:calc(50% - 4px); width:8px; height:100%; background:rgba(131,110,88,.2); }
-.tm-ma-paper-samples { position:absolute; bottom:33px; left:50%; width:33%; height:63%; display:flex; align-items:end; gap:clamp(7px,1vw,15px); }
-.tm-ma-paper-sample { flex:1 1 0; display:block; height:83%; background:#dfc6a8; box-shadow:1px 3px 4px rgba(42,32,26,.2); }
-.tm-ma-paper-sample--fiber { background:#e8d8c5; height:89%; }
-.tm-ma-paper-sample--umber { background:#b68a76; height:70%; }
-.tm-ma-paper-sample--oxblood { background:#4B2830; height:77%; }
-.tm-ma-paper-sample--pattern { background:repeating-linear-gradient(45deg,#9b856b 0 4px,#d4bd9d 5px 9px); height:64%; }
-.tm-ma-shelf-ledger-label { position:absolute; right:2%; bottom:38px; width:13%; color:#4c3d31; font:500 8px/1.65 'Inter',sans-serif; letter-spacing:.1em; }
-.tm-ma-footer { display:flex; justify-content:space-between; align-items:center; gap:15px; border-top:1px solid var(--ma-rule); color:#594c3e; padding:11px 0 clamp(25px,4vw,58px); margin-top:10px; }
 
 /* Accessible full artwork viewer. */
 .tm-ma-viewer { position:fixed; inset:0; z-index:1200; isolation:isolate; display:grid; place-items:center; padding:clamp(10px,2.8vw,38px); }
@@ -206,7 +155,7 @@
 @media (max-width:1160px) {
   .tm-ma-primary-paper img { max-height: clamp(250px, 27vw, 340px); }
   .tm-ma-content { width:calc(100% - 42px); }
-  .tm-ma-exhibition { grid-template-columns:repeat(2,minmax(0,1fr)); column-gap:24px; row-gap:16px; }
+  .tm-ma-exhibition { grid-template-columns:repeat(2,minmax(0,1fr)); column-gap:24px; row-gap:22px; }
   .tm-ma-stage { height:clamp(330px,38vw,425px); }
   .tm-ma-exhibit-caption button { font-size:16px; }
 }
@@ -222,10 +171,6 @@
   .tm-ma-exhibit--moodboard .tm-ma-primary { left:38%;width:48%; }
   .tm-ma-exhibit--triptych .tm-ma-primary { left:1%;width:33%; }
   .tm-ma-exhibit-caption { padding-inline:10%; }
-  .tm-ma-shelf-scene { height:130px; width:97%; }
-  .tm-ma-glass-case { width:53%; height:62%; }
-  .tm-ma-paper-samples { left:62%;width:34%;height:55%; }
-  .tm-ma-shelf-ledger-label { display:none; }
   .tm-ma-footer { font-size:8px; }
   .tm-ma-viewer-body { display:flex;flex-direction:column; }
   .tm-ma-viewer-picture img { max-height:53svh; }
