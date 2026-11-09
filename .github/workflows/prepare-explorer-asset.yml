@@ -1,0 +1,30 @@
+name: Prepare approved explorer foreground
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/prepare-explorer-asset.yml'
+permissions:
+  contents: write
+jobs:
+  import:
+    if: github.head_ref == 'feat/fullscreen-white-moon-coded-hero-20261109' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+      - name: Import only the approved transparent foreground
+        run: |
+          mkdir -p public/assets/explorer
+          curl --fail --location --retry 2 'https://at.adobe.com/g6C36JNJtJJkDzhD' -o public/assets/explorer/astronaut.webp
+          echo 'ed4d7f1f26bacad20deb0fb6e70270f8e23ac6346fa5433149fc7435f688918a  public/assets/explorer/astronaut.webp' | sha256sum --check --strict
+          file public/assets/explorer/astronaut.webp
+      - name: Commit the isolated foreground to this feature branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/assets/explorer/astronaut.webp
+          git diff --cached --quiet && exit 0
+          git commit -m 'asset: add approved helmeted explorer foreground cutout'
+          git push origin HEAD:feat/fullscreen-white-moon-coded-hero-20261109
