@@ -5,7 +5,6 @@ import { chromium } from 'playwright';
 const browser = await chromium.launch({ headless: true });
 const base = 'http://127.0.0.1:4173/';
 const expected = [
-  ['.tm-hero', 'rgb(75, 40, 48)'],
   ['#project', 'rgb(217, 214, 210)'],
   ['#posters', 'rgb(170, 156, 144)'],
   ['.tm-about', 'rgb(239, 230, 214)'],
@@ -21,18 +20,67 @@ try {
   for (const width of sizes) {
     const page = await browser.newPage({ viewport: { width, height: 900 }, deviceScaleFactor: 1, reducedMotion: 'reduce' });
     await page.goto(base, { waitUntil: 'networkidle' });
-    await page.locator('.tm-masthead').waitFor();
-    await page.evaluate(() => document.fonts.ready);
-    const actual = await page.evaluate(() => ({
-      hero: getComputedStyle(document.querySelector('.tm-hero')).backgroundColor,
-      overflow: document.documentElement.scrollWidth - window.innerWidth,
-      masthead: document.querySelector('.tm-masthead')?.textContent,
-      artLoaded: Boolean(document.querySelector('.tm-picture-print img')?.naturalWidth),
-    }));
-    if (actual.hero !== 'rgb(75, 40, 48)') errors.push(width + ': hero background ' + actual.hero);
+    await page.locator('.tm-retro-cover-art').waitFor();
+    await page.evaluate(async () => {
+      await document.fonts.ready;
+      // Async decoding may lag behind image load while WebGL is already painting.
+      // The screenshot must include the actual TUMANEEN masthead and seated explorer.
+      await Promise.all([...document.querySelectorAll('.tm-retro-cover-art, .tm-retro-foreground')]
+        .map(img => img.decode()));
+      await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    });
+    const actual = await page.evaluate(() => {
+      const art = document.querySelector('.tm-retro-cover-art');
+      const still = document.querySelector('.tm-retro-foreground');
+      const moon = document.querySelector('.tm-retro-moon');
+      const cover = document.querySelector('.tm-retro-cover');
+      return {
+        overflow: document.documentElement.scrollWidth - window.innerWidth,
+        masthead: document.querySelector('#tm-hero-title')?.textContent,
+        subtitle: document.querySelector('.tm-retro-screen-reader + p')?.textContent,
+        artLoaded: Boolean(art?.naturalWidth),
+        foregroundLoaded: Boolean(still?.naturalWidth),
+        artSource: art?.getAttribute('src') || '',
+        moonMode: moon?.dataset.renderMode,
+        clip: still ? getComputedStyle(still).clipPath : 'none',
+        posterRatio: cover ? cover.getBoundingClientRect().width / cover.getBoundingClientRect().height : 0,
+        backdrop: getComputedStyle(document.querySelector('.tm-retro-hero')).backgroundImage,
+      };
+    });
     if (actual.overflow > 2) errors.push(width + ': horizontal overflow ' + actual.overflow + 'px');
-    if (!actual.artLoaded) errors.push(width + ': Shanakht did not load');
-    if (!actual.masthead?.includes('TUMANEEN')) errors.push(width + ': masthead missing');
+    if (!actual.artLoaded || !actual.foregroundLoaded) errors.push(width + ': retro poster asset did not load');
+    if (!actual.artSource.includes('visual-explorer-poster.webp')) errors.push(width + ': wrong visual explorer cover art');
+    if (!actual.masthead?.includes('TUMANEEN')) errors.push(width + ': huge TUMANEEN masthead missing');
+    if (actual.subtitle !== 'Visual Explorer') errors.push(width + ': Visual Explorer tagline missing');
+    if (actual.clip === 'none') errors.push(width + ': seated figure is not layered over rotating moon');
+    const layering = await page.locator('.tm-retro-cover').evaluate(cover => {
+      const art = cover.querySelector('.tm-retro-cover-art');
+      const cliff = cover.querySelector('.tm-retro-cliff');
+      const person = cover.querySelector('.tm-retro-person');
+      const globe = cover.querySelector('.tm-retro-moon');
+      const bounds = cover.getBoundingClientRect();
+      const artwork = art.getBoundingClientRect();
+      return {
+        artPosition: getComputedStyle(art).position,
+        artWidth: artwork.width,
+        coverWidth: bounds.width,
+        artLayer: Number(getComputedStyle(art).zIndex),
+        moonLayer: Number(getComputedStyle(globe).zIndex),
+        cliffLayer: Number(getComputedStyle(cliff).zIndex),
+        personLayer: Number(getComputedStyle(person).zIndex),
+        personClip: getComputedStyle(person).clipPath,
+      };
+    });
+    if (layering.artPosition !== 'absolute' || Math.abs(layering.artWidth - layering.coverWidth) > 3)
+      errors.push(width + ': retro cover image no longer fills the poster');
+    if (!(layering.artLayer < layering.moonLayer && layering.moonLayer < layering.cliffLayer &&
+        layering.cliffLayer === layering.personLayer))
+      errors.push(width + ': moon / artwork / foreground stacking order is wrong');
+    if (layering.personClip === 'none') errors.push(width + ': person silhouette clipping missing');
+    if (Math.abs(actual.posterRatio - 1086/1448) > .012) errors.push(width + ': approved poster aspect ratio changed');
+    if (!actual.backdrop.includes('radial-gradient')) errors.push(width + ': retro paper styling missing');
+    if (await page.locator('.tm-retro-moon canvas').count() !== 1)
+      errors.push(width + ': real three-dimensional moon canvas missing');
     await page.screenshot({ path: 'editorial-snapshots/hero-' + width + '.png', animations: 'disabled' });
 
     // The Poster Archive is a six-exhibit, three-column museum installation.
@@ -257,17 +305,51 @@ try {
         if (computed !== color) errors.push(selector + ': background ' + computed + ' (expected ' + color + ')');
         await page.screenshot({ path: 'editorial-snapshots/' + selector.replace(/[^a-z]+/gi, '-') + '-1440.png', animations: 'disabled' });
       }
-      const imageStyle = await page.locator('.tm-picture-print img').evaluate(el => ({
-        filter: getComputedStyle(el).filter,
-        objectFit: getComputedStyle(el).objectFit,
-      }));
-      if (imageStyle.filter !== 'none') errors.push('Shanakht image is filtered');
-      if (imageStyle.objectFit !== 'contain') errors.push('Shanakht image fit changed');
+      const assetResponse = await page.request.get(new URL('assets/retro/moon-nasa-lroc-2k.jpg', page.url()).toString());
+      if (!assetResponse.ok()) errors.push('local NASA lunar texture was not served from the correct base path');
+      await page.getByRole('link', { name: 'WORK', exact: true }).click();
+      await page.waitForTimeout(500);
+      if (await page.locator('#project').count() !== 1) errors.push('retro WORK navigation is broken');
       for (const id of ['home', 'posters', 'project', 'process', 'about', 'services', 'contact-form']) {
         if (await page.locator('#' + id).count() !== 1) errors.push('Missing or duplicated section id: ' + id);
       }
     }
     await page.close();
+  }
+  // The moon must complete a real continuous 360-degree revolution when
+  // motion is allowed, and it must remain still under reduced-motion settings.
+  const movingPage = await browser.newPage({
+    viewport: { width: 1024, height: 800 },
+    deviceScaleFactor: 1,
+    reducedMotion: 'no-preference',
+  });
+  try {
+    await movingPage.goto(base, { waitUntil: 'networkidle' });
+    await movingPage.locator('.tm-retro-moon').waitFor();
+    await movingPage.waitForTimeout(400);
+    const mode = await movingPage.locator('.tm-retro-moon').getAttribute('data-render-mode');
+    if (mode === 'webgl') {
+      const a = Number(await movingPage.locator('.tm-retro-moon').getAttribute('data-angle'));
+      await movingPage.waitForTimeout(850);
+      const b = Number(await movingPage.locator('.tm-retro-moon').getAttribute('data-angle'));
+      if (a === b) errors.push('WebGL moon is not animating around its own axis');
+
+      // User drag should turn the globe independently of the still poster.
+      const canvas = movingPage.locator('.tm-retro-moon canvas');
+      const bounds = await canvas.boundingBox();
+      if (bounds) {
+        await movingPage.mouse.move(bounds.x + bounds.width*.5, bounds.y + bounds.height*.5);
+        await movingPage.mouse.down();
+        await movingPage.mouse.move(bounds.x + bounds.width*.8, bounds.y + bounds.height*.5, { steps: 7 });
+        await movingPage.mouse.up();
+        const c = Number(await movingPage.locator('.tm-retro-moon').getAttribute('data-angle'));
+        if (c === b) errors.push('drag-to-rotate moon gesture has no effect');
+      }
+    } else if (mode !== 'fallback') {
+      errors.push('3D moon failed to initialize or provide a fallback: ' + mode);
+    }
+  } finally {
+    await movingPage.close();
   }
 } finally {
   await browser.close();
@@ -276,5 +358,5 @@ if (errors.length) {
   console.error(errors.join('\n'));
   process.exitCode = 1;
 } else {
-  console.log('Editorial colors, Shanakht artwork, anchors and responsive overflow checks passed.');
+  console.log('Retro 3D moon, museum exhibits, case-study gallery, anchors and responsive checks passed.');
 }
