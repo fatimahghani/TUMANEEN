@@ -110,68 +110,7 @@
   color: var(--tm-wine);
 }
 
-/* 01 — A dimly inked, gallery-like poster index. Keep the original interaction. */
-.tm-site #posters[data-lens-bloom] {
-  --lb-stage: var(--tm-ink);
-  --lb-stage-deep: #171513;
-  --lb-text: var(--tm-ivory);
-  --lb-muted: rgba(239, 230, 214, .7);
-  --lb-faint: rgba(239, 230, 214, .6);
-  --lb-line: rgba(239, 230, 214, .32);
-  --lb-glow: rgba(239, 230, 214, .36);
-  background: var(--tm-ink);
-  color: var(--tm-ivory);
-  box-shadow: none;
-}
-.tm-site #posters[data-lens-bloom]::after {
-  content: 'TUMANEEN    /    FOLIO 01';
-  pointer-events: none; position: absolute; z-index: 500;
-  right: 19px; top: 50%; writing-mode: vertical-rl;
-  color: rgba(239, 230, 214, .48);
-  font: 500 9px/1 'Inter', sans-serif;
-  letter-spacing: .16em;
-}
-.tm-site #posters .lb-word {
-  font-family: 'Fraunces', Georgia, serif;
-  font-weight: 400;
-  letter-spacing: -.035em;
-  color: var(--tm-ivory);
-  font-size: clamp(46px, 8vw, 120px);
-  line-height: .79;
-}
-.tm-site #posters .lb-word-l { font-style: italic; }
-.tm-site #posters .lb-word-r { font-weight: 500; }
-.tm-site #posters .lb-card {
-  border-radius: 0;
-  border: 7px solid var(--tm-ivory);
-  box-shadow: 10px 18px 35px rgba(27, 4, 13, .42), 0 0 0 1px rgba(255, 245, 225, .2);
-}
-.tm-site #posters .lb-hint-label {
-  font-family: 'Inter', sans-serif;
-  letter-spacing: .08em;
-  color: rgba(239, 230, 214, .75);
-  font-size: 9px;
-}
-.tm-site #posters [data-lb-ui] { border-bottom: 1px solid rgba(239, 230, 214, .22); }
-.tm-site #posters [data-lb-ui] > div:first-child > span:first-child {
-  color: var(--tm-ivory);
-  font: 500 10px/1.2 'Inter', sans-serif;
-  letter-spacing: .05em;
-}
-.tm-site #posters [data-lb-ui] span.font-serif {
-  font: italic 19px/1.1 'Fraunces', Georgia, serif;
-  color: var(--tm-rose);
-}
-.tm-site #posters [data-lb-ui] button {
-  border: 1px solid rgba(239, 230, 214, .5);
-  background: transparent; color: var(--tm-ivory);
-  backdrop-filter: none;
-  border-radius: 0;
-}
-.tm-site #posters [data-lb-ui] button:hover { background: var(--tm-ivory); color: var(--tm-burgundy); }
-.tm-site #posters .lb-cardtitle { font-family: 'Fraunces', Georgia, serif; }
-.tm-site #posters .lb-cap { font-family: 'Fraunces', Georgia, serif; font-style: italic; }
-.tm-site #posters .lb-card + .lb-card { outline: 0; }
+/* Poster Archive museum styling lives in components/PosterSection.css. */
 
 /* A transition with editorial purpose, not a generic cinematic gradient. */
 .tm-bridge {
