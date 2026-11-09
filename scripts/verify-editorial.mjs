@@ -51,10 +51,12 @@ try {
     if (await page.locator('.tm-ma-clip-metal').count() !== 14 ||
         await page.locator('.tm-ma-clip-wire').count() !== 14)
       errors.push(width + ': museum exhibit clips and suspension wires are incomplete');
-    if (await page.locator('.tm-ma-study-group').count() !== 5)
-      errors.push(width + ': missing supporting study-paper fragments');
-    if (await page.locator('.tm-ma-shelf-scene, .tm-ma-glass-case, .tm-ma-shelf-base').count() !== 3)
-      errors.push(width + ': archival display shelf is missing');
+    if (await page.locator('.tm-ma-study-group').count() !== 3)
+      errors.push(width + ': expected three restrained companion paper slips');
+    if (await page.locator('.tm-ma-study-sheet').count() !== 3)
+      errors.push(width + ': expected one small supporting sheet per featured study');
+    if (await page.locator('.tm-ma-shelf-scene, .tm-ma-glass-case, .tm-ma-paper-samples, .tm-ma-color-chips, .tm-ma-pressed-flower').count() !== 0)
+      errors.push(width + ': retired decorative clutter returned');
 
     const exhibitGrid = await page.locator('.tm-ma-exhibition').evaluate(el =>
       getComputedStyle(el).gridTemplateColumns.split(' ').filter(Boolean).length

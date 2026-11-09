@@ -185,41 +185,12 @@ const ExhibitClip: React.FC<{ twin?: boolean; small?: boolean }> = ({ twin = tru
   </span>
 );
 
-const StudyDecoration: React.FC<{ poster: LensBloomPosterCard; type: ExhibitVariant }> = ({ poster, type }) => (
-  <div className={'tm-ma-study-group tm-ma-study-group--' + type} aria-hidden="true">
-    <div className="tm-ma-study-sheet tm-ma-study-sheet--a">
+// One small companion study for three key prints, not a second collage wall.
+const StudyDecoration: React.FC<{ poster: LensBloomPosterCard }> = ({ poster }) => (
+  <div className="tm-ma-study-group" aria-hidden="true">
+    <div className="tm-ma-study-sheet">
       <img src={poster.src} alt="" loading="lazy" decoding="async" />
     </div>
-    <div className="tm-ma-study-sheet tm-ma-study-sheet--b">
-      <svg viewBox="0 0 120 145" fill="none" aria-hidden="true" focusable="false">
-        <path d="M16 128V18H104V128Z M26 116V51Q60 9 94 51V116Z M36 116V57Q60 29 84 57V116Z" stroke="currentColor" strokeWidth=".9" />
-        <path d="M8 22H111M8 123H111M60 7V139 M21 37H100 M22 83H100" stroke="currentColor" strokeWidth=".5" strokeDasharray="3 3" />
-        <circle cx="60" cy="74" r="28" stroke="currentColor" strokeWidth=".55" />
-        <path d="M37 95L83 50M38 50L84 95" stroke="currentColor" strokeWidth=".45" />
-      </svg>
-    </div>
-    <span className="tm-ma-study-registration">+ &nbsp;&nbsp; + &nbsp;&nbsp; +</span>
-  </div>
-);
-
-const ArchiveShelf: React.FC = () => (
-  <div className="tm-ma-shelf-scene" aria-hidden="true">
-    <div className="tm-ma-glass-case">
-      <div className="tm-ma-ledger-open">
-        <div className="tm-ma-ledger-page tm-ma-ledger-page--left" />
-        <div className="tm-ma-ledger-spine" />
-        <div className="tm-ma-ledger-page tm-ma-ledger-page--right" />
-      </div>
-      <span className="tm-ma-glass-glint" />
-    </div>
-    <div className="tm-ma-paper-samples">
-      <span className="tm-ma-paper-sample tm-ma-paper-sample--fiber" />
-      <span className="tm-ma-paper-sample tm-ma-paper-sample--umber" />
-      <span className="tm-ma-paper-sample tm-ma-paper-sample--oxblood" />
-      <span className="tm-ma-paper-sample tm-ma-paper-sample--pattern" />
-    </div>
-    <div className="tm-ma-shelf-ledger-label">TUMANEEN / ARCHIVE MATERIALS</div>
-    <div className="tm-ma-shelf-base" />
   </div>
 );
 
@@ -333,29 +304,9 @@ export const PosterSection: React.FC = () => {
                       </button>
                     </div>
                   ))
-                ) : (
-                  <StudyDecoration poster={exhibit.primary} type={exhibit.variant} />
-                )}
-                {exhibit.variant === 'moodboard' && (
-                  <>
-                    <div className="tm-ma-color-chips" aria-hidden="true"><span /><span /><span /></div>
-                    <svg className="tm-ma-pressed-flower" viewBox="0 0 75 170" fill="none" aria-hidden="true" focusable="false">
-                      <path d="M34 168C47 124 29 83 39 17" stroke="#625343" strokeWidth="2" />
-                      <path d="M37 114C11 110 7 93 9 86C25 89 35 100 37 114ZM36 84C54 65 69 70 72 74C60 91 49 95 36 84Z" fill="#79634c" />
-                      <g fill="#8e6257">
-                        <ellipse cx="37" cy="17" rx="8" ry="16" />
-                        <ellipse cx="22" cy="27" rx="8" ry="16" transform="rotate(-55 22 27)" />
-                        <ellipse cx="52" cy="27" rx="8" ry="16" transform="rotate(55 52 27)" />
-                        <ellipse cx="26" cy="46" rx="7" ry="13" transform="rotate(-125 26 46)" />
-                        <ellipse cx="47" cy="46" rx="7" ry="13" transform="rotate(125 47 46)" />
-                      </g>
-                      <circle cx="37" cy="33" r="7" fill="#a88a5f" />
-                    </svg>
-                  </>
-                )}
-                {exhibit.variant === 'collage' && (
-                  <span className="tm-ma-scrap-label" aria-hidden="true">FIELD NOTES / IMAGE 06</span>
-                )}
+                ) : ['archival', 'calligraphy', 'moodboard'].includes(exhibit.variant) ? (
+                  <StudyDecoration poster={exhibit.primary} />
+                ) : null}
               </div>
               <div className="tm-ma-exhibit-caption">
                 <button type="button" onClick={() => openPoster(exhibit.primary)}>
@@ -367,11 +318,9 @@ export const PosterSection: React.FC = () => {
           ))}
         </div>
 
-        <ArchiveShelf />
-
         <footer className="tm-ma-footer">
-          <span>THE TUMANEEN POSTER COLLECTION</span>
-          <span>EIGHT ORIGINAL PRINTS / SIX EXHIBITS</span>
+          <span>TUMANEEN / POSTER ARCHIVE</span>
+          <span>06 EXHIBITS · 08 PRINTS</span>
         </footer>
       </div>
 
