@@ -31,7 +31,7 @@
   background-image:
     radial-gradient(circle at 72% 28%, rgba(255, 234, 198, .52), transparent 53%),
     radial-gradient(circle at 22% 76%, rgba(44, 7, 5, .8), transparent 75%),
-    url('/assets/retro/moon-nasa-lroc-2k.jpg');
+    var(--moon-texture);
   background-size: cover, cover, 210% 100%;
   background-position: center, center, 50% center;
   box-shadow: inset -26px -23px 75px rgba(44, 8, 6, .74), inset 13px 10px 35px rgba(255, 216, 156, .31);

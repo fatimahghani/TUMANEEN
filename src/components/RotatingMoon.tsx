@@ -278,7 +278,7 @@ export const RotatingMoon: React.FC = () => {
   }, []);
 
   return (
-    <div className="tm-retro-moon" ref={containerRef} data-render-mode="loading" data-angle="0">
+    <div className="tm-retro-moon" ref={containerRef} data-render-mode="loading" data-angle="0" style={{ ["--moon-texture" as string]: `url("${MOON_MAP}")` } as React.CSSProperties}>
       <div className="tm-retro-moon-fallback" aria-hidden="true" />
       <canvas
         ref={canvasRef}
