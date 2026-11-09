@@ -104,7 +104,7 @@
 .tm-ma-exhibit--geometry .tm-ma-study-group { top:31%; }
 .tm-ma-exhibit--geometry .tm-ma-study-sheet--b { height:48%; }
 .tm-ma-exhibit--collage .tm-ma-primary { left:22%; width:66%; top:15%; }
-.tm-ma-exhibit--collage .tm-ma-study-group { left:0; right:auto; top:39%; width:33%; }
+.tm-ma-exhibit--collage .tm-ma-study-group { left:0; right:auto; top:34%; width:33%; height:52%; }
 .tm-ma-exhibit--collage .tm-ma-study-sheet--a { height:56%; }
 .tm-ma-exhibit--collage .tm-ma-study-sheet--b { height:39%; }
 .tm-ma-scrap-label { position:absolute; right:1%; bottom:4%; color:#44362d; font:500 8px/1.3 'Inter',sans-serif; letter-spacing:.1em; }
@@ -127,6 +127,7 @@
 .tm-ma-pressed-flower { position:absolute; left:6%; bottom:5%; width:17%; height:38%; filter:drop-shadow(2px 3px 2px rgba(35,29,22,.18)); pointer-events:none; }
 
 .tm-ma-exhibit-caption {
+  position:relative; z-index:6;
   min-height:39px; display:flex; align-items:baseline; flex-wrap:wrap; justify-content:space-between;
   gap:4px 10px; border-top:1px solid rgba(50,39,28,.23); padding:8px 4% 0 12%;
 }
