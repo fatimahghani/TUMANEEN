@@ -17,20 +17,20 @@ const float PI=3.141592653589793;
 float value(vec2 uv){return dot(texture2D(uMoon,vec2(fract(uv.x),clamp(uv.y,0.,1.))).rgb,vec3(.299,.587,.114));}
 void main(){
   vec2 p=(vUv-.5)*2.; float r=dot(p,p); if(r>=1.) discard;
-  // Analytic intersection with a sphere: independent longitude, fixed lighting.
+  // Analytic sphere intersection: independent longitude under fixed lighting.
   vec3 n=vec3(p,sqrt(1.-r));
   float c=cos(uAngle),s=sin(uAngle);
   vec3 q=vec3(c*n.x-s*n.z,n.y,s*n.x+c*n.z);
-  vec2 uv=vec2(atan(q.z,q.x)/(2.*PI)+.5,acos(clamp(q.y,-1.,1.))/PI);
+  vec2 uv=vec2(atan(q.z,q.x)/(2.*PI)+.25,acos(clamp(q.y,-1.,1.))/PI);
   float raw=value(uv);
-  float a=pow(clamp(raw*1.58,.0,1.),.8);
-  // Fine relief from the map keeps the crater surface dimensional as it turns.
+  // Preserve lunar maria instead of clipping the entire map to white.
+  float a=pow(clamp((raw-.22)/.65,0.,1.),.9);
   float dx=value(uv+vec2(uTexel.x,0.))-value(uv-vec2(uTexel.x,0.));
   float dy=value(uv+vec2(0.,uTexel.y))-value(uv-vec2(0.,uTexel.y));
   vec3 detail=normalize(n+vec3(-dx*1.2,dy*1.2,0.));
   vec3 light=normalize(vec3(.45,.6,1.7));
-  float lit=.67+.33*max(dot(detail,light),0.);
-  vec3 stone=mix(vec3(.41,.40,.37),vec3(1.,.985,.947),a);
+  float lit=.56+.44*max(dot(detail,light),0.);
+  vec3 stone=mix(vec3(.30,.29,.27),vec3(1.,.985,.955),a);
   vec3 color=stone*lit;
   float edge=1.-smoothstep(.997,1.,sqrt(r));
   gl_FragColor=vec4(color,edge);
