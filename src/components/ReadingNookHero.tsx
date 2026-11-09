@@ -36,15 +36,15 @@ export const ReadingNookHero: React.FC<ReadingNookHeroProps> = ({
           className="tm-retro-cover-art"
           alt=""
           fetchPriority="high"
-          decoding="async"
+          decoding="sync"
         />
         <div className="tm-retro-red-disc" aria-hidden="true" />
         <RotatingMoon />
 
         {/* The exact figure silhouette is separated from the cliff so the
             lunar backdrop cannot leave an artificial red halo around his head. */}
-        <img className="tm-retro-foreground tm-retro-cliff" src={COVER} alt="" aria-hidden="true" />
-        <img className="tm-retro-foreground tm-retro-person" src={COVER} alt="" aria-hidden="true" />
+        <img className="tm-retro-foreground tm-retro-cliff" src={COVER} alt="" aria-hidden="true" decoding="sync" />
+        <img className="tm-retro-foreground tm-retro-person" src={COVER} alt="" aria-hidden="true" decoding="sync" />
 
         <h1 id="tm-hero-title" className="tm-retro-screen-reader">TUMANEEN</h1>
         <p className="tm-retro-screen-reader">Visual Explorer</p>
