@@ -28,6 +28,17 @@
     0 13px 34px rgba(85,45,26,.14);
 }
 .tm-retro-cover-art,
+.tm-retro-foreground {
+  display: block;
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  width: 100%;
+  object-fit: fill;
+  user-select: none;
+  pointer-events: none;
+}
+.tm-retro-cover-art { z-index: 0; }
 .tm-retro-red-disc {
   position: absolute;
   left: -1.5%;

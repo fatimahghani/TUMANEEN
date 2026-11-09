@@ -46,6 +46,30 @@ try {
     if (!actual.masthead?.includes('TUMANEEN')) errors.push(width + ': huge TUMANEEN masthead missing');
     if (actual.subtitle !== 'Visual Explorer') errors.push(width + ': Visual Explorer tagline missing');
     if (actual.clip === 'none') errors.push(width + ': seated figure is not layered over rotating moon');
+    const layering = await page.locator('.tm-retro-cover').evaluate(cover => {
+      const art = cover.querySelector('.tm-retro-cover-art');
+      const cliff = cover.querySelector('.tm-retro-cliff');
+      const person = cover.querySelector('.tm-retro-person');
+      const globe = cover.querySelector('.tm-retro-moon');
+      const bounds = cover.getBoundingClientRect();
+      const artwork = art.getBoundingClientRect();
+      return {
+        artPosition: getComputedStyle(art).position,
+        artWidth: artwork.width,
+        coverWidth: bounds.width,
+        artLayer: Number(getComputedStyle(art).zIndex),
+        moonLayer: Number(getComputedStyle(globe).zIndex),
+        cliffLayer: Number(getComputedStyle(cliff).zIndex),
+        personLayer: Number(getComputedStyle(person).zIndex),
+        personClip: getComputedStyle(person).clipPath,
+      };
+    });
+    if (layering.artPosition !== 'absolute' || Math.abs(layering.artWidth - layering.coverWidth) > 3)
+      errors.push(width + ': retro cover image no longer fills the poster');
+    if (!(layering.artLayer < layering.moonLayer && layering.moonLayer < layering.cliffLayer &&
+        layering.cliffLayer === layering.personLayer))
+      errors.push(width + ': moon / artwork / foreground stacking order is wrong');
+    if (layering.personClip === 'none') errors.push(width + ': person silhouette clipping missing');
     if (Math.abs(actual.posterRatio - 1086/1448) > .012) errors.push(width + ': approved poster aspect ratio changed');
     if (!actual.backdrop.includes('radial-gradient')) errors.push(width + ': retro paper styling missing');
     if (await page.locator('.tm-retro-moon canvas').count() !== 1)
