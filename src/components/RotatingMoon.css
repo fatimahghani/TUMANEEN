@@ -1,43 +1,53 @@
-.tm-retro-moon {
+/* A round, independently rendered moon. Its size never distorts with the viewport. */
+.tm-explorer-hero .tm-explorer-moon {
   position: absolute;
   z-index: 2;
-  top: 27.8%;
-  left: 2.3%;
-  width: 95.4%;
+  left: 50%;
+  top: 20.5%;
+  width: min(66vw, 126svh);
   aspect-ratio: 1;
-  overflow: visible;
-  touch-action: pan-y;
-  filter: drop-shadow(2px 8px 10px rgba(70, 21, 13, .28));
-}
-.tm-retro-moon canvas {
-  position: absolute;
-  z-index: 2;
-  inset: 0;
-  display: block;
-  width: 100%;
-  height: 100%;
-  cursor: grab;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  overflow: hidden;
   touch-action: pan-y;
   background: transparent;
-  outline-offset: 5px;
+  filter: none;
 }
-.tm-retro-moon canvas:active { cursor: grabbing; }
-.tm-retro-moon canvas:focus-visible { outline: 2px solid #e8bd86; }
+.tm-explorer-moon canvas {
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  touch-action: pan-y;
+  cursor: grab;
+  border-radius: 50%;
+}
+.tm-explorer-moon canvas:active { cursor: grabbing; }
+.tm-explorer-moon canvas:focus-visible { outline: 2px solid #650c08; outline-offset: -5px; }
 .tm-retro-moon-fallback {
   position: absolute;
-  inset: .7%;
+  inset: .2%;
   z-index: 0;
   border-radius: 50%;
+  background-color: #e7e3da;
   background-image:
-    radial-gradient(circle at 72% 28%, rgba(255, 234, 198, .52), transparent 53%),
-    radial-gradient(circle at 22% 76%, rgba(44, 7, 5, .8), transparent 75%),
+    radial-gradient(circle at 67% 26%, rgba(255,255,249,.42), transparent 64%),
+    radial-gradient(circle at 16% 82%, rgba(51,50,47,.34), transparent 68%),
     var(--moon-texture);
   background-size: cover, cover, 210% 100%;
   background-position: center, center, 50% center;
-  box-shadow: inset -26px -23px 75px rgba(44, 8, 6, .74), inset 13px 10px 35px rgba(255, 216, 156, .31);
+  background-blend-mode: screen, multiply, normal;
+  box-shadow: inset -12px -12px 35px rgba(47,46,43,.15), inset 10px 9px 35px rgba(255,252,239,.22);
+  filter: grayscale(1) brightness(1.35);
 }
-.tm-retro-moon[data-render-mode="webgl"] .tm-retro-moon-fallback { display: none; }
-.tm-retro-moon[data-render-mode="fallback"] canvas { display: none; }
-@media (prefers-reduced-motion: reduce) {
-  .tm-retro-moon canvas { animation: none; }
+.tm-explorer-moon[data-render-mode='webgl'] .tm-retro-moon-fallback { display: none; }
+.tm-explorer-moon[data-render-mode='fallback'] canvas { display: none; }
+@media (max-width: 760px) and (orientation: portrait) {
+  .tm-explorer-hero .tm-explorer-moon { top: 31%; width: 132vw; }
+}
+@media (min-aspect-ratio: 2/1) {
+  .tm-explorer-hero .tm-explorer-moon { top: 17%; width: 123svh; }
 }
