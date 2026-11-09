@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Sparkles } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import { ArrowLeft, ArrowRight, ArrowUpRight, X } from 'lucide-react';
+import './PosterSection.css';
 
 export interface LensBloomPosterCard {
   src: string;
@@ -98,470 +100,320 @@ export const LENS_BLOOM_POSTERS: LensBloomPosterCard[] = [
   },
 ];
 
-const LB = {
-  CARD_H_FRAC: 0.66,
-  CARD_ASPECT: 0.72,
-  CLUSTER_SCALE: 0.48,
-  ROW_SCALE: 0.48,
-  OPEN_SCALE: 1.0,
-  ROW_GAP_FRAC: 0.016,
-  TITLE_MIN: 0.33,
-  WORDS_IN: 0.26,
-  CARD_ONSET: 0.06,
-  CARD_APPEAR: 0.3,
-  LOAD_DUR: 2.2,
-  EASE: 0.14,
-  SNAP: 0.0005,
+type ExhibitVariant = 'archival' | 'calligraphy' | 'moodboard' | 'geometry' | 'triptych' | 'collage';
+
+type MuseumExhibit = {
+  number: string;
+  name: string;
+  descriptor: string;
+  variant: ExhibitVariant;
+  primary: LensBloomPosterCard;
+  companions: LensBloomPosterCard[];
 };
 
-const smoothstep = (x: number) => x * x * (3 - 2 * x);
-const clamp = (val: number, min: number, max: number) =>
-  val < min ? min : val > max ? max : val;
-const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
-const easeInOutQuad = (t: number) =>
-  t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+const posterNamed = (name: string): LensBloomPosterCard => {
+  const poster = LENS_BLOOM_POSTERS.find((item) => item.name.startsWith(name));
+  if (!poster) throw new Error('Missing original TUMANEEN poster: ' + name);
+  return poster;
+};
+
+// Six installations of the existing eight authentic posters. Process-style
+// scraps are decorative crops of those originals, not invented portfolio works.
+const MUSEUM_EXHIBITS: MuseumExhibit[] = [
+  {
+    number: '01',
+    name: 'Shanakht',
+    descriptor: 'Identity / visual memory',
+    variant: 'archival',
+    primary: posterNamed('Shanakht'),
+    companions: [],
+  },
+  {
+    number: '02',
+    name: 'Wajood',
+    descriptor: 'Urdu form / presence',
+    variant: 'calligraphy',
+    primary: posterNamed('Wajood'),
+    companions: [],
+  },
+  {
+    number: '03',
+    name: 'Chai',
+    descriptor: 'Ritual / typographic culture',
+    variant: 'moodboard',
+    primary: posterNamed('Chai'),
+    companions: [],
+  },
+  {
+    number: '04',
+    name: 'Tehreem',
+    descriptor: 'Editorial portrait / print',
+    variant: 'geometry',
+    primary: posterNamed('Tehreem'),
+    companions: [],
+  },
+  {
+    number: '05',
+    name: 'Color & Motion',
+    descriptor: 'Three experiments in image-making',
+    variant: 'triptych',
+    primary: posterNamed('Chill & Mix'),
+    companions: [posterNamed('Retro Horizon'), posterNamed('Reality')],
+  },
+  {
+    number: '06',
+    name: 'Trying New Things',
+    descriptor: 'Collage / visual diary',
+    variant: 'collage',
+    primary: posterNamed('Trying New Things'),
+    companions: [],
+  },
+];
+
+const ExhibitClip: React.FC<{ twin?: boolean; small?: boolean }> = ({ twin = true, small = false }) => (
+  <span className={'tm-ma-clip-set' + (small ? ' tm-ma-clip-set--small' : '')} aria-hidden="true">
+    <span className="tm-ma-clip-anchor tm-ma-clip-anchor--left">
+      <span className="tm-ma-clip-wire" />
+      <span className="tm-ma-clip-metal" />
+    </span>
+    {twin && (
+      <span className="tm-ma-clip-anchor tm-ma-clip-anchor--right">
+        <span className="tm-ma-clip-wire" />
+        <span className="tm-ma-clip-metal" />
+      </span>
+    )}
+  </span>
+);
+
+const StudyDecoration: React.FC<{ poster: LensBloomPosterCard; type: ExhibitVariant }> = ({ poster, type }) => (
+  <div className={'tm-ma-study-group tm-ma-study-group--' + type} aria-hidden="true">
+    <div className="tm-ma-study-sheet tm-ma-study-sheet--a">
+      <img src={poster.src} alt="" loading="lazy" decoding="async" />
+    </div>
+    <div className="tm-ma-study-sheet tm-ma-study-sheet--b">
+      <svg viewBox="0 0 120 145" fill="none" aria-hidden="true" focusable="false">
+        <path d="M16 128V18H104V128Z M26 116V51Q60 9 94 51V116Z M36 116V57Q60 29 84 57V116Z" stroke="currentColor" strokeWidth=".9" />
+        <path d="M8 22H111M8 123H111M60 7V139 M21 37H100 M22 83H100" stroke="currentColor" strokeWidth=".5" strokeDasharray="3 3" />
+        <circle cx="60" cy="74" r="28" stroke="currentColor" strokeWidth=".55" />
+        <path d="M37 95L83 50M38 50L84 95" stroke="currentColor" strokeWidth=".45" />
+      </svg>
+    </div>
+    <span className="tm-ma-study-registration">+ &nbsp;&nbsp; + &nbsp;&nbsp; +</span>
+  </div>
+);
+
+const ArchiveShelf: React.FC = () => (
+  <div className="tm-ma-shelf-scene" aria-hidden="true">
+    <div className="tm-ma-glass-case">
+      <div className="tm-ma-ledger-open">
+        <div className="tm-ma-ledger-page tm-ma-ledger-page--left" />
+        <div className="tm-ma-ledger-spine" />
+        <div className="tm-ma-ledger-page tm-ma-ledger-page--right" />
+      </div>
+      <span className="tm-ma-glass-glint" />
+    </div>
+    <div className="tm-ma-paper-samples">
+      <span className="tm-ma-paper-sample tm-ma-paper-sample--fiber" />
+      <span className="tm-ma-paper-sample tm-ma-paper-sample--umber" />
+      <span className="tm-ma-paper-sample tm-ma-paper-sample--oxblood" />
+      <span className="tm-ma-paper-sample tm-ma-paper-sample--pattern" />
+    </div>
+    <div className="tm-ma-shelf-ledger-label">TUMANEEN / ARCHIVE MATERIALS</div>
+    <div className="tm-ma-shelf-base" />
+  </div>
+);
 
 export const PosterSection: React.FC = () => {
-  const sectionRef = useRef<HTMLElement | null>(null);
-  const wordLeftRef = useRef<HTMLDivElement | null>(null);
-  const wordRightRef = useRef<HTMLDivElement | null>(null);
-  const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
-  const imgsRef = useRef<(HTMLImageElement | null)[]>([]);
-  const hintRef = useRef<HTMLDivElement | null>(null);
+  const [activePoster, setActivePoster] = useState<LensBloomPosterCard | null>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const triggerRef = useRef<HTMLElement | null>(null);
+  const modalOpen = activePoster !== null;
 
-  const hoveredIndexRef = useRef<number | null>(null);
-  const [hoveredPoster, setHoveredPoster] = useState<LensBloomPosterCard | null>(null);
+  const openPoster = (poster: LensBloomPosterCard) => {
+    triggerRef.current = document.activeElement as HTMLElement | null;
+    setActivePoster(poster);
+  };
 
-  const controlsRef = useRef<{
-    replayBloom: () => void;
-  } | null>(null);
-  const wakeLoopRef = useRef<(() => void) | null>(null);
-
-  const cards = LENS_BLOOM_POSTERS;
-  const u = cards.length;
-  const d = (0.94 - LB.CARD_ONSET - LB.CARD_APPEAR) / Math.max(1, u - 1);
+  const movePoster = (direction: number) => {
+    setActivePoster((previous) => {
+      if (!previous) return null;
+      const index = LENS_BLOOM_POSTERS.findIndex((item) => item.src === previous.src);
+      return LENS_BLOOM_POSTERS[(index + direction + LENS_BLOOM_POSTERS.length) % LENS_BLOOM_POSTERS.length];
+    });
+  };
 
   useEffect(() => {
-    const t = sectionRef.current;
-    if (!t) return;
+    if (!modalOpen) return;
+    const oldOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    closeButtonRef.current?.focus();
 
-    let o = 0;
-    let P = 0;
-    let F = 0;
-    let B = 0;
-    let I = 0;
-    let H = 0;
-    let z = 0;
-    let U = 0;
-    let W = 0;
-    let q = 0;
-    let eo = 0;
-    let cachedLeftWordW = 0;
-    let cachedRightWordW = 0;
-
-    let introStartTime: number | null = null;
-    let introActive = false;
-
-    // Smooth per-card hover progress (0 = in line, 1 = opened full image)
-    const hoverProgress = new Array<number>(u).fill(0);
-    // Smooth neighbor horizontal shift when a card opens
-    const neighborShift = new Array<number>(u).fill(0);
-
-    const rowPose = (e: number) => ({
-      x: (e - (u - 1) / 2) * U,
-      y: 0,
-      s: LB.ROW_SCALE,
-      z: 0,
-      op: 1,
-      zi: 300 - 12 * e,
-    });
-
-    const lerpPose = (
-      aPose: { x: number; y: number; s: number; z: number; op: number; zi: number },
-      bPose: { x: number; y: number; s: number; z: number; op: number; zi: number },
-      r: number
-    ) => ({
-      x: lerp(aPose.x, bPose.x, r),
-      y: lerp(aPose.y, bPose.y, r),
-      s: lerp(aPose.s, bPose.s, r),
-      z: lerp(aPose.z, bPose.z, r),
-      op: lerp(aPose.op, bPose.op, r),
-      zi: Math.round(lerp(aPose.zi, bPose.zi, r)),
-    });
-
-    const baseLinePose = (e: number, tVal: number, r: number) => {
-      const targetRow = rowPose(e);
-      if (tVal < 1) {
-        const tPose = lerpPose(
-          {
-            x: (e - (u - 1) / 2) * W,
-            y: 0,
-            s: LB.CLUSTER_SCALE,
-            z: 0,
-            op: 1,
-            zi: 100,
-          },
-          targetRow,
-          r
-        );
-        const n = smoothstep(clamp((r - LB.CARD_ONSET - e * d) / LB.CARD_APPEAR, 0, 1));
-        return {
-          ...tPose,
-          s: tPose.s * (0.7 + 0.3 * n),
-          y: tPose.y + (1 - n) * I * 0.03,
-          op: n,
-          zi: 300 - 12 * e,
-        };
-      }
-      return targetRow;
-    };
-
-    const wakeUp = () => {
-      if (!F && !document.hidden) {
-        F = requestAnimationFrame(ev);
-      }
-    };
-    wakeLoopRef.current = wakeUp;
-
-    const eh = () => {
-      B = t.clientWidth;
-      I = t.clientHeight;
-      const isMobile = B < 768;
-      z = (isMobile ? 0.48 : LB.CARD_H_FRAC) * I;
-      H = z * LB.CARD_ASPECT;
-      const spanFrac = isMobile ? 0.56 : B < 1024 ? 0.48 : 0.38;
-      U = Math.min(
-        LB.ROW_SCALE * H + LB.ROW_GAP_FRAC * B,
-        (spanFrac * B) / Math.max(1, u - 1)
-      );
-      W = 0.6 * U;
-      q = ((u - 1) * U) / 2 + (LB.ROW_SCALE * H) / 2;
-
-      if (wordLeftRef.current) cachedLeftWordW = wordLeftRef.current.offsetWidth;
-      if (wordRightRef.current) cachedRightWordW = wordRightRef.current.offsetWidth;
-
-      for (let idx = 0; idx < u; idx++) {
-        const cardEl = cardsRef.current[idx];
-        if (cardEl) {
-          cardEl.style.width = `${H}px`;
-          cardEl.style.height = `${z}px`;
-        }
-      }
-      wakeUp();
-    };
-
-    const startIntroAnimation = (now: number) => {
-      introStartTime = now;
-      introActive = true;
-      o = 0;
-      P = 0;
-      if (hintRef.current) hintRef.current.style.opacity = '0';
-      wakeUp();
-    };
-
-    const ev = (now: number) => {
-      F = 0;
-      let isAnimating = false;
-
-      if (introActive && introStartTime !== null) {
-        const elapsed = (now - introStartTime) / 1000;
-        const progress = clamp(elapsed / LB.LOAD_DUR, 0, 1);
-        const eased = easeInOutQuad(progress);
-        o = eased;
-        P = eased;
-        isAnimating = true;
-        if (progress >= 1) {
-          introActive = false;
-          o = 1;
-          P = 1;
-          if (hintRef.current) hintRef.current.style.opacity = '1';
-        }
-      } else {
-        const diff = P - o;
-        if (Math.abs(diff) >= LB.SNAP) {
-          o += diff * LB.EASE;
-          isAnimating = true;
-        } else {
-          o = P;
-        }
-      }
-
-      const i = o < 1 ? smoothstep(clamp((o - LB.WORDS_IN) / (1 - LB.WORDS_IN), 0, 1)) : 1;
-
-      const dWord = wordLeftRef.current;
-      const wWord = wordRightRef.current;
-      if (dWord && wWord) {
-        const eWidth = cachedLeftWordW || dWord.offsetWidth;
-        const tWidth = cachedRightWordW || wWord.offsetWidth;
-        const centerX = B / 2;
-        const gap = 0.045 * B;
-        const startLeft = centerX - (eWidth + gap + tWidth) / 2;
-        const margin = Math.max(10, 0.025 * B);
-        const scale = lerp(1, LB.TITLE_MIN, i);
-        const targetLeftX = Math.max(8, centerX - q - margin - eWidth * scale);
-        const targetRightX = Math.min(B - tWidth * scale - 8, centerX + q + margin);
-        const leftX = lerp(startLeft, targetLeftX, i);
-        const rightX = lerp(startLeft + eWidth + gap, targetRightX, i);
-        eo = lerp(startLeft + eWidth + gap / 2, centerX, i);
-        const wordOpacity = o < 1 ? smoothstep(clamp(o / LB.WORDS_IN, 0, 1)) : 1;
-
-        dWord.style.transform = `translateY(-50%) translate(${leftX.toFixed(1)}px, 0) scale(${scale.toFixed(3)})`;
-        wWord.style.transform = `translateY(-50%) translate(${rightX.toFixed(1)}px, 0) scale(${scale.toFixed(3)})`;
-        dWord.style.opacity = wordOpacity.toFixed(3);
-        wWord.style.opacity = wordOpacity.toFixed(3);
-      } else {
-        eo = B / 2;
-      }
-
-      const activeHoverIdx = hoveredIndexRef.current;
-
-      for (let idx = 0; idx < u; idx++) {
-        const cardEl = cardsRef.current[idx];
-        if (!cardEl) continue;
-
-        const targetH = activeHoverIdx === idx ? 1 : 0;
-        const hDiff = targetH - hoverProgress[idx];
-        if (Math.abs(hDiff) >= 0.001) {
-          hoverProgress[idx] += hDiff * 0.16;
-          isAnimating = true;
-        } else {
-          hoverProgress[idx] = targetH;
-        }
-
-        // Subtle horizontal breathing room in the line around the hovered poster
-        let targetShift = 0;
-        if (activeHoverIdx !== null && activeHoverIdx !== idx) {
-          const dist = idx - activeHoverIdx;
-          const dir = dist > 0 ? 1 : -1;
-          const falloff = Math.max(0.25, 1 - (Math.abs(dist) - 1) * 0.12);
-          targetShift = dir * (0.26 * H) * falloff;
-        }
-        const sDiff = targetShift - neighborShift[idx];
-        if (Math.abs(sDiff) >= 0.1) {
-          neighborShift[idx] += sDiff * 0.16;
-          isAnimating = true;
-        } else {
-          neighborShift[idx] = targetShift;
-        }
-
-        const basePose = baseLinePose(idx, o, i);
-        const hAmt = hoverProgress[idx];
-        const isNarrow = B < 900;
-
-        // Smoothly morph card width from uniform row aspect (0.72) to the poster's true native aspect when opened
-        const openWidth = z * cards[idx].aspect;
-        const currentWidth = lerp(H, openWidth, hAmt);
-        cardEl.style.width = `${currentWidth.toFixed(1)}px`;
-
-        // Ensure opened poster always fits comfortably inside mobile/tablet viewport
-        const maxOpenScaleW = (B * (isNarrow ? 0.84 : 0.92)) / Math.max(1, openWidth);
-        const maxOpenScaleH = (I * (isNarrow ? 0.56 : 0.72)) / Math.max(1, z);
-        const effectiveOpenScale = Math.min(LB.OPEN_SCALE, maxOpenScaleW, maxOpenScaleH);
-
-        // On narrow viewports, smoothly center the opened card horizontally so edge posters never clip
-        const openTargetX = isNarrow ? 0 : basePose.x + neighborShift[idx];
-        const finalX = lerp(basePose.x + neighborShift[idx], openTargetX, hAmt);
-        const finalY = lerp(basePose.y, isNarrow ? -24 : -12, hAmt);
-        const finalS = lerp(basePose.s, effectiveOpenScale, hAmt);
-        const finalZ = lerp(basePose.z, 90, hAmt);
-        const finalZi = hAmt > 0.05 ? 600 + Math.round(hAmt * 100) : basePose.zi;
-
-        cardEl.style.transform = `translate3d(${(eo + finalX).toFixed(1)}px, ${(I / 2 + finalY).toFixed(1)}px, ${finalZ.toFixed(1)}px) translate(-50%, -50%) scale(${finalS.toFixed(3)})`;
-        cardEl.style.opacity = basePose.op.toFixed(3);
-        cardEl.style.zIndex = String(finalZi);
-      }
-
-      if (isAnimating && !document.hidden) {
-        F = requestAnimationFrame(ev);
+    const onKeyboard = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setActivePoster(null);
+      } else if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        movePoster(1);
+      } else if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        movePoster(-1);
       }
     };
 
-    controlsRef.current = {
-      replayBloom: () => {
-        startIntroAnimation(performance.now());
-      },
-    };
-
-    const onVisibilityChange = () => {
-      if (document.hidden) {
-        if (F) cancelAnimationFrame(F);
-        F = 0;
-      } else {
-        wakeUp();
-      }
-    };
-
-    document.addEventListener('visibilitychange', onVisibilityChange);
-
-    const resizeObserver = new ResizeObserver(() => eh());
-    resizeObserver.observe(t);
-    eh();
-    document.fonts?.ready.then(() => eh());
-
-    let hasTriggeredIntro = false;
-    const intersectionObserver = new IntersectionObserver(
-      (entries) => {
-        const entry = entries[0];
-        if (!entry) return;
-        if (entry.isIntersecting && entry.intersectionRatio >= 0.22) {
-          if (!hasTriggeredIntro) {
-            hasTriggeredIntro = true;
-            startIntroAnimation(performance.now());
-          }
-        } else if (!entry.isIntersecting) {
-          // Reset when scrolled completely out of view so returning to Posters replays the Bloom animation
-          hasTriggeredIntro = false;
-          introActive = false;
-          o = 0;
-          P = 0;
-          wakeUp();
-        }
-      },
-      { threshold: [0, 0.22, 0.5] }
-    );
-    intersectionObserver.observe(t);
-
-    wakeUp();
-
+    window.addEventListener('keydown', onKeyboard);
     return () => {
-      if (F) cancelAnimationFrame(F);
-      resizeObserver.disconnect();
-      intersectionObserver.disconnect();
-      document.removeEventListener('visibilitychange', onVisibilityChange);
+      window.removeEventListener('keydown', onKeyboard);
+      document.body.style.overflow = oldOverflow;
+      triggerRef.current?.focus();
     };
-  }, [cards, d, u]);
+  }, [modalOpen]);
 
-  const selectPosterByIndex = (idx: number | null) => {
-    hoveredIndexRef.current = idx;
-    setHoveredPoster(idx !== null ? cards[idx] || null : null);
-    wakeLoopRef.current?.();
+  const handleModalTab = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== 'Tab') return;
+    const controls = panelRef.current?.querySelectorAll<HTMLButtonElement>('button:not(:disabled)');
+    if (!controls?.length) return;
+    const first = controls[0];
+    const last = controls[controls.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
   };
 
   return (
-    <section
-      id="posters"
-      ref={sectionRef}
-      data-lens-bloom="" data-editorial-posters=""
-      aria-label="The Poster Index"
-      className="relative h-[100svh] min-h-[580px] w-full !cursor-default"
-    >
-      <div
-        className="lb-stage"
-        onClick={() => {
-          if (hoveredIndexRef.current !== null) {
-            selectPosterByIndex(null);
-          }
-        }}
-      >
-        {/* Top Studio Context & Bloom Replay */}
-        <div
-          data-lb-ui="true"
-          className="absolute top-0 left-0 right-0 z-[630] flex items-center justify-between px-4 sm:px-12 lg:px-[clamp(24px,7vw,100px)] py-5 sm:py-7 pointer-events-auto"
-        >
-          <div className="flex items-center gap-3">
-            <span className="font-sans text-[10px] sm:text-[11px] font-medium uppercase tracking-[0.22em] sm:tracking-[0.26em] text-[#F0E4D2]/65">
-              01 / THE POSTER INDEX
-            </span>
-            <span className="hidden sm:inline-block h-1 w-1 rounded-full bg-[#D9C0A8]/40" />
+    <section id="posters" data-museum-posters="" className="tm-ma-museum" aria-labelledby="tm-ma-title">
+      <div className="tm-ma-content">
+        <header className="tm-ma-running-head">
+          <div className="tm-ma-running-heading">
+            <span>01 / POSTER ARCHIVE</span>
+            <h2 id="tm-ma-title">Studies in print</h2>
           </div>
+          <span>TUMANEEN / COLLECTED WORKS</span>
+        </header>
 
-          <div className="flex items-center gap-2 sm:gap-3">
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                controlsRef.current?.replayBloom();
-              }}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-mono uppercase tracking-[0.18em] text-[#F0E4D2]/70 hover:text-[#F0E4D2] border border-[#F0E4D2]/15 hover:border-[#F0E4D2]/40 transition-colors cursor-pointer bg-[#391E25]/50 backdrop-blur-sm"
-              title="Replay print sequence"
+        <div className="tm-ma-exhibition" aria-label="Six poster exhibits on an archival museum wall">
+          {MUSEUM_EXHIBITS.map((exhibit) => (
+            <article
+              key={exhibit.number}
+              className={'tm-ma-exhibit tm-ma-exhibit--' + exhibit.number + ' tm-ma-exhibit--' + exhibit.variant}
+              data-exhibit-number={exhibit.number}
+              data-exhibit-name={exhibit.name}
             >
-              <Sparkles className="w-3 h-3" />
-              Bloom
-            </button>
-          </div>
-        </div>
+              <span className="tm-ma-number-plaque" aria-hidden="true">{exhibit.number}</span>
+              <div className="tm-ma-stage">
+                <div className="tm-ma-primary">
+                  <ExhibitClip small={exhibit.variant === 'triptych'} />
+                  <button
+                    type="button"
+                    className="tm-ma-primary-paper"
+                    onClick={() => openPoster(exhibit.primary)}
+                    aria-label={'View ' + exhibit.primary.name + ' poster'}
+                  >
+                    <img src={exhibit.primary.src} alt={exhibit.primary.name + ' original poster'} loading="lazy" decoding="async" />
+                    <span className="tm-ma-open-arrow" aria-hidden="true"><ArrowUpRight size={18} strokeWidth={1.5} /></span>
+                  </button>
+                </div>
 
-        {/* Flanking Split Editorial Words */}
-        <div
-          ref={wordLeftRef}
-          className="lb-word lb-word-l"
-          aria-hidden="true"
-        >
-          My
-        </div>
-        <div
-          ref={wordRightRef}
-          className="lb-word lb-word-r"
-          aria-hidden="true"
-        >
-          Posters
-        </div>
-
-        {/* 8 Curated Poster Cards in Horizontal Line — Hovering or Tapping a Card Opens ONLY That Card to Full Native Image */}
-        <div className="lb-cards">
-          {cards.map((card, idx) => (
-            <div
-              key={card.src}
-              ref={(el) => {
-                cardsRef.current[idx] = el;
-              }}
-              onClick={(e) => {
-                e.stopPropagation();
-                if (hoveredIndexRef.current === idx) {
-                  selectPosterByIndex(null);
-                } else {
-                  selectPosterByIndex(idx);
-                }
-              }}
-              onPointerEnter={(e) => {
-                if (e.pointerType !== 'touch') {
-                  selectPosterByIndex(idx);
-                }
-              }}
-              onPointerLeave={(e) => {
-                if (e.pointerType !== 'touch' && hoveredIndexRef.current === idx) {
-                  selectPosterByIndex(null);
-                }
-              }}
-              className="lb-card group cursor-pointer"
-            >
-              <img
-                ref={(el) => {
-                  imgsRef.current[idx] = el;
-                }}
-                src={card.src}
-                alt={card.name}
-                loading="eager"
-                decoding="async"
-                draggable={false}
-              />
-            </div>
+                {exhibit.variant === 'triptych' ? (
+                  exhibit.companions.map((poster, i) => (
+                    <div className={'tm-ma-secondary tm-ma-secondary--' + (i + 1)} key={poster.src}>
+                      <ExhibitClip twin={false} small />
+                      <button
+                        type="button"
+                        className="tm-ma-secondary-paper"
+                        onClick={() => openPoster(poster)}
+                        aria-label={'View ' + poster.name + ' poster'}
+                      >
+                        <img src={poster.src} alt={poster.name + ' original poster'} loading="lazy" decoding="async" />
+                      </button>
+                    </div>
+                  ))
+                ) : (
+                  <StudyDecoration poster={exhibit.primary} type={exhibit.variant} />
+                )}
+                {exhibit.variant === 'moodboard' && (
+                  <>
+                    <div className="tm-ma-color-chips" aria-hidden="true"><span /><span /><span /></div>
+                    <svg className="tm-ma-pressed-flower" viewBox="0 0 75 170" fill="none" aria-hidden="true" focusable="false">
+                      <path d="M34 168C47 124 29 83 39 17" stroke="#625343" strokeWidth="2" />
+                      <path d="M37 114C11 110 7 93 9 86C25 89 35 100 37 114ZM36 84C54 65 69 70 72 74C60 91 49 95 36 84Z" fill="#79634c" />
+                      <g fill="#8e6257">
+                        <ellipse cx="37" cy="17" rx="8" ry="16" />
+                        <ellipse cx="22" cy="27" rx="8" ry="16" transform="rotate(-55 22 27)" />
+                        <ellipse cx="52" cy="27" rx="8" ry="16" transform="rotate(55 52 27)" />
+                        <ellipse cx="26" cy="46" rx="7" ry="13" transform="rotate(-125 26 46)" />
+                        <ellipse cx="47" cy="46" rx="7" ry="13" transform="rotate(125 47 46)" />
+                      </g>
+                      <circle cx="37" cy="33" r="7" fill="#a88a5f" />
+                    </svg>
+                  </>
+                )}
+                {exhibit.variant === 'collage' && (
+                  <span className="tm-ma-scrap-label" aria-hidden="true">FIELD NOTES / IMAGE 06</span>
+                )}
+              </div>
+              <div className="tm-ma-exhibit-caption">
+                <button type="button" onClick={() => openPoster(exhibit.primary)}>
+                  {exhibit.name} <ArrowUpRight size={13} strokeWidth={1.5} aria-hidden="true" />
+                </button>
+                <span>{exhibit.descriptor}</span>
+              </div>
+            </article>
           ))}
         </div>
 
-        {/* Bottom Caption & Hover Cue */}
-        <div
-          onClick={(e) => e.stopPropagation()}
-          className="pointer-events-auto absolute inset-x-0 bottom-4 sm:bottom-7 z-[650] flex flex-col items-center justify-center gap-2.5 px-4 sm:px-6 text-center"
-        >
-          {hoveredPoster ? (
-            <div className="bg-[#391E25]/92 backdrop-blur-md border border-[#F0E4D2]/20 px-4 sm:px-6 py-2.5 sm:py-3 shadow-[0_20px_50px_rgba(0,0,0,0.5)] transition-all duration-200 max-w-[92vw] sm:max-w-xl">
-              <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5 text-xs sm:text-base font-display text-[#F0E4D2]">
-                <span>{hoveredPoster.name}</span>
-                <span className="text-[#D9C0A8]/40">·</span>
-                <span className="font-mono text-[9px] sm:text-[10px] uppercase tracking-[0.18em] text-[#D9C0A8]/80">
-                  {hoveredPoster.project}
-                </span>
+        <ArchiveShelf />
+
+        <footer className="tm-ma-footer">
+          <span>THE TUMANEEN POSTER COLLECTION</span>
+          <span>EIGHT ORIGINAL PRINTS / SIX EXHIBITS</span>
+        </footer>
+      </div>
+
+      {activePoster && createPortal(
+        <div className="tm-ma-viewer" role="dialog" aria-modal="true" aria-labelledby="tm-ma-viewer-title">
+          <button
+            type="button"
+            className="tm-ma-viewer-scrim"
+            onClick={() => setActivePoster(null)}
+            aria-label="Close poster preview"
+            tabIndex={-1}
+          />
+          <div className="tm-ma-viewer-panel" ref={panelRef} onKeyDown={handleModalTab}>
+            <div className="tm-ma-viewer-head">
+              <span>PRINT ARCHIVE / {activePoster.roman}</span>
+              <button type="button" ref={closeButtonRef} onClick={() => setActivePoster(null)}>
+                CLOSE <X size={17} strokeWidth={1.6} aria-hidden="true" />
+              </button>
+            </div>
+            <div className="tm-ma-viewer-body">
+              <div className="tm-ma-viewer-picture">
+                <img src={activePoster.src} alt={activePoster.name + ' original full-size poster'} />
+              </div>
+              <div className="tm-ma-viewer-notes">
+                <span>ORIGINAL ARTWORK</span>
+                <h3 id="tm-ma-viewer-title">{activePoster.name}</h3>
+                <p>{activePoster.project}</p>
+                <p>{activePoster.description}</p>
+                <div className="tm-ma-viewer-controls">
+                  <button type="button" onClick={() => movePoster(-1)} aria-label="Previous poster">
+                    <ArrowLeft size={20} strokeWidth={1.6} />
+                  </button>
+                  <button type="button" onClick={() => movePoster(1)} aria-label="Next poster">
+                    <ArrowRight size={20} strokeWidth={1.6} />
+                  </button>
+                  <span>{LENS_BLOOM_POSTERS.findIndex((p) => p.src === activePoster.src) + 1} / {LENS_BLOOM_POSTERS.length}</span>
+                </div>
               </div>
             </div>
-          ) : (
-            <div ref={hintRef} className="lb-hint !static !transform-none" aria-hidden="true">
-              <span className="lb-hint-track !h-3.5 sm:!h-[22px]" />
-              <span className="lb-hint-label">HOVER OR TAP TO VIEW</span>
-            </div>
-          )}
-        </div>
-      </div>
+          </div>
+        </div>, document.body
+      )}
     </section>
   );
 };

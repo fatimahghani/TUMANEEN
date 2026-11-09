@@ -7,7 +7,7 @@ const base = 'http://127.0.0.1:4173/';
 const expected = [
   ['.tm-hero', 'rgb(75, 40, 48)'],
   ['#project', 'rgb(217, 214, 210)'],
-  ['#posters', 'rgb(36, 32, 29)'],
+  ['#posters', 'rgb(170, 156, 144)'],
   ['.tm-about', 'rgb(239, 230, 214)'],
   ['.tm-process', 'rgb(239, 230, 214)'],
   ['.tm-services', 'rgb(239, 230, 214)'],
@@ -34,6 +34,95 @@ try {
     if (!actual.artLoaded) errors.push(width + ': Shanakht did not load');
     if (!actual.masthead?.includes('TUMANEEN')) errors.push(width + ': masthead missing');
     await page.screenshot({ path: 'editorial-snapshots/hero-' + width + '.png', animations: 'disabled' });
+
+    // The Poster Archive is a six-exhibit, three-column museum installation.
+    // All eight original poster files must still be accessible and unfiltered.
+    const museum = page.locator('#posters[data-museum-posters]');
+    if (await museum.count() !== 1) errors.push(width + ': museum archive missing');
+    const exhibits = page.locator('.tm-ma-exhibit');
+    if (await exhibits.count() !== 6) errors.push(width + ': expected six poster exhibits');
+    const plaques = page.locator('.tm-ma-number-plaque');
+    if (await plaques.count() !== 6) errors.push(width + ': missing six exhibit number plaques');
+    const mainPapers = page.locator('.tm-ma-primary-paper');
+    if (await mainPapers.count() !== 6) errors.push(width + ': six original poster sheets required');
+    const realPosterImages = page.locator('.tm-ma-primary-paper img, .tm-ma-secondary-paper img');
+    if (await realPosterImages.count() !== 8)
+      errors.push(width + ': eight real original designs must be preserved in the museum');
+    if (await page.locator('.tm-ma-clip-metal').count() !== 14 ||
+        await page.locator('.tm-ma-clip-wire').count() !== 14)
+      errors.push(width + ': museum exhibit clips and suspension wires are incomplete');
+    if (await page.locator('.tm-ma-study-group').count() !== 5)
+      errors.push(width + ': missing supporting study-paper fragments');
+    if (await page.locator('.tm-ma-shelf-scene, .tm-ma-glass-case, .tm-ma-shelf-base').count() !== 3)
+      errors.push(width + ': archival display shelf is missing');
+
+    const exhibitGrid = await page.locator('.tm-ma-exhibition').evaluate(el =>
+      getComputedStyle(el).gridTemplateColumns.split(' ').filter(Boolean).length
+    );
+    const expectedExhibitColumns = width > 1160 ? 3 : width > 690 ? 2 : 1;
+    if (exhibitGrid !== expectedExhibitColumns)
+      errors.push(width + ': expected ' + expectedExhibitColumns + ' museum columns, found ' + exhibitGrid);
+
+    const seenSources = new Set();
+    for (let i = 0; i < await realPosterImages.count(); i++) {
+      await realPosterImages.nth(i).scrollIntoViewIfNeeded();
+      const details = await realPosterImages.nth(i).evaluate(async img => {
+        try { await img.decode(); } catch {}
+        const style = getComputedStyle(img);
+        return { loaded: img.naturalWidth > 0, fit: style.objectFit, filter: style.filter, src: img.currentSrc };
+      });
+      if (!details.loaded) errors.push(width + ': original museum artwork ' + i + ' failed to load');
+      if (details.fit !== 'contain' || details.filter !== 'none')
+        errors.push(width + ': museum artwork was cropped or filtered');
+      seenSources.add(details.src);
+    }
+    if (seenSources.size !== 8) errors.push(width + ': museum must contain eight distinct original poster files');
+
+    const interferingScraps = await exhibits.evaluateAll(nodes => nodes.flatMap((exhibit) => {
+      const labelTop = exhibit.querySelector('.tm-ma-exhibit-caption')?.getBoundingClientRect().top;
+      if (labelTop == null) return [];
+      return [...exhibit.querySelectorAll('.tm-ma-study-sheet')].flatMap(sheet => {
+        const bottom = sheet.getBoundingClientRect().bottom;
+        return bottom > labelTop - 2 ? [{ exhibit: exhibit.dataset.exhibitNumber, bottom, labelTop }] : [];
+      });
+    }));
+    if (interferingScraps.length)
+      errors.push(width + ': archival study scraps overlap exhibit captions ' + JSON.stringify(interferingScraps));
+
+    // Hide only the fixed navigation while taking the full-section screenshot.
+    // Otherwise Playwright stitches it across the middle of the exhibition.
+    const fixedHeader = page.locator('[data-editorial-nav]');
+    const oldVisibility = await fixedHeader.evaluate(el => {
+      const before = el.style.visibility;
+      el.style.visibility = 'hidden';
+      return before;
+    });
+    await museum.screenshot({
+      path: 'editorial-snapshots/poster-museum-' + width + '.png',
+      animations: 'disabled',
+    });
+    await fixedHeader.evaluate((el, previous) => { el.style.visibility = previous; }, oldVisibility);
+
+    if (width === 1440) {
+      await page.getByRole('button', { name: /View Wajood.*poster/ }).first().click();
+      await page.locator('.tm-ma-viewer').waitFor({ state: 'visible' });
+      if (!(await page.locator('#tm-ma-viewer-title').textContent())?.includes('Wajood'))
+        errors.push('Wajood poster did not open in full-size viewer');
+      if (await page.locator('.tm-ma-viewer-picture img').evaluate(el => getComputedStyle(el).filter) !== 'none')
+        errors.push('full-size viewer filters original work');
+      await page.getByRole('button', { name: 'Next poster' }).click();
+      if (!(await page.locator('#tm-ma-viewer-title').textContent())?.includes('Chai'))
+        errors.push('museum next button failed to browse originals');
+      await page.keyboard.press('Escape');
+      await page.locator('.tm-ma-viewer').waitFor({ state: 'hidden' });
+
+      await page.getByRole('button', { name: /View Retro Horizon poster/ }).click();
+      await page.locator('.tm-ma-viewer').waitFor({ state: 'visible' });
+      if (!(await page.locator('#tm-ma-viewer-title').textContent())?.includes('Retro Horizon'))
+        errors.push('secondary triptych poster is not interactive');
+      await page.getByRole('button', { name: 'Close poster preview' }).click({ position: { x: 3, y: 3 } });
+      await page.locator('.tm-ma-viewer').waitFor({ state: 'hidden' });
+    }
 
     // Four case studies, each hung on two thin wires and black binder clips.
     // At every breakpoint they must stay in one horizontal line.
