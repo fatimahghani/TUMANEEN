@@ -21,7 +21,14 @@ try {
     const page = await browser.newPage({ viewport: { width, height: 900 }, deviceScaleFactor: 1, reducedMotion: 'reduce' });
     await page.goto(base, { waitUntil: 'networkidle' });
     await page.locator('.tm-retro-cover-art').waitFor();
-    await page.evaluate(() => document.fonts.ready);
+    await page.evaluate(async () => {
+      await document.fonts.ready;
+      // Async decoding may lag behind image load while WebGL is already painting.
+      // The screenshot must include the actual TUMANEEN masthead and seated explorer.
+      await Promise.all([...document.querySelectorAll('.tm-retro-cover-art, .tm-retro-foreground')]
+        .map(img => img.decode()));
+      await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    });
     const actual = await page.evaluate(() => {
       const art = document.querySelector('.tm-retro-cover-art');
       const still = document.querySelector('.tm-retro-foreground');
