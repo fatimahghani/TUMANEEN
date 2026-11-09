@@ -78,6 +78,17 @@ try {
     }
     if (seenSources.size !== 8) errors.push(width + ': museum must contain eight distinct original poster files');
 
+    const interferingScraps = await exhibits.evaluateAll(nodes => nodes.flatMap((exhibit) => {
+      const labelTop = exhibit.querySelector('.tm-ma-exhibit-caption')?.getBoundingClientRect().top;
+      if (labelTop == null) return [];
+      return [...exhibit.querySelectorAll('.tm-ma-study-sheet')].flatMap(sheet => {
+        const bottom = sheet.getBoundingClientRect().bottom;
+        return bottom > labelTop - 2 ? [{ exhibit: exhibit.dataset.exhibitNumber, bottom, labelTop }] : [];
+      });
+    }));
+    if (interferingScraps.length)
+      errors.push(width + ': archival study scraps overlap exhibit captions ' + JSON.stringify(interferingScraps));
+
     // Hide only the fixed navigation while taking the full-section screenshot.
     // Otherwise Playwright stitches it across the middle of the exhibition.
     const fixedHeader = page.locator('[data-editorial-nav]');
