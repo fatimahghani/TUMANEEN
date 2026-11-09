@@ -23,7 +23,7 @@
 .tm-ma-running-heading h2 { margin:4px 0 0; font:450 clamp(24px,2.6vw,37px)/1.13 'Fraunces',Georgia,serif; letter-spacing:-.035em; }
 .tm-ma-exhibition { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:clamp(25px,3vw,46px) clamp(17px,2.3vw,36px); padding:clamp(24px,3vw,45px) 0 6px; }
 .tm-ma-exhibit { position:relative; min-width:0; padding-top:2px; }
-.tm-ma-stage { height:clamp(318px,28.1vw,446px); position:relative; }
+.tm-ma-stage { height:clamp(370px,31.5vw,480px); position:relative; }
 .tm-ma-number-plaque {
   position:absolute; top:clamp(30px,4vw,61px); left:0; z-index:8;
   display:grid; place-items:center; width:clamp(34px,3vw,44px); height:clamp(29px,2.6vw,38px);
@@ -46,6 +46,8 @@
 .tm-ma-primary-paper img,.tm-ma-secondary-paper img {
   display:block; width:100%; height:auto; object-fit:contain; object-position:center; filter:none;
 }
+.tm-ma-primary-paper img { max-height: clamp(290px, 25vw, 335px); }
+
 .tm-ma-primary-paper:hover,.tm-ma-primary-paper:focus-visible,.tm-ma-secondary-paper:hover,.tm-ma-secondary-paper:focus-visible {
   transform:translateY(-2px); box-shadow:3px 8px 12px rgba(46,32,20,.2),7px 15px 23px rgba(46,32,20,.18);
 }
@@ -201,12 +203,14 @@
 .tm-ma-museum button:focus-visible,.tm-ma-viewer button:focus-visible { outline:2px solid #4B2830; outline-offset:3px; }
 
 @media (max-width:1160px) {
+  .tm-ma-primary-paper img { max-height: clamp(250px, 27vw, 340px); }
   .tm-ma-content { width:calc(100% - 42px); }
   .tm-ma-exhibition { grid-template-columns:repeat(2,minmax(0,1fr)); column-gap:24px; row-gap:16px; }
   .tm-ma-stage { height:clamp(330px,38vw,425px); }
   .tm-ma-exhibit-caption button { font-size:16px; }
 }
 @media (max-width:690px) {
+  .tm-ma-primary-paper img { max-height: min(68vw, 228px); }
   .tm-ma-content { width:calc(100% - 30px); }
   .tm-ma-running-head { padding-top:30px; }
   .tm-ma-running-heading h2 { font-size:29px; }

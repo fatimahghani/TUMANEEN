@@ -78,10 +78,19 @@ try {
     }
     if (seenSources.size !== 8) errors.push(width + ': museum must contain eight distinct original poster files');
 
+    // Hide only the fixed navigation while taking the full-section screenshot.
+    // Otherwise Playwright stitches it across the middle of the exhibition.
+    const fixedHeader = page.locator('[data-editorial-nav]');
+    const oldVisibility = await fixedHeader.evaluate(el => {
+      const before = el.style.visibility;
+      el.style.visibility = 'hidden';
+      return before;
+    });
     await museum.screenshot({
       path: 'editorial-snapshots/poster-museum-' + width + '.png',
       animations: 'disabled',
     });
+    await fixedHeader.evaluate((el, previous) => { el.style.visibility = previous; }, oldVisibility);
 
     if (width === 1440) {
       await page.getByRole('button', { name: /View Wajood.*poster/ }).first().click();
