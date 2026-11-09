@@ -1,0 +1,43 @@
+.tm-retro-moon {
+  position: absolute;
+  z-index: 1;
+  top: 27.8%;
+  left: 2.3%;
+  width: 95.4%;
+  aspect-ratio: 1;
+  overflow: visible;
+  touch-action: pan-y;
+  filter: drop-shadow(2px 8px 10px rgba(70, 21, 13, .28));
+}
+.tm-retro-moon canvas {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  touch-action: pan-y;
+  background: transparent;
+  outline-offset: 5px;
+}
+.tm-retro-moon canvas:active { cursor: grabbing; }
+.tm-retro-moon canvas:focus-visible { outline: 2px solid #e8bd86; }
+.tm-retro-moon-fallback {
+  position: absolute;
+  inset: .7%;
+  z-index: 0;
+  border-radius: 50%;
+  background-image:
+    radial-gradient(circle at 72% 28%, rgba(255, 234, 198, .52), transparent 53%),
+    radial-gradient(circle at 22% 76%, rgba(44, 7, 5, .8), transparent 75%),
+    url('/assets/retro/moon-nasa-lroc-2k.jpg');
+  background-size: cover, cover, 210% 100%;
+  background-position: center, center, 50% center;
+  box-shadow: inset -26px -23px 75px rgba(44, 8, 6, .74), inset 13px 10px 35px rgba(255, 216, 156, .31);
+}
+.tm-retro-moon[data-render-mode="webgl"] .tm-retro-moon-fallback { display: none; }
+.tm-retro-moon[data-render-mode="fallback"] canvas { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  .tm-retro-moon canvas { animation: none; }
+}
