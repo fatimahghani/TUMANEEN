@@ -38,11 +38,13 @@ export const ReadingNookHero: React.FC<ReadingNookHeroProps> = ({
           fetchPriority="high"
           decoding="async"
         />
+        <div className="tm-retro-red-disc" aria-hidden="true" />
         <RotatingMoon />
 
-        {/* Restore the original still foreground over the dynamic lunar disc.
-            The clip follows the seated figure and the cliff silhouette. */}
-        <img className="tm-retro-foreground" src={COVER} alt="" aria-hidden="true" />
+        {/* The exact figure silhouette is separated from the cliff so the
+            lunar backdrop cannot leave an artificial red halo around his head. */}
+        <img className="tm-retro-foreground tm-retro-cliff" src={COVER} alt="" aria-hidden="true" />
+        <img className="tm-retro-foreground tm-retro-person" src={COVER} alt="" aria-hidden="true" />
 
         <h1 id="tm-hero-title" className="tm-retro-screen-reader">TUMANEEN</h1>
         <p className="tm-retro-screen-reader">Visual Explorer</p>

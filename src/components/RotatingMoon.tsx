@@ -42,15 +42,15 @@ void main() {
   albedo = pow(clamp(albedo * 1.18, .08, 1.), .9);
 
   // Amber highlights / burnt-sienna maria, matching the print artwork.
-  vec3 warmDark = vec3(.29, .07, .046);
-  vec3 warmLight = vec3(1.0, .78, .54);
+  vec3 warmDark = vec3(.18, .045, .029);
+  vec3 warmLight = vec3(.98, .69, .43);
   vec3 earthTones = mix(warmDark, warmLight, albedo);
   vec3 lightDirection = normalize(vec3(.63, .62, 1.18));
   float diffuse = max(dot(n, lightDirection), 0.);
-  float lighting = .19 + .87 * pow(diffuse, .9);
+  float lighting = .11 + .97 * pow(diffuse, 1.12);
   // Side shadow and small warm rim retain a spherical silhouette.
   float contour = pow(1. - max(n.z, 0.), 3.);
-  vec3 color = earthTones * lighting + vec3(.18, .055, .022) * contour;
+  vec3 color = earthTones * lighting + vec3(.12, .032, .014) * contour;
   float edge = 1. - smoothstep(.987, 1., sqrt(r2));
   gl_FragColor = vec4(color, edge);
 }
