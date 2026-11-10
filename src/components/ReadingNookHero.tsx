@@ -2,6 +2,7 @@ import React, { useEffect, useId, useRef, useState } from 'react';
 import { ArrowRight, Menu, Pause, Play, X } from 'lucide-react';
 import { RotatingMoon } from './RotatingMoon';
 import { ExplorerMasthead } from './ExplorerMasthead';
+import { ExplorerSky } from './ExplorerSky';
 import './ReadingNookHero.css';
 
 type Section = 'home' | 'project' | 'about' | 'services' | 'posters' | 'process';
@@ -11,8 +12,8 @@ interface ReadingNookHeroProps {
   onEmailClick?: () => void;
 }
 
-// Only the isolated astronaut/rock is an image. Typography, background,
-// moon, navigation and the subtle film finish are independent code layers.
+// The existing transparent astronaut/rock is the only composited image.
+// The new sky, lettering, grain and layout are HTML/SVG/CSS; the moon is WebGL.
 const FOREGROUND = import.meta.env.BASE_URL + 'assets/explorer/astronaut.webp';
 
 export const ReadingNookHero: React.FC<ReadingNookHeroProps> = ({ onSelectNav, onEmailClick }) => {
@@ -45,6 +46,7 @@ export const ReadingNookHero: React.FC<ReadingNookHeroProps> = ({ onSelectNav, o
 
   return (
     <section className="tm-hero tm-explorer-hero" aria-labelledby="tm-hero-title" data-coded-hero="true">
+      <ExplorerSky />
       <ExplorerMasthead />
       <RotatingMoon paused={paused} />
       <img className="tm-explorer-foreground" src={FOREGROUND} alt="" aria-hidden="true" decoding="sync" fetchPriority="high" draggable={false} />
