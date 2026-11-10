@@ -1,6 +1,7 @@
 import React, { useEffect, useId, useRef, useState } from 'react';
 import { ArrowRight, Menu, Pause, Play, X } from 'lucide-react';
 import { RotatingMoon } from './RotatingMoon';
+import { ExplorerMasthead } from './ExplorerMasthead';
 import './ReadingNookHero.css';
 
 type Section = 'home' | 'project' | 'about' | 'services' | 'posters' | 'process';
@@ -10,10 +11,9 @@ interface ReadingNookHeroProps {
   onEmailClick?: () => void;
 }
 
-// Only the isolated astronaut/rock is an image. The heading, backdrop, moon,
-// navigation and tagline are separate editable, responsive elements.
+// Only the isolated astronaut/rock is an image. Typography, background,
+// moon, navigation and the subtle film finish are independent code layers.
 const FOREGROUND = import.meta.env.BASE_URL + 'assets/explorer/astronaut.webp';
-const LETTER_HEIGHTS = [630, 420, 300, 205, 270, 355, 490, 685];
 
 export const ReadingNookHero: React.FC<ReadingNookHeroProps> = ({ onSelectNav, onEmailClick }) => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -45,27 +45,11 @@ export const ReadingNookHero: React.FC<ReadingNookHeroProps> = ({ onSelectNav, o
 
   return (
     <section className="tm-hero tm-explorer-hero" aria-labelledby="tm-hero-title" data-coded-hero="true">
-      <h1 id="tm-hero-title" className="tm-explorer-heading">
-        <span className="tm-explorer-sr">TUMANEEN</span>
-        <svg viewBox="0 0 1600 720" preserveAspectRatio="none" aria-hidden="true" className="tm-explorer-masthead">
-          <defs>
-            <clipPath id={'masthead-arc-' + uid}>
-              <path d="M0 0H1600V720C1395 497 1144 186 800 186S211 457 0 672Z" />
-            </clipPath>
-          </defs>
-          <g clipPath={'url(#masthead-arc-' + uid + ')'}>
-            {'TUMANEEN'.split('').map((letter, index) => (
-              <svg key={index} x={index * 200 + 2} y="0" width="190" height={LETTER_HEIGHTS[index]} viewBox="0 0 100 100" preserveAspectRatio="none" overflow="visible">
-                <text x="0" y="94" fontSize="128" textLength="100" lengthAdjust="spacingAndGlyphs">{letter}</text>
-              </svg>
-            ))}
-          </g>
-        </svg>
-      </h1>
-
+      <ExplorerMasthead />
       <RotatingMoon paused={paused} />
       <img className="tm-explorer-foreground" src={FOREGROUND} alt="" aria-hidden="true" decoding="sync" fetchPriority="high" draggable={false} />
-      <p className="tm-explorer-tagline">Visual<br />Explorer<span aria-hidden="true" /></p>
+      <div className="tm-explorer-film-grain" aria-hidden="true" />
+      <p className="tm-explorer-tagline"><span className="tm-explorer-tagline-line">Visual</span><span className="tm-explorer-tagline-line">Explorer</span><span className="tm-explorer-tagline-rule" aria-hidden="true" /></p>
 
       <button
         ref={menuButton}
