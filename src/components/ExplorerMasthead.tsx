@@ -105,7 +105,10 @@ export const ExplorerMasthead: React.FC = () => {
         data-type-ready="false">
         {WORD.split('').map((letter, index) => (
           <g key={index}>
-            <text x="0" y="0" fontSize="100" data-explorer-letter={letter}>{letter}</text>
+            <text x="0" y="0" fontSize="100" data-explorer-letter={letter}
+              stroke="var(--explorer-burgundy)" vectorEffect="non-scaling-stroke"
+              paintOrder="stroke fill" strokeLinejoin="round"
+              style={{ strokeWidth: 'clamp(.65px, .08vw, 1.5px)' }}>{letter}</text>
           </g>
         ))}
       </svg>
