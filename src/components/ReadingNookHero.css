@@ -12,7 +12,9 @@
   height: 100svh;
   min-height: 460px;
   padding: 0;
-  overflow: hidden;
+  /* Unlike hidden, clip does not make this a scroll container when the
+     keyboard focuses the intentionally oversized moon canvas. */
+  overflow: clip;
   color: var(--explorer-burgundy);
   background: radial-gradient(ellipse at 52% 43%, #faf0e1 0%, var(--explorer-cream) 75%, #e9d8c0 100%);
 }
