@@ -6,12 +6,9 @@ const VIEW_HEIGHT = 720;
 const SIDE_BEARING = 12;
 const LETTER_GAP = 22;
 
-/**
- * Preserve the approved tall, arched display word without cropping the U, M,
- * A or E with an arbitrary clip path. A single horizontal scale preserves the
- * font's relative character widths; each complete glyph fits above the moon.
- * All eight letters remain editable SVG text rather than outlined imagery.
- */
+/** Eight editable letters, optically fitted above the moon without cutting
+ * their strokes. The measuring canvas only supplies metrics; all visible
+ * typography is SVG text, not a rasterized headline. */
 export const ExplorerMasthead: React.FC = () => {
   const headingRef = useRef<HTMLHeadingElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -24,11 +21,26 @@ export const ExplorerMasthead: React.FC = () => {
     if (!heading || !svg || !hero || !moon) return;
     let disposed = false;
     let scheduled = 0;
+    const measuringContext = document.createElement('canvas').getContext('2d');
 
     const fitLetters = () => {
       if (disposed) return;
       const texts = [...svg.querySelectorAll<SVGTextElement>('text')];
-      const boxes = texts.map((text) => text.getBBox());
+      // SVG getBBox can include font-cell whitespace. Canvas ink metrics let
+      // rounded U/N and square E/T share the same visible cap line and gaps.
+      const boxes = texts.map((text) => {
+        if (measuringContext) {
+          measuringContext.font = `400 100px ${getComputedStyle(text).fontFamily}`;
+          measuringContext.textBaseline = 'alphabetic';
+          const m = measuringContext.measureText(text.textContent || '');
+          const width = m.actualBoundingBoxLeft + m.actualBoundingBoxRight;
+          const height = m.actualBoundingBoxAscent + m.actualBoundingBoxDescent;
+          if (Number.isFinite(width) && Number.isFinite(height) && width > 0 && height > 0) {
+            return { x: -m.actualBoundingBoxLeft, y: -m.actualBoundingBoxAscent, width, height };
+          }
+        }
+        return text.getBBox();
+      });
       const bounds = svg.getBoundingClientRect();
       const globe = moon.getBoundingClientRect();
       if (!bounds.width || !bounds.height || boxes.some((box) => box.width <= 0 || box.height <= 0)) return;
@@ -46,8 +58,6 @@ export const ExplorerMasthead: React.FC = () => {
         const width = box.width * scaleX;
         const left = bounds.left + cursor / VIEW_WIDTH * bounds.width;
         const right = bounds.left + (cursor + width) / VIEW_WIDTH * bounds.width;
-        // Use the closest point to the lunar center so no part of a complete
-        // letter is hidden behind the sphere at any responsive breakpoint.
         const nearestX = Math.min(right, Math.max(left, centerX));
         const distance = Math.abs(nearestX - centerX);
         const lowerEdge = distance < radius
@@ -69,7 +79,7 @@ export const ExplorerMasthead: React.FC = () => {
       cancelAnimationFrame(scheduled);
       scheduled = requestAnimationFrame(fitLetters);
     };
-    fitLetters(); // A readable system-font fallback is available immediately.
+    fitLetters();
     document.fonts.ready.then(() => { if (!disposed) scheduleFit(); });
     document.fonts.addEventListener('loadingdone', scheduleFit);
     const observer = new ResizeObserver(scheduleFit);
