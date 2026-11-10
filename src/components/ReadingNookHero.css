@@ -1,10 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');
 
-/* The approved widescreen composition, rebuilt as independent layers.
-   No poster screenshot, red disc, distressed overlay or portrait card. */
+/* Full-screen, live Visual Explorer. The finish is deliberately light:
+   no scratches, blur, distressed borders, extra copy or flattened cover. */
 .tm-site .tm-explorer-hero {
-  --explorer-cream: #f3e3cd;
-  --explorer-burgundy: #650c08;
+  --explorer-cream: #f1e2ce;
+  --explorer-burgundy: #641613;
+  --explorer-film-grain: .027;
   position: relative;
   isolation: isolate;
   width: 100%;
@@ -13,25 +14,37 @@
   padding: 0;
   overflow: hidden;
   color: var(--explorer-burgundy);
-  background: radial-gradient(ellipse at 52% 48%, #f9eddd 0%, var(--explorer-cream) 72%, #eedbc1 100%);
+  background: radial-gradient(ellipse at 52% 43%, #faf0e1 0%, var(--explorer-cream) 75%, #e9d8c0 100%);
 }
 .tm-explorer-hero *, .tm-explorer-hero *::before, .tm-explorer-hero *::after { box-sizing: border-box; }
+.tm-explorer-hero::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 45%, transparent 45%, rgba(70, 42, 32, .055) 100%);
+}
 .tm-explorer-heading {
   position: absolute;
   z-index: 1;
   left: 3.5%;
-  top: 1.1%;
+  top: 1.6%;
   width: 93%;
   height: 75%;
   margin: 0;
   pointer-events: none;
 }
 .tm-explorer-masthead { width: 100%; height: 100%; display: block; overflow: visible; }
+.tm-explorer-masthead[data-type-ready='false'] { visibility: hidden; }
 .tm-explorer-masthead text {
   font-family: 'Anton', Impact, 'Arial Narrow', sans-serif !important;
   font-weight: 400 !important;
+  font-style: normal;
+  font-synthesis: none;
   fill: var(--explorer-burgundy);
   letter-spacing: 0 !important;
+  text-rendering: geometricPrecision;
 }
 .tm-explorer-sr {
   position: absolute; width: 1px; height: 1px;
@@ -48,7 +61,21 @@
   display: block;
   pointer-events: none;
   user-select: none;
-  filter: none;
+  filter: sepia(.12) saturate(.88) contrast(1.045) brightness(1.025);
+}
+/* Grade only this live canvas/fallback. The original lunar map is unchanged. */
+.tm-site .tm-explorer-hero .tm-explorer-moon {
+  filter: sepia(.055) saturate(.86) contrast(1.025) brightness(1.015);
+}
+.tm-explorer-film-grain {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  pointer-events: none;
+  opacity: var(--explorer-film-grain);
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.88' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
 }
 .tm-site .tm-explorer-tagline {
   position: absolute;
@@ -56,19 +83,22 @@
   left: 6.8%;
   bottom: 5.5%;
   margin: 0;
-  color: #fbecd4;
-  font: italic 450 clamp(32px, 4.1vw, 76px)/.94 'Fraunces', Georgia, serif !important;
-  letter-spacing: -.045em;
-  text-shadow: 0 1px 5px rgba(22,17,12,.12);
+  color: #fbefdb;
+  font: italic 400 clamp(32px, 4vw, 74px)/1.04 'Fraunces', Georgia, serif !important;
+  font-optical-sizing: auto;
+  font-kerning: normal;
+  letter-spacing: -.03em !important;
+  text-shadow: 0 1px 4px rgba(22,17,12,.16);
 }
-.tm-explorer-tagline > span {
-  display: inline-block;
-  width: clamp(60px, 11vw, 190px);
+.tm-explorer-tagline-line { display: block; }
+.tm-explorer-tagline-rule {
+  position: absolute;
+  left: calc(100% + 24px);
+  bottom: .13em;
+  width: clamp(60px, 9vw, 168px);
   height: 1px;
-  margin-left: 22px;
   background: currentColor;
-  vertical-align: baseline;
-  opacity: .8;
+  opacity: .65;
 }
 .tm-explorer-menu-button {
   position: absolute; z-index: 8; left: 10px; top: 14px;
@@ -114,11 +144,14 @@
   .tm-explorer-heading { left: 3%; width: 94%; top: 7%; height: 40%; }
   .tm-explorer-foreground { width: 172%; max-width: none; left: -41%; bottom: -1px; }
   .tm-site .tm-explorer-tagline { left: 6%; bottom: 5%; font-size: clamp(31px, 8.2vw, 50px); }
-  .tm-explorer-tagline > span { width: 45px; margin-left: 12px; }
+  .tm-explorer-tagline-rule { width: 40px; left: calc(100% + 14px); }
   .tm-explorer-controls { right: 3%; bottom: 3%; gap: 4px; }
   .tm-explorer-controls a, .tm-explorer-controls button { color: #fff1d9; }
   .tm-explorer-menu-button { top: 10px; left: 10px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .tm-explorer-hero *, .tm-explorer-hero *::before, .tm-explorer-hero *::after { animation: none !important; transition: none !important; }
+}
+@media (forced-colors: active) {
+  .tm-explorer-film-grain, .tm-explorer-hero::before { display: none; }
 }
