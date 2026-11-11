@@ -24,28 +24,83 @@ async function waitForHero(page) {
   await page.waitForFunction(() => document.querySelector('.tm-explorer-masthead')?.dataset.typeReady === 'true');
 }
 
-// These helpers run inside the browser, so the checks use rendered motion and pixels.
-function moonLooksToward(direction) {
-  const { lookYaw, lookPitch } = document.querySelector('.tm-explorer-moon').dataset;
-  const yaw = Number(lookYaw);
-  const pitch = Number(lookPitch);
-  if (direction === 0) return Math.abs(yaw) < .15 && Math.abs(pitch) < .15;
-  return direction * yaw > 13 && direction * pitch > 6;
+// Sample an unobstructed patch of lunar terrain, including CSS compositing and fallback.
+async function checkLunarTone(page) {
+  const moon = await page.locator('.tm-explorer-moon').boundingBox();
+  const clip = {
+    x: Math.floor(moon.x + .4 * moon.width), y: Math.floor(moon.y + .20 * moon.height),
+    width: Math.floor(.23 * moon.width), height: Math.floor(.19 * moon.height),
+  };
+  const png = await page.screenshot({ clip });
+  const tone = await page.evaluate(async encoded => {
+    const image = new Image();
+    image.src = 'data:image/png;base64,' + encoded;
+    await image.decode();
+    const sample = document.createElement('canvas');
+    sample.width = image.width;
+    sample.height = image.height;
+    const ctx = sample.getContext('2d');
+    ctx.drawImage(image, 0, 0);
+    const rgba = ctx.getImageData(0, 0, sample.width, sample.height).data;
+    const levels = [];
+    for (let i = 0; i < rgba.length; i += 4) {
+      levels.push((rgba[i] + rgba[i + 1] + rgba[i + 2]) / 3);
+    }
+    levels.sort((a, b) => a - b);
+    return [levels[Math.floor(levels.length * .1)], levels[Math.floor(levels.length * .9)]];
+  }, png.toString('base64'));
+  assert(tone[1] < 95 && tone[1] - tone[0] > 4, 'Expected a charcoal face with visible terrain, got ' + tone);
 }
 
-function moonLookIsStill() {
-  const { lookYaw, lookPitch } = document.querySelector('.tm-explorer-moon').dataset;
-  return Number(lookYaw) === 0 && Number(lookPitch) === 0;
-}
-
-function hasVisibleDust() {
-  const dust = document.querySelector('.tm-lunar-dust');
-  if (!dust.width || !dust.height || !dust.checkVisibility({ opacityProperty: true, visibilityProperty: true })) return false;
-  const pixels = dust.getContext('2d').getImageData(0, 0, dust.width, dust.height).data;
-  for (let alpha = 3; alpha < pixels.length; alpha += 4) {
-    if (pixels[alpha] > 0) return true;
+// Read actual dust pixels, including those that have crossed the silhouette.
+function sampleDust() {
+  const canvas = document.querySelector('.tm-lunar-dust');
+  const ctx = canvas.getContext('2d');
+  const {width, height} = canvas;
+  const moonWidth = document.querySelector('.tm-explorer-moon').getBoundingClientRect().width;
+  const rim = width * moonWidth / canvas.getBoundingClientRect().width / 2;
+  const rgba = ctx.getImageData(0, 0, width, height).data;
+  let exterior = 0, checksum = 2166136261;
+  for (let py = 0; py < height; py++) {
+    for (let px = 0; px < width; px++) {
+      const alpha = rgba[4 * (py * width + px) + 3];
+      if (!alpha) continue;
+      checksum = Math.imul(checksum ^ (py * width + px), 16777619) ^ alpha;
+      const dx = px - width / 2, dy = py - height / 2;
+      if (dx * dx + dy * dy > rim * rim) exterior++;
+    }
   }
-  return false;
+  return { exterior, checksum };
+}
+
+// Replay the same frames twice so outward travel and cursor deflection can be
+// distinguished. Also compare the actual surface at the same rotation angle.
+async function replayParticles(hover) {
+  const page = await browser.newPage({viewport: {width: 900, height: 700}, reducedMotion: 'reduce'});
+  await page.clock.install({time: new Date('2026-01-01T00:00:00Z')});
+  await page.clock.pauseAt(new Date('2026-01-01T00:01:00Z'));
+  await page.goto(base, {waitUntil: 'networkidle'});
+  await page.clock.runFor(80);
+  const moon = page.locator('.tm-explorer-moon[data-render-mode="webgl"]');
+  const box = await moon.boundingBox();
+  assert(box, 'WebGL surface should be ready for particle replay');
+  await page.mouse.move(box.x + box.width * (hover ? .95 : -.60), box.y + box.height * .32);
+  await page.emulateMedia({reducedMotion: 'no-preference'});
+  await page.clock.runFor(128);
+  // Deliver real pointer input after the media query and first draw.
+  await page.mouse.move(box.x + box.width * (hover ? .96 : -.61), box.y + box.height * .31);
+  const start = await page.evaluate(sampleDust);
+  await page.clock.runFor(512);
+  const end = await page.evaluate(sampleDust);
+  const rotation = await angle(page);
+  const face = await page.screenshot({
+    clip: {x: Math.floor(box.x + .31 * box.width), y: Math.floor(box.y + .26 * box.height),
+      width: Math.floor(.25 * box.width), height: Math.floor(.22 * box.height)},
+    style: '.tm-lunar-dust { visibility: hidden !important; }',
+  });
+  await page.close();
+  assert(end.exterior > 20 && end.checksum !== start.checksum, 'Dust should travel beyond the moon rim');
+  return { rotation, face, end };
 }
 
 async function swipe(session, from, to) {
@@ -166,14 +221,7 @@ try {
     const still=await angle(page);await wait(page,240);
     assert.equal(await angle(page),still,'Reduced motion must stop rotation');
     const canvas=page.locator('.tm-explorer-moon .tm-lunar-surface');
-    await canvas.focus();
-    assert.equal(await page.locator('.tm-explorer-hero').evaluate(el=>el.scrollTop),0,'Focusing moon scrolled scene internally');
-    await page.keyboard.press('ArrowRight');
-    assert(Math.abs(delta(still,await angle(page))-15)<.02,'Keyboard step should be 15 degrees');
-    for(let i=0;i<23;i++)await page.keyboard.press('ArrowRight');
-    assert(Math.min(delta(still,await angle(page)),delta(await angle(page),still))<.03,'Full 360-degree wrap failed');
-    await page.keyboard.press('Home');
-    await canvas.evaluate(el=>el.blur());
+    assert.equal(await canvas.evaluate(el=>el.tabIndex),-1,'The passive moon surface should not be a keyboard control');
     await page.evaluate(()=>window.scrollTo({top:0,behavior:'instant'}));
     await page.locator('.tm-explorer-hero').screenshot({path:`editorial-snapshots/hero-${width}.png`});
 
@@ -194,7 +242,7 @@ try {
       const from = { x: box.x + box.width * .4, y: box.y + box.height * .38 };
       const beforeSwipe = await angle(page);
       await swipe(session, from, { x: from.x + box.width * .22, y: from.y });
-      assert(delta(beforeSwipe, await angle(page)) > 10, 'A horizontal touch drag should turn the moon');
+      assert.equal(await angle(page), beforeSwipe, 'A horizontal swipe must leave the surface alone');
       await swipe(session, from, { x: from.x, y: from.y - 140 });
       await page.waitForFunction(() => document.querySelector('.tm-explorer-hero').getBoundingClientRect().top < -30);
       await session.detach();
@@ -204,44 +252,31 @@ try {
       const dust = page.locator('.tm-lunar-dust');
       assert.equal(await dust.getAttribute('aria-hidden'), 'true');
       assert.equal(await dust.evaluate(el => getComputedStyle(el).pointerEvents), 'none');
-      await page.mouse.move(width * .1, height * .2);
-      await wait(page, 160);
-      assert(await page.evaluate(moonLookIsStill), 'Reduced motion should keep the moon facing forward');
-      assert.equal(await page.evaluate(hasVisibleDust), false, 'Reduced motion should hide the animated dust');
-      // Drag still works through the nonblocking decorative sky/grain layers.
+      await checkLunarTone(page);
+      const reducedDust = await page.evaluate(sampleDust);
+      assert(reducedDust.exterior > 20, 'Reduced motion should show a still dust field');
       const box=await canvas.boundingBox();
-      const beforeDrag=await angle(page);
-      await page.mouse.move(box.x+box.width*.5,box.y+box.height*.25);
+      await page.mouse.move(box.x+box.width*.4,box.y+box.height*.3);
       await page.mouse.down();
-      await page.mouse.move(box.x+box.width*.64,box.y+box.height*.25,{steps:8});
+      await page.mouse.move(box.x+box.width*.72,box.y+box.height*.45,{steps:8});
       await page.mouse.up();
-      assert(Math.min(delta(beforeDrag,await angle(page)),delta(await angle(page),beforeDrag))>10,'Moon drag failed');
-      await canvas.focus();await page.keyboard.press('Home');
-      await canvas.evaluate(el=>el.blur());
+      await page.keyboard.press('ArrowRight');
+      assert.equal(await angle(page),still,'Pointer, drag and keyboard inputs must not turn the surface');
+      assert.deepEqual(await page.evaluate(sampleDust), reducedDust, 'Reduced motion should freeze the grains');
       await page.emulateMedia({reducedMotion:'no-preference'});
       await page.waitForFunction(()=>document.querySelector('.tm-explorer-moon')?.dataset.animating==='true');
       const before=await angle(page);await wait(page,900);
       assert(delta(before,await angle(page))>1,'Automatic rotation failed');
-      // Hovering in the hero margins works even when the pointer is outside the globe.
-      for (const direction of [-1, 1]) {
-        await page.mouse.move(width * (direction < 0 ? .1 : .9), height * (direction < 0 ? .2 : .8));
-        await page.waitForFunction(moonLooksToward, direction, { timeout: 6000 });
-        await page.waitForFunction(hasVisibleDust, null, { timeout: 6000 });
-        const side = direction < 0 ? 'left' : 'right';
-        await page.screenshot({ path: `editorial-snapshots/hero-1440-look-${side}.png` });
-      }
-      await page.waitForFunction(moonLooksToward, 0, { timeout: 10000 });
-      await page.mouse.move(width * .12, height * .22);
-      await page.waitForFunction(moonLooksToward, -1, { timeout: 6000 });
-      await page.getByRole('button',{name:'Pause moon rotation'}).click();
-      await page.mouse.move(width * .86, height * .78);
-      const stopped=await angle(page);await wait(page,250);
-      assert.equal(await angle(page),stopped,'Pause failed');
-      assert(await page.evaluate(moonLookIsStill), 'Pausing should reset and disable the pointer response');
-      assert.equal(await page.evaluate(hasVisibleDust), false, 'Pausing should hide the animated dust');
-      await canvas.focus();await page.keyboard.press('ArrowRight');
-      assert(Math.abs(delta(stopped,await angle(page))-15)<.02,'Manual rotation while paused failed');
-      await page.getByRole('button',{name:'Resume moon rotation'}).click();
+      await page.mouse.move(box.x + box.width * .96, box.y + box.height * .31);
+      await wait(page, 320);
+      await page.screenshot({ path:'editorial-snapshots/hero-1440-dust.png' });
+      await page.getByRole('button',{name:/Pause lunar animation/i}).click();
+      const stopped=await angle(page), stoppedDust=await page.evaluate(sampleDust);
+      await page.mouse.move(box.x+box.width*.3,box.y+box.height*.2);
+      await wait(page,250);
+      assert.equal(await angle(page),stopped,'Pause should stop rotation');
+      assert.deepEqual(await page.evaluate(sampleDust),stoppedDust,'Paused dust should stay still as the pointer moves');
+      await page.getByRole('button',{name:/Resume lunar animation/i}).click();
       await page.locator('#posters').scrollIntoViewIfNeeded();
       await page.waitForFunction(()=>document.querySelector('.tm-explorer-moon')?.dataset.animating==='false');
       const offscreen=await angle(page);await wait(page,250);
@@ -254,17 +289,18 @@ try {
       assert.equal(await page.locator('.tm-epok-study-thumbnails button').count(),3,'Grouped posters changed');
       await page.keyboard.press('Escape');await page.locator('.tm-epok-study-overlay').waitFor({state:'hidden'});
       await page.locator('.tm-explorer-hero').scrollIntoViewIfNeeded();
-      await page.emulateMedia({reducedMotion:'reduce'});
-      await canvas.focus();await page.keyboard.press('Home');await page.keyboard.press('ArrowRight');
-      await canvas.evaluate(el=>el.blur());
-      await page.evaluate(()=>window.scrollTo({top:0,behavior:'instant'}));
-      await page.locator('.tm-explorer-hero').screenshot({path:'editorial-snapshots/hero-1440-rotated.png'});
     }
     assert.deepEqual(errors,[],'Browser error');
     await page.close();
   }
 
-  // Keep a readable layout and static white moon without WebGL or web fonts.
+  const control = await replayParticles(false);
+  const hovered = await replayParticles(true);
+  assert.equal(control.rotation, hovered.rotation, 'The same 48-second spin should run independently of pointer position');
+  assert(control.face.equals(hovered.face), 'Cursor movement must not turn or tilt the visible lunar surface');
+  assert.notEqual(control.end.checksum, hovered.end.checksum, 'Pointer proximity should displace the dust');
+
+  // Keep a readable black moon without WebGL or web fonts.
   const fallback=await browser.newPage({viewport:{width:1280,height:800}});
   await fallback.route('**/fonts.googleapis.com/**',route=>route.abort());
   await fallback.route('**/fonts.gstatic.com/**',route=>route.abort());
@@ -278,10 +314,12 @@ try {
   await waitForHero(fallback);
   await fallback.waitForFunction(()=>document.querySelector('.tm-explorer-moon')?.dataset.renderMode==='fallback');
   assert(await fallback.locator('.tm-retro-moon-fallback').isVisible(),'Moon fallback missing');
-  assert.equal(await fallback.evaluate(hasVisibleDust), false, 'The static fallback should hide the animated dust');
+  await checkLunarTone(fallback);
+  await fallback.waitForFunction(() => document.querySelector('.tm-explorer-moon')?.dataset.animating === 'true');
+  assert((await fallback.evaluate(sampleDust)).exterior > 20, 'Dust should work with the CSS fallback');
   assert(await fallback.locator('.tm-explorer-masthead').isVisible(),'Font fallback missing');
   assert.equal(await fallback.locator('.tm-explorer-star').count(),14,'CSS sky should work without WebGL');
   await fallback.screenshot({path:'editorial-snapshots/hero-fallback.png'});
   await fallback.close();
-  console.log('PASS: 360-degree moon, pointer tracking, dust, touch gestures, keyboard, motion preferences, eight viewport sizes and original portfolio.');
+  console.log('PASS: black textured moon, outward and cursor-reactive dust, independent rotation, touch scrolling, motion preferences, eight viewport sizes and original portfolio.');
 }finally{await browser.close();}

@@ -9,7 +9,7 @@
   transform: translateX(-50%);
   border-radius: 50%;
   overflow: visible;
-  touch-action: pan-y;
+  pointer-events: none;
   background: transparent;
   filter: none;
 }
@@ -21,38 +21,31 @@
   width: 100%;
   height: 100%;
   background: transparent;
-  touch-action: pan-y;
-  cursor: grab;
   border-radius: 50%;
 }
-.tm-explorer-moon .tm-lunar-surface:active { cursor: grabbing; }
-.tm-explorer-moon .tm-lunar-surface:focus-visible { outline: 2px solid #650c08; outline-offset: -5px; }
 .tm-explorer-moon .tm-lunar-dust {
-  display: none;
+  display: block;
   position: absolute;
   z-index: 3;
-  top: -10%;
-  left: -10%;
-  width: 120%;
-  height: 120%;
+  top: -25%;
+  left: -25%;
+  width: 150%;
+  height: 150%;
   pointer-events: none;
 }
-.tm-explorer-moon[data-render-mode='webgl'][data-animating='true'] .tm-lunar-dust { display: block; }
 .tm-retro-moon-fallback {
   position: absolute;
   inset: .2%;
   z-index: 0;
   border-radius: 50%;
-  background-color: #e7e3da;
+  background-color: #171716;
   background-image:
-    radial-gradient(circle at 67% 26%, rgba(255,255,249,.42), transparent 64%),
-    radial-gradient(circle at 16% 82%, rgba(51,50,47,.34), transparent 68%),
+    radial-gradient(ellipse at 78% 82%, rgba(7,7,8,.86), rgba(7,7,8,.29) 63%, transparent 90%),
     var(--moon-texture);
-  background-size: cover, cover, 210% 100%;
-  background-position: center, center, 50% center;
-  background-blend-mode: screen, multiply, normal;
-  box-shadow: inset -12px -12px 35px rgba(47,46,43,.15), inset 10px 9px 35px rgba(255,252,239,.22);
-  filter: grayscale(1) brightness(1.35);
+  background-size: cover, 210% 100%;
+  background-position: center, 50% center;
+  box-shadow: inset 1px 1px 4px rgba(218,216,206,.33);
+  filter: grayscale(1) brightness(.38) contrast(1.06);
 }
 .tm-explorer-moon[data-render-mode='webgl'] .tm-retro-moon-fallback { display: none; }
 .tm-explorer-moon[data-render-mode='fallback'] .tm-lunar-surface { display: none; }
