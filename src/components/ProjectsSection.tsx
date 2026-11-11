@@ -139,11 +139,11 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
   return (
     <section id="project" className="tm-projects tm-epok-gallery tm-hanging-gallery" aria-labelledby="tm-gallery-title">
       <div className="tm-epok-shell tm-hung-shell">
-        <h2 id="tm-gallery-title" className="sr-only">Selected design projects</h2>
         <div className="tm-hung-running">
           <span>02 / SELECTED PROJECTS</span>
           <span>TUMANEEN — A VISUAL NOTEBOOK</span>
         </div>
+        <h2 id="tm-gallery-title" className="tm-hung-heading">Selected design projects</h2>
 
         {/* Four original case studies share one continuous horizontal hanging rail.
             On narrow screens the row scrolls, rather than wrapping into cards. */}

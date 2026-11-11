@@ -138,6 +138,7 @@ export const CaseStudyModal: React.FC<CaseStudyModalProps> = ({
         {!slides[activeSlide]?.imageUrl && slides[activeSlide]?.visualType === 'monogram' && (
           <button
             onClick={() => setShowGrid(!showGrid)}
+            aria-pressed={showGrid}
             className={`pointer-events-auto inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] px-2.5 sm:px-3 py-1.5 transition-colors cursor-pointer shadow-lg ${
               showGrid
                 ? 'bg-[#F0E4D2] text-[#5D182B]'

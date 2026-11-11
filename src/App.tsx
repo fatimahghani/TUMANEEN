@@ -211,6 +211,7 @@ export default function App() {
                   <button
                     key={item.id}
                     type="button"
+                    aria-current={isCurrent ? 'location' : undefined}
                     onClick={() => scrollToSection(item.id)}
                     className={`group relative py-1 font-sans font-medium text-[11px] tracking-[0.18em] uppercase transition-colors cursor-pointer whitespace-nowrap ${
                       isCurrent ? 'text-[#F0E4D2]' : 'text-[#F0E4D2]/75 hover:text-[#F0E4D2]'
@@ -262,6 +263,7 @@ export default function App() {
                 <button
                   key={item.id}
                   type="button"
+                  aria-current={isCurrent ? 'location' : undefined}
                   onClick={() => scrollToSection(item.id)}
                   className={`relative py-0.5 font-sans font-medium text-[10px] tracking-[0.18em] uppercase whitespace-nowrap shrink-0 transition-colors cursor-pointer ${
                     isCurrent ? 'text-[#F0E4D2]' : 'text-[#F0E4D2]/65'

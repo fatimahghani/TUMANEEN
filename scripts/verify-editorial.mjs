@@ -115,6 +115,70 @@ async function swipe(session, from, to) {
   await dispatch('touchEnd', []);
 }
 
+async function checkChapters(page, width) {
+  const paper = 'rgb(241, 226, 206)', wine = 'rgb(100, 22, 19)', night = 'rgb(27, 27, 26)';
+  const chapters = [['posters', paper], ['project', night], ['process', paper],
+    ['about', paper], ['services', paper], ['contact-form', wine]];
+  for (const [id, background] of chapters) {
+    const section = page.locator('#' + id);
+    await section.evaluate(el => {
+      const navHeight = document.querySelector('[data-editorial-nav]').getBoundingClientRect().height;
+      window.scrollTo({top: scrollY + el.getBoundingClientRect().top - navHeight, behavior: 'instant'});
+    });
+    await page.waitForFunction(() => document.querySelector('[data-editorial-nav]').getBoundingClientRect().y >= -1);
+    await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+    const presentation = await section.evaluate(el => {
+      const heading = el.querySelector('h2');
+      const bounds = el.getBoundingClientRect();
+      const tone = value => {
+        const ctx = document.createElement('canvas').getContext('2d');
+        ctx.fillStyle = value;
+        ctx.fillRect(0, 0, 1, 1);
+        const [r,g,b] = [...ctx.getImageData(0, 0, 1, 1).data].map(channel => {
+          const s = channel / 255;
+          return s <= .04045 ? s / 12.92 : ((s + .055) / 1.055) ** 2.4;
+        });
+        return .2126*r + .7152*g + .0722*b;
+      };
+      const background = getComputedStyle(el).backgroundColor;
+      const a = tone(background), b = tone(getComputedStyle(heading).color);
+      return {background, contrast:(Math.max(a,b)+.05)/(Math.min(a,b)+.05), font: getComputedStyle(heading).fontFamily,
+        left: bounds.left, right: bounds.right, overflow: document.documentElement.scrollWidth - innerWidth};
+    });
+    assert.equal(presentation.background, background, id + ' chapter palette');
+    assert(presentation.font.includes('Bodoni Moda'), id + ' chapter typography');
+    assert(presentation.contrast >= 3, id + ' chapter heading should be readable against its surface');
+    assert(presentation.left >= -1 && presentation.right <= width + 1 && presentation.overflow <= 2,
+      id + ' must fit the viewport');
+    await page.screenshot({path: `editorial-snapshots/chapter-${width}-${id}.png`, animations: 'disabled'});
+  }
+
+  const form = page.locator('#contact-form form');
+  assert.equal(await form.evaluate(el => el.checkValidity()), false, 'An empty inquiry should fail validation');
+  await form.locator('input[type="text"]').fill('Preview');
+  await form.locator('input[type="email"]').fill('invalid');
+  assert.equal(await form.evaluate(el => el.checkValidity()), false, 'An invalid email should fail validation');
+  await form.locator('input[type="email"]').fill('preview@example.com');
+  assert.equal(await form.evaluate(el => el.checkValidity()), true, 'The required inquiry fields should accept valid input');
+
+  const trigger = page.locator('.tm-ma-primary-paper').first();
+  await trigger.click();
+  const viewer = page.locator('.tm-ma-viewer-panel');
+  await viewer.waitFor({state: 'visible'});
+  assert.equal(await viewer.evaluate(el => getComputedStyle(el).backgroundColor), paper, 'Poster viewer palette');
+  assert(await viewer.evaluate(el => el.contains(document.activeElement)), 'Poster viewer should receive focus');
+  const artwork = viewer.locator('.tm-ma-viewer-picture img');
+  await artwork.evaluate(el => el.decode());
+  assert.equal(await artwork.evaluate(el => getComputedStyle(el).filter), 'none', 'Keep the original artwork colors');
+  await page.screenshot({path: `editorial-snapshots/poster-viewer-${width}.png`, animations: 'disabled'});
+  await page.keyboard.press('Escape');
+  await viewer.waitFor({state: 'hidden'});
+  assert(await trigger.evaluate(el => el === document.activeElement), 'Closing the poster should restore focus');
+  const navigation = page.getByRole('navigation', {name: width < 768 ? 'Mobile section navigation' : 'Floating navigation'});
+  await navigation.getByRole('button', {name: 'About', exact: true}).click();
+  await page.waitForFunction(() => Math.abs(document.getElementById('about').getBoundingClientRect().top) < 180);
+}
+
 try {
   for (const [width,height] of sizes) {
     const page = await browser.newPage({viewport:{width,height},reducedMotion:'reduce',deviceScaleFactor:1,hasTouch:width===375});
@@ -254,7 +318,8 @@ try {
       assert.equal(await dust.evaluate(el => getComputedStyle(el).pointerEvents), 'none');
       await checkLunarTone(page);
       const reducedDust = await page.evaluate(sampleDust);
-      assert(reducedDust.exterior > 20, 'Reduced motion should show a still dust field');
+      // This fixed viewport and DPR previously painted about 1,400 exterior pixels.
+      assert(reducedDust.exterior > 2800, 'The denser particle stream should remain visible beyond the rim');
       const box=await canvas.boundingBox();
       await page.mouse.move(box.x+box.width*.4,box.y+box.height*.3);
       await page.mouse.down();
@@ -289,6 +354,10 @@ try {
       assert.equal(await page.locator('.tm-epok-study-thumbnails button').count(),3,'Grouped posters changed');
       await page.keyboard.press('Escape');await page.locator('.tm-epok-study-overlay').waitFor({state:'hidden'});
       await page.locator('.tm-explorer-hero').scrollIntoViewIfNeeded();
+    }
+    if (width === 375 || width === 1440) {
+      await page.emulateMedia({reducedMotion: 'reduce'});
+      await checkChapters(page, width);
     }
     assert.deepEqual(errors,[],'Browser error');
     await page.close();
