@@ -4,7 +4,8 @@ The hero is not a screenshot of the approved design. Its layers are independentl
 
 - `ReadingNookHero.tsx`: semantic H1, eight real SVG text characters, HTML Visual Explorer tagline, navigation and motion controls.
 - `ReadingNookHero.css` lays out the full-screen cream sky and its fine paper grain. The masthead uses Bodoni Moda and the tagline uses Fraunces.
-- `RotatingMoon.tsx`: WebGL analytic sphere projection of the local NASA lunar map, white/ivory lighting and a 48-second 360-degree rotation. The geographic surface moves under fixed lighting; this is not CSS rotation of a flat picture.
+- `RotatingMoon.tsx` projects the NASA map onto a sphere under fixed lighting. A 48-second revolution carries the craters around the globe. Pointer movement across the hero adds an eased horizontal and vertical turn.
+- `lunarDust.ts` draws fine grains close to the lunar rim. They move with the surface, disperse near the pointer and settle as it moves away.
 - `RotatingMoon.css`: viewport-dependent moon position and round silhouette, plus a static fallback.
 - `astronaut.webp` is a 2169 × 661 transparent foreground. A woman wearing a cream astronaut helmet with an opaque mirrored visor sits facing right on a sunlit rock ledge, her arms resting on her raised knees.
 
@@ -12,4 +13,4 @@ The reference is an art-direction target, not a claim of pixel-identical renderi
 
 The moon uses `../retro/moon-nasa-lroc-2k.jpg`, already in this repository. Source: NASA Scientific Visualization Studio CGI Moon Kit, https://svs.gsfc.nasa.gov/4720/ . Credit: NASA's Scientific Visualization Studio / Ernie Wright (USRA) / Noah Petro (NASA/GSFC).
 
-Controls: drag the moon or use left/right arrows; Home resets its longitude; the pause button stops automatic motion. Reduced motion, hidden tabs and offscreen rendering suspend automatic rotation. No new runtime dependency was added. Assets honor Vite's BASE_URL for GitHub Pages deployment.
+Move the pointer across the hero to turn the moon toward it. Drag the moon or use the arrow keys to explore, and press Home to reset the view. On touchscreens, horizontal swipes rotate the moon and vertical swipes scroll the page. Pausing or selecting reduced motion disables automatic spin, pointer tracking and dust while keeping manual controls available. Rendering suspends offscreen and in hidden tabs.

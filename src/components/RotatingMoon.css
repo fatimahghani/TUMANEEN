@@ -1,5 +1,4 @@
-/* Smaller round moon, rendered independently of the live text and sky.
-   The original 48-second 360-degree WebGL renderer is unchanged. */
+/* The circular surface and its halo share a center behind the explorer. */
 .tm-explorer-hero .tm-explorer-moon {
   position: absolute;
   z-index: 2;
@@ -9,12 +8,12 @@
   aspect-ratio: 1;
   transform: translateX(-50%);
   border-radius: 50%;
-  overflow: hidden;
+  overflow: visible;
   touch-action: pan-y;
   background: transparent;
   filter: none;
 }
-.tm-explorer-moon canvas {
+.tm-explorer-moon .tm-lunar-surface {
   display: block;
   position: absolute;
   inset: 0;
@@ -26,8 +25,19 @@
   cursor: grab;
   border-radius: 50%;
 }
-.tm-explorer-moon canvas:active { cursor: grabbing; }
-.tm-explorer-moon canvas:focus-visible { outline: 2px solid #650c08; outline-offset: -5px; }
+.tm-explorer-moon .tm-lunar-surface:active { cursor: grabbing; }
+.tm-explorer-moon .tm-lunar-surface:focus-visible { outline: 2px solid #650c08; outline-offset: -5px; }
+.tm-explorer-moon .tm-lunar-dust {
+  display: none;
+  position: absolute;
+  z-index: 3;
+  top: -10%;
+  left: -10%;
+  width: 120%;
+  height: 120%;
+  pointer-events: none;
+}
+.tm-explorer-moon[data-render-mode='webgl'][data-animating='true'] .tm-lunar-dust { display: block; }
 .tm-retro-moon-fallback {
   position: absolute;
   inset: .2%;
@@ -45,7 +55,7 @@
   filter: grayscale(1) brightness(1.35);
 }
 .tm-explorer-moon[data-render-mode='webgl'] .tm-retro-moon-fallback { display: none; }
-.tm-explorer-moon[data-render-mode='fallback'] canvas { display: none; }
+.tm-explorer-moon[data-render-mode='fallback'] .tm-lunar-surface { display: none; }
 @media (max-width: 1100px) and (orientation: portrait) {
   .tm-explorer-hero .tm-explorer-moon { top: 33%; width: min(84vw, 64svh); }
 }

@@ -24,9 +24,45 @@ async function waitForHero(page) {
   await page.waitForFunction(() => document.querySelector('.tm-explorer-masthead')?.dataset.typeReady === 'true');
 }
 
+// These helpers run inside the browser, so the checks use rendered motion and pixels.
+function moonLooksToward(direction) {
+  const { lookYaw, lookPitch } = document.querySelector('.tm-explorer-moon').dataset;
+  const yaw = Number(lookYaw);
+  const pitch = Number(lookPitch);
+  if (direction === 0) return Math.abs(yaw) < .15 && Math.abs(pitch) < .15;
+  return direction * yaw > 13 && direction * pitch > 6;
+}
+
+function moonLookIsStill() {
+  const { lookYaw, lookPitch } = document.querySelector('.tm-explorer-moon').dataset;
+  return Number(lookYaw) === 0 && Number(lookPitch) === 0;
+}
+
+function hasVisibleDust() {
+  const dust = document.querySelector('.tm-lunar-dust');
+  if (!dust.width || !dust.height || !dust.checkVisibility({ opacityProperty: true, visibilityProperty: true })) return false;
+  const pixels = dust.getContext('2d').getImageData(0, 0, dust.width, dust.height).data;
+  for (let alpha = 3; alpha < pixels.length; alpha += 4) {
+    if (pixels[alpha] > 0) return true;
+  }
+  return false;
+}
+
+async function swipe(session, from, to) {
+  const dispatch = (type, points) => session.send('Input.dispatchTouchEvent', { type, touchPoints: points });
+  await dispatch('touchStart', [from]);
+  for (let step = 1; step <= 8; step++) {
+    await dispatch('touchMove', [{
+      x: from.x + (to.x - from.x) * step / 8,
+      y: from.y + (to.y - from.y) * step / 8,
+    }]);
+  }
+  await dispatch('touchEnd', []);
+}
+
 try {
   for (const [width,height] of sizes) {
-    const page = await browser.newPage({viewport:{width,height},reducedMotion:'reduce',deviceScaleFactor:1});
+    const page = await browser.newPage({viewport:{width,height},reducedMotion:'reduce',deviceScaleFactor:1,hasTouch:width===375});
     const errors=[];
     page.on('pageerror', error=>errors.push(error.message));
     await page.goto(base,{waitUntil:'networkidle'});
@@ -129,7 +165,7 @@ try {
 
     const still=await angle(page);await wait(page,240);
     assert.equal(await angle(page),still,'Reduced motion must stop rotation');
-    const canvas=page.locator('.tm-explorer-moon canvas');
+    const canvas=page.locator('.tm-explorer-moon .tm-lunar-surface');
     await canvas.focus();
     assert.equal(await page.locator('.tm-explorer-hero').evaluate(el=>el.scrollTop),0,'Focusing moon scrolled scene internally');
     await page.keyboard.press('ArrowRight');
@@ -152,7 +188,26 @@ try {
     assert.equal(await page.locator('.tm-hung-study').count(),4,'Case studies changed');
     assert.equal(await page.locator('.tm-hung-clip').count(),8,'Project clips changed');
 
+    if (width === 375) {
+      const session = await page.context().newCDPSession(page);
+      const box = await canvas.boundingBox();
+      const from = { x: box.x + box.width * .4, y: box.y + box.height * .38 };
+      const beforeSwipe = await angle(page);
+      await swipe(session, from, { x: from.x + box.width * .22, y: from.y });
+      assert(delta(beforeSwipe, await angle(page)) > 10, 'A horizontal touch drag should turn the moon');
+      await swipe(session, from, { x: from.x, y: from.y - 140 });
+      await page.waitForFunction(() => document.querySelector('.tm-explorer-hero').getBoundingClientRect().top < -30);
+      await session.detach();
+    }
+
     if(width===1440){
+      const dust = page.locator('.tm-lunar-dust');
+      assert.equal(await dust.getAttribute('aria-hidden'), 'true');
+      assert.equal(await dust.evaluate(el => getComputedStyle(el).pointerEvents), 'none');
+      await page.mouse.move(width * .1, height * .2);
+      await wait(page, 160);
+      assert(await page.evaluate(moonLookIsStill), 'Reduced motion should keep the moon facing forward');
+      assert.equal(await page.evaluate(hasVisibleDust), false, 'Reduced motion should hide the animated dust');
       // Drag still works through the nonblocking decorative sky/grain layers.
       const box=await canvas.boundingBox();
       const beforeDrag=await angle(page);
@@ -162,13 +217,28 @@ try {
       await page.mouse.up();
       assert(Math.min(delta(beforeDrag,await angle(page)),delta(await angle(page),beforeDrag))>10,'Moon drag failed');
       await canvas.focus();await page.keyboard.press('Home');
+      await canvas.evaluate(el=>el.blur());
       await page.emulateMedia({reducedMotion:'no-preference'});
       await page.waitForFunction(()=>document.querySelector('.tm-explorer-moon')?.dataset.animating==='true');
       const before=await angle(page);await wait(page,900);
       assert(delta(before,await angle(page))>1,'Automatic rotation failed');
+      // Hovering in the hero margins works even when the pointer is outside the globe.
+      for (const direction of [-1, 1]) {
+        await page.mouse.move(width * (direction < 0 ? .1 : .9), height * (direction < 0 ? .2 : .8));
+        await page.waitForFunction(moonLooksToward, direction, { timeout: 6000 });
+        await page.waitForFunction(hasVisibleDust, null, { timeout: 6000 });
+        const side = direction < 0 ? 'left' : 'right';
+        await page.screenshot({ path: `editorial-snapshots/hero-1440-look-${side}.png` });
+      }
+      await page.waitForFunction(moonLooksToward, 0, { timeout: 10000 });
+      await page.mouse.move(width * .12, height * .22);
+      await page.waitForFunction(moonLooksToward, -1, { timeout: 6000 });
       await page.getByRole('button',{name:'Pause moon rotation'}).click();
+      await page.mouse.move(width * .86, height * .78);
       const stopped=await angle(page);await wait(page,250);
       assert.equal(await angle(page),stopped,'Pause failed');
+      assert(await page.evaluate(moonLookIsStill), 'Pausing should reset and disable the pointer response');
+      assert.equal(await page.evaluate(hasVisibleDust), false, 'Pausing should hide the animated dust');
       await canvas.focus();await page.keyboard.press('ArrowRight');
       assert(Math.abs(delta(stopped,await angle(page))-15)<.02,'Manual rotation while paused failed');
       await page.getByRole('button',{name:'Resume moon rotation'}).click();
@@ -208,9 +278,10 @@ try {
   await waitForHero(fallback);
   await fallback.waitForFunction(()=>document.querySelector('.tm-explorer-moon')?.dataset.renderMode==='fallback');
   assert(await fallback.locator('.tm-retro-moon-fallback').isVisible(),'Moon fallback missing');
+  assert.equal(await fallback.evaluate(hasVisibleDust), false, 'The static fallback should hide the animated dust');
   assert(await fallback.locator('.tm-explorer-masthead').isVisible(),'Font fallback missing');
   assert.equal(await fallback.locator('.tm-explorer-star').count(),14,'CSS sky should work without WebGL');
   await fallback.screenshot({path:'editorial-snapshots/hero-fallback.png'});
   await fallback.close();
-  console.log('PASS: smaller 360-degree moon, live serif letters, sparse HTML/CSS sky, grain, eight viewport sizes, motion controls and original portfolio.');
+  console.log('PASS: 360-degree moon, pointer tracking, dust, touch gestures, keyboard, motion preferences, eight viewport sizes and original portfolio.');
 }finally{await browser.close();}
