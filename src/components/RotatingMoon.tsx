@@ -9,15 +9,12 @@ const MAP = new URL(import.meta.env.BASE_URL + 'assets/retro/moon-nasa-lroc-2k.j
 const TAU = Math.PI * 2;
 const PERIOD = 48;
 
-export const RotatingMoon: React.FC<{ paused?: boolean }> = ({ paused = false }) => {
+export const RotatingMoon: React.FC = () => {
   const hostRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fallbackRef = useRef<HTMLCanvasElement>(null);
   const dustRef = useRef<HTMLCanvasElement>(null);
-  const pausedRef = useRef(paused);
-  const wakeRef = useRef<() => void>(() => {});
   const [generation, setGeneration] = useState(0);
-  useEffect(() => { pausedRef.current = paused; wakeRef.current(); }, [paused]);
 
   useEffect(() => {
     const host = hostRef.current, canvas = canvasRef.current, dustCanvas = dustRef.current, fallback = fallbackRef.current;
@@ -34,7 +31,7 @@ export const RotatingMoon: React.FC<{ paused?: boolean }> = ({ paused = false })
       dust.draw(elapsed, pointer);
       host.dataset.angle = (angle * 360 / TAU).toFixed(3);
     };
-    const canAnimate = () => visible && !document.hidden && !motion.matches && !pausedRef.current;
+    const canAnimate = () => visible && !document.hidden && !motion.matches;
     const tick = (now: number) => {
       const elapsed = previousTime ? Math.min((now - previousTime) / 1000, .1) : 0;
       previousTime = now;
@@ -51,7 +48,6 @@ export const RotatingMoon: React.FC<{ paused?: boolean }> = ({ paused = false })
       if (visible && !document.hidden) draw();
       if (playing) frame = requestAnimationFrame(tick);
     };
-    wakeRef.current = wake;
     const setReady = (loaded: boolean) => {
       host.dataset.renderMode = loaded ? 'webgl' : 'fallback';
       if (visible && !document.hidden) draw();
@@ -97,7 +93,6 @@ export const RotatingMoon: React.FC<{ paused?: boolean }> = ({ paused = false })
     wake();
     return () => {
       cancelAnimationFrame(frame);
-      wakeRef.current = () => {};
       observer.disconnect();
       sizing.disconnect();
       hero.removeEventListener('pointermove', trackPointer);
