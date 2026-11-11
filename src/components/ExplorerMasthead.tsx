@@ -1,117 +1,106 @@
 import React, { useLayoutEffect, useRef } from 'react';
+import './HeroTypography.css';
 
 const WORD = 'TUMANEEN';
-const VIEW_WIDTH = 1600;
-const VIEW_HEIGHT = 720;
-const SIDE_BEARING = 12;
-const LETTER_GAP = 16;
+const MEASURE_SIZE = 100;
+const ROW_GAP = 8;
 
-/**
- * Live, accessible SVG lettering, not outlined artwork or a raster headline.
- * A shared horizontal scale preserves relative glyph widths. Complete glyphs
- * follow a shallow editorial arch; the moon is only a clearance constraint,
- * so reducing it no longer stretches the outer letters down the whole screen.
- */
+// Measure the ink at the font's native proportions. Keep the font's pair
+// kerning, with a small optical clearance between neighboring serifs.
+function measureLine(letters: SVGTextElement[], ctx: CanvasRenderingContext2D) {
+  let pen = 0, lastRight = 0;
+  let ascent = 0, descent = 0;
+  const glyphs = letters.map((element, index) => {
+    const char = element.textContent || '';
+    const ink = ctx.measureText(char);
+    if (index === 0) {
+      pen = ink.actualBoundingBoxLeft;
+    } else {
+      const previous = letters[index - 1].textContent || '';
+      const advance = ctx.measureText(previous + char).width - ink.width;
+      pen = Math.max(pen + advance - 1.3, lastRight + 1.4 + ink.actualBoundingBoxLeft);
+    }
+    lastRight = pen + ink.actualBoundingBoxRight;
+    ascent = Math.max(ascent, ink.actualBoundingBoxAscent);
+    descent = Math.max(descent, ink.actualBoundingBoxDescent);
+    return { element, x: pen };
+  });
+  return { glyphs, width: lastRight, ascent, descent };
+}
+
 export const ExplorerMasthead: React.FC = () => {
-  const headingRef = useRef<HTMLHeadingElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
 
   useLayoutEffect(() => {
-    const heading = headingRef.current;
     const svg = svgRef.current;
-    const hero = heading?.closest<HTMLElement>('.tm-explorer-hero');
+    const hero = svg?.closest<HTMLElement>('.tm-explorer-hero');
     const moon = hero?.querySelector<HTMLElement>('.tm-explorer-moon');
-    if (!heading || !svg || !hero || !moon) return;
-    let disposed = false;
-    let scheduled = 0;
-    const context = document.createElement('canvas').getContext('2d');
+    const ctx = document.createElement('canvas').getContext('2d');
+    if (!svg || !hero || !moon || !ctx) return;
+    const portrait = window.matchMedia('(max-width: 600px) and (orientation: portrait)');
+    const letters = [...svg.querySelectorAll<SVGTextElement>('text')];
+    let scheduled = 0, disposed = false;
 
-    const fitLetters = () => {
+    const fit = () => {
       if (disposed) return;
-      const texts = [...svg.querySelectorAll<SVGTextElement>('text')];
-      const boxes = texts.map((text) => {
-        if (context) {
-          const style = getComputedStyle(text);
-          context.font = `${style.fontStyle} ${style.fontWeight} 100px ${style.fontFamily}`;
-          context.textBaseline = 'alphabetic';
-          const metrics = context.measureText(text.textContent || '');
-          const width = metrics.actualBoundingBoxLeft + metrics.actualBoundingBoxRight;
-          const height = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
-          if (Number.isFinite(width) && Number.isFinite(height) && width > 0 && height > 0) {
-            return { x: -metrics.actualBoundingBoxLeft, y: -metrics.actualBoundingBoxAscent, width, height };
-          }
-        }
-        return text.getBBox();
-      });
       const bounds = svg.getBoundingClientRect();
-      const globe = moon.getBoundingClientRect();
-      if (!bounds.width || !bounds.height || boxes.some((box) => box.width <= 0 || box.height <= 0)) return;
-
-      const scaleX = (VIEW_WIDTH - 2 * SIDE_BEARING - LETTER_GAP * (texts.length - 1)) /
-        boxes.reduce((sum, box) => sum + box.width, 0);
-      const radius = globe.width / 2;
-      const centerX = globe.left + radius;
-      const centerY = globe.top + radius;
-      const clearance = Math.max(10, Math.min(20, bounds.width * .01));
-      let cursor = SIDE_BEARING;
-
-      texts.forEach((text, index) => {
-        const box = boxes[index];
-        const width = box.width * scaleX;
-        const left = bounds.left + cursor / VIEW_WIDTH * bounds.width;
-        const right = bounds.left + (cursor + width) / VIEW_WIDTH * bounds.width;
-        const midpoint = (cursor + width / 2) / VIEW_WIDTH;
-        const distanceFromMiddle = Math.abs(2 * midpoint - 1);
-        const editorialHeight = VIEW_HEIGHT * (.50 + .46 * Math.pow(distanceFromMiddle, 1.6));
-        const nearestX = Math.min(right, Math.max(left, centerX));
-        const distance = Math.abs(nearestX - centerX);
-        const moonCeiling = distance < radius
-          ? centerY - Math.sqrt(Math.max(0, radius * radius - distance * distance)) - clearance
-          : bounds.bottom;
-        const availableHeight = (moonCeiling - bounds.top) * VIEW_HEIGHT / bounds.height - 8;
-        const height = Math.max(80, Math.min(editorialHeight, availableHeight));
-        const scaleY = height / box.height;
-        text.parentElement?.setAttribute('transform',
-          `matrix(${scaleX} 0 0 ${scaleY} ${cursor - box.x * scaleX} ${8 - box.y * scaleY})`);
-        cursor += width + LETTER_GAP;
+      const clearance = Math.max(11, Math.min(26, bounds.width * .024));
+      const height = Math.min(bounds.height, moon.getBoundingClientRect().top - bounds.top - clearance);
+      if (height <= 0 || bounds.width <= 0) return;
+      const style = getComputedStyle(letters[0]);
+      ctx.font = `${style.fontStyle} ${style.fontWeight} ${MEASURE_SIZE}px ${style.fontFamily}`;
+      ctx.fontKerning = 'normal';
+      const groups = portrait.matches ? [letters.slice(0, 4), letters.slice(4)] : [letters];
+      const lines = groups.map(group => measureLine(group, ctx));
+      if (lines.some(line => !Number.isFinite(line.width + line.ascent + line.descent) || !line.width || !line.ascent)) {
+        svg.dataset.typeReady = 'false';
+        return;
+      }
+      const capHeight = Math.max(...lines.map(line => line.ascent + line.descent));
+      const totalHeight = lines.length * capHeight + (lines.length - 1) * ROW_GAP;
+      const scale = Math.min(bounds.width / Math.max(...lines.map(line => line.width)), height / totalHeight);
+      const top = (height - totalHeight * scale) * (portrait.matches ? .66 : .56);
+      // Screen-space coordinates give every glyph the same scale in both axes.
+      svg.setAttribute('viewBox', `0 0 ${bounds.width} ${bounds.height}`);
+      lines.forEach((line, row) => {
+        const spare = bounds.width - line.width * scale;
+        const left = portrait.matches ? (row ? spare : 0) : spare * .5;
+        const baseline = top + (row * (capHeight + ROW_GAP) + line.ascent) * scale;
+        for (const { element, x } of line.glyphs) {
+          element.parentElement?.setAttribute('transform', `translate(${left + x * scale} ${baseline}) scale(${scale})`);
+        }
       });
       svg.dataset.typeReady = 'true';
     };
 
-    const scheduleFit = () => {
+    const schedule = () => {
       cancelAnimationFrame(scheduled);
-      scheduled = requestAnimationFrame(fitLetters);
+      scheduled = requestAnimationFrame(fit);
     };
-    fitLetters();
-    document.fonts.ready.then(() => { if (!disposed) scheduleFit(); });
-    document.fonts.addEventListener('loadingdone', scheduleFit);
-    const observer = new ResizeObserver(scheduleFit);
-    observer.observe(hero);
+    fit();
+    document.fonts.ready.then(() => { if (!disposed) schedule(); });
+    document.fonts.addEventListener('loadingdone', schedule);
+    const observer = new ResizeObserver(schedule);
+    observer.observe(svg);
     observer.observe(moon);
-    observer.observe(heading);
     return () => {
       disposed = true;
       cancelAnimationFrame(scheduled);
       observer.disconnect();
-      document.fonts.removeEventListener('loadingdone', scheduleFit);
+      document.fonts.removeEventListener('loadingdone', schedule);
     };
   }, []);
 
   return (
-    <h1 id="tm-hero-title" className="tm-explorer-heading" ref={headingRef}>
-      <span className="tm-explorer-sr">TUMANEEN</span>
-      <svg ref={svgRef} viewBox="0 0 1600 720" preserveAspectRatio="none"
-        aria-hidden="true" focusable="false" className="tm-explorer-masthead"
-        data-type-ready="false">
-        {WORD.split('').map((letter, index) => (
+    <h1 id="tm-hero-title" className="tm-explorer-heading">
+      <svg ref={svgRef} className="tm-explorer-masthead" aria-hidden="true" focusable="false" data-type-ready="false">
+        {[...WORD].map((letter, index) => (
           <g key={index}>
-            <text x="0" y="0" fontSize="100" data-explorer-letter={letter}
-              stroke="var(--explorer-burgundy)" vectorEffect="non-scaling-stroke"
-              paintOrder="stroke fill" strokeLinejoin="round"
-              style={{ strokeWidth: 'clamp(.65px, .08vw, 1.5px)' }}>{letter}</text>
+            <text x="0" y="0" fontSize={MEASURE_SIZE} data-explorer-letter={letter}>{letter}</text>
           </g>
         ))}
       </svg>
+      <span className="tm-explorer-sr">{WORD}</span>
     </h1>
   );
 };

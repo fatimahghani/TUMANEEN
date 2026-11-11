@@ -1,0 +1,94 @@
+.tm-explorer-hero .tm-explorer-heading {
+  position: absolute;
+  z-index: 1;
+  top: max(51px, 6.5%);
+  left: 4%;
+  width: 92%;
+  height: 32%;
+  margin: 0;
+  pointer-events: none;
+}
+
+.tm-explorer-masthead {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.tm-explorer-masthead[data-type-ready='false'] { visibility: hidden; }
+.tm-explorer-masthead[data-type-ready='false'] + .tm-explorer-sr {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: start center;
+  width: auto;
+  height: auto;
+  margin: 0;
+  clip: auto;
+  overflow: visible;
+  color: var(--explorer-burgundy);
+  font: 700 min(14.5vw, 21svh)/1 'Bodoni Moda', 'Didot', Georgia, serif;
+  letter-spacing: -.025em;
+}
+.tm-explorer-masthead text {
+  font-family: 'Bodoni Moda', 'Didot', 'Bodoni MT', Georgia, serif !important;
+  font-size: 100px;
+  font-weight: 700 !important;
+  font-style: normal;
+  font-optical-sizing: none;
+  font-synthesis: none;
+  letter-spacing: 0 !important;
+  fill: var(--explorer-burgundy);
+  text-rendering: geometricPrecision;
+}
+
+.tm-site .tm-explorer-hero .tm-explorer-tagline {
+  position: absolute;
+  z-index: 4;
+  bottom: clamp(30px, 5.3svh, 58px);
+  left: 5.4%;
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  align-items: center;
+  column-gap: .65rem;
+  row-gap: .35rem;
+  margin: 0;
+  color: #fff2da;
+  text-shadow: 0 1px 4px rgb(25 18 13 / 35%);
+}
+.tm-explorer-tagline-line:first-child {
+  grid-row: 1;
+  grid-column: 2;
+  font: 600 clamp(11px, .82vw, 15px)/1.2 'Inter', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: .18em;
+}
+.tm-explorer-tagline-line:nth-child(2) {
+  grid-row: 2;
+  grid-column: 1 / -1;
+  font: italic 450 clamp(40px, 4.4vw, 77px)/.98 'Fraunces', Georgia, serif;
+  font-optical-sizing: auto;
+  font-kerning: normal;
+  letter-spacing: -.045em;
+}
+.tm-explorer-tagline-rule {
+  grid-column: 1;
+  grid-row: 1;
+  width: clamp(23px, 2.5vw, 45px);
+  height: 1px;
+  background: currentColor;
+  opacity: .87;
+}
+@media (max-width: 600px) and (orientation: portrait) {
+  .tm-explorer-hero .tm-explorer-heading {
+    left: 5%;
+    width: 90%;
+    top: max(60px, 7.5%);
+  }
+  .tm-site .tm-explorer-hero .tm-explorer-tagline {
+    left: 6%;
+    bottom: max(23px, 3.9svh);
+    row-gap: .25rem;
+  }
+  .tm-explorer-tagline-line:nth-child(2) { font-size: clamp(35px, 9.2vw, 49px); }
+}

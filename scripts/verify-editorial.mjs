@@ -166,6 +166,46 @@ async function replayParticles(side) {
   return { rotation, surface, released, end };
 }
 
+// Hardware cursors are excluded from browser captures. On the demonstration frame
+// only, composite the cursor image from computed CSS at its real pointer hotspot.
+async function inspectStar(page, point, capture = false) {
+  const geometry = await page.evaluate(async ({point, capture}) => {
+    const hit = document.elementFromPoint(point.x, point.y);
+    const value = getComputedStyle(hit).cursor;
+    const cursor = value.match(/^url\("([^"]+)"\)\s+([\d.]+)\s+([\d.]+)\s*,/);
+    if (!cursor) return { value };
+    const image = new Image();
+    image.src = cursor[1];
+    await image.decode();
+    const hotspot = [Number(cursor[2]), Number(cursor[3])];
+    const canvas = document.createElement('canvas');
+    canvas.width = image.naturalWidth; canvas.height = image.naturalHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(image, 0, 0);
+    const sample = (x, y) => [...ctx.getImageData(x, y, 1, 1).data];
+    if (capture) {
+      image.id = 'qa-star-capture';
+      image.alt = '';
+      Object.assign(image.style, {position: 'fixed', width: canvas.width + 'px', height: canvas.height + 'px',
+        left: (point.x - hotspot[0]) + 'px', top: (point.y - hotspot[1]) + 'px', pointerEvents: 'none', zIndex: '10000'});
+      document.body.append(image);
+    }
+    return {value, width: canvas.width, height: canvas.height, hotspot, center: sample(...hotspot), corner: sample(0, 0)};
+  }, {point, capture});
+  assert(geometry.width >= 16 && geometry.width <= 40 && geometry.width === geometry.height,
+    'The star cursor must decode as a small square image');
+  assert.deepEqual(geometry.hotspot, [geometry.width / 2, geometry.height / 2], 'The light and click hotspots must coincide');
+  assert(geometry.center[0] > 190 && geometry.center[3] > 200 && geometry.corner[3] < 24,
+    'Cursor should have a luminous center and transparent margins');
+  if (capture) {
+    try {
+      await page.screenshot({path: 'editorial-snapshots/hero-1440-star.png'});
+    } finally {
+      await page.locator('#qa-star-capture').evaluate(el => el.remove());
+    }
+  }
+}
+
 async function swipe(session, from, to) {
   const dispatch = (type, points) => session.send('Input.dispatchTouchEvent', { type, touchPoints: points });
   await dispatch('touchStart', [from]);
@@ -321,26 +361,47 @@ try {
         ctx.font=`${style.fontStyle} ${style.fontWeight} 100px ${style.fontFamily}`;
         ctx.textBaseline='alphabetic';
         const m=ctx.measureText(el.textContent),matrix=el.getScreenCTM();
-        const top=new DOMPoint(-m.actualBoundingBoxLeft,-m.actualBoundingBoxAscent).matrixTransform(matrix);
-        const bottom=new DOMPoint(m.actualBoundingBoxRight,m.actualBoundingBoxDescent).matrixTransform(matrix);
-        return {letter:el.textContent,x:top.x,y:top.y,right:bottom.x,bottom:bottom.y,width:bottom.x-top.x,height:bottom.y-top.y};
+        const x=el.x.baseVal[0]?.value || 0, y=el.y.baseVal[0]?.value || 0;
+        const top=new DOMPoint(x-m.actualBoundingBoxLeft,y-m.actualBoundingBoxAscent).matrixTransform(matrix);
+        const bottom=new DOMPoint(x+m.actualBoundingBoxRight,y+m.actualBoundingBoxDescent).matrixTransform(matrix);
+        const baseline=new DOMPoint(x,y).matrixTransform(matrix).y;
+        return {letter:el.textContent,x:top.x,y:top.y,right:bottom.x,bottom:bottom.y,width:bottom.x-top.x,height:bottom.y-top.y,
+          baseline, scaleRatio:matrix.a / matrix.d};
       });
       const m=document.querySelector('.tm-explorer-moon').getBoundingClientRect();
       return {letters,clips:svg.querySelectorAll('clipPath').length,moon:{x:m.x,y:m.y,width:m.width}};
     });
     assert.equal(typography.clips,0,'Do not clip letters');
     assert.equal(typography.letters.map(l=>l.letter).join(''),'TUMANEEN');
-    const tops=typography.letters.map(l=>l.y);
-    assert(Math.max(...tops)-Math.min(...tops)<2,'Visible cap tops must align');
+    const narrow = portrait && width <= 600;
+    const lines = narrow
+      ? [typography.letters.slice(0, 4), typography.letters.slice(4)]
+      : [typography.letters];
     const radius=typography.moon.width/2,cx=typography.moon.x+radius,cy=typography.moon.y+radius;
-    typography.letters.forEach((l,i)=>{
-      assert(l.width>8&&l.height>20,'Collapsed letter');
-      assert(l.x>=0&&l.right<=width&&l.y>=0,'Letter cropped by viewport');
-      if(i)assert(l.x-typography.letters[i-1].right>1,'Letters touch');
-      const dx=Math.abs(Math.min(l.right,Math.max(l.x,cx))-cx);
-      if(dx<radius)assert(l.bottom<cy-Math.sqrt(radius*radius-dx*dx)-2,'Moon obscures a letter');
+    for (const line of lines) {
+      const baselines = line.map(letter => letter.baseline);
+      assert(Math.max(...baselines) - Math.min(...baselines) < 2, 'Each line should share a baseline');
+      line.forEach((letter, i) => {
+        assert(letter.width > 8 && letter.height > 20 && Math.abs(letter.scaleRatio - 1) < .02,
+          'Use full, proportionate live letterforms');
+        assert(letter.x >= 0 && letter.right <= width && letter.y >= 0, 'Letter cropped by viewport');
+        if (i) assert(letter.x > line[i - 1].right - .5, 'Adjacent letterforms overlap');
+        const dx=Math.abs(Math.min(letter.right,Math.max(letter.x,cx))-cx);
+        if(dx<radius)assert(letter.bottom<cy-Math.sqrt(radius*radius-dx*dx)-2,'Moon obscures a letter');
+      });
+    }
+    if (narrow) {
+      assert(Math.max(...lines[0].map(letter => letter.bottom)) < Math.min(...lines[1].map(letter => letter.y)),
+        'The two mobile lines must clear each other');
+    }
+    const caption = await page.locator('.tm-explorer-tagline').evaluate(el => {
+      const [label, title] = el.querySelectorAll('.tm-explorer-tagline-line');
+      return { label: getComputedStyle(label).fontStyle, title: getComputedStyle(title).fontStyle,
+        small: parseFloat(getComputedStyle(label).fontSize), large: parseFloat(getComputedStyle(title).fontSize),
+        gap: title.getBoundingClientRect().top - label.getBoundingClientRect().bottom };
     });
-    assert(typography.letters[0].height>typography.letters[3].height,'Serif headline must retain the editorial arch');
+    assert(caption.small >= 11 && caption.small < caption.large && caption.label === 'normal' && caption.title === 'italic' && caption.gap >= 2,
+      'Visual and Explorer should have distinct typographic roles');
 
     const finish=await page.locator('.tm-explorer-hero').evaluate(hero=>{
       const grain=getComputedStyle(hero.querySelector('.tm-explorer-film-grain'));
@@ -350,7 +411,6 @@ try {
       const sky=hero.querySelector('.tm-explorer-sky'),skyStyle=getComputedStyle(sky);
       return {opacity:Number(grain.opacity),events:grain.pointerEvents,grain:grain.backgroundImage,grainLayer:Number(grain.zIndex),
         foreground:image.filter,moon:moon.filter,type:tag.filter,
-        lineHeight:parseFloat(tag.lineHeight)/parseFloat(tag.fontSize),
         skyEvents:skyStyle.pointerEvents,skyLayer:Number(skyStyle.zIndex),skyHidden:sky.getAttribute('aria-hidden'),
         stars:sky.querySelectorAll('.tm-explorer-star').length,
         trails:sky.querySelectorAll('.tm-explorer-stardust').length,
@@ -364,7 +424,6 @@ try {
     assert(finish.foreground.includes('sepia')&&!finish.foreground.includes('blur'),'Foreground grade not sharp');
     assert(finish.moon.includes('contrast')&&!finish.moon.includes('blur'),'Moon grade not sharp');
     assert.equal(finish.type,'none','Tagline must stay clear');
-    assert(finish.lineHeight>=1,'Tagline lines are cramped');
     assert.equal(finish.skyEvents,'none','Sky should never intercept moon gestures');
     assert.equal(finish.skyLayer,0,'Celestial details must stay behind the scene');
     assert.equal(finish.skyHidden,'true','Decorative sky should be hidden from screen readers');
@@ -380,9 +439,23 @@ try {
     await page.evaluate(()=>window.scrollTo({top:0,behavior:'instant'}));
     await page.locator('.tm-explorer-hero').screenshot({path:`editorial-snapshots/hero-${width}.png`});
 
-    await page.getByRole('button',{name:'Open navigation',exact:true}).click();
-    assert(await page.getByRole('navigation',{name:'Portfolio navigation',exact:true}).isVisible(),'Navigation failed');
+    assert.equal(await page.locator('.tm-explorer-motion').count(),0,'Remove the lunar pause control');
+    assert.equal(await page.getByRole('button',{name:/(?:pause|resume).*lunar/i}).count(),0);
+    const menu = page.getByRole('button',{name:'Open navigation',exact:true});
+    const next = page.getByRole('link',{name:'Explore the poster archive',exact:true});
+    assert(await next.isVisible(),'Keep the archive link');
+    const cursorOf = el => getComputedStyle(el).cursor;
+    assert(!/url\(/.test(await menu.evaluate(cursorOf)) && !/url\(/.test(await next.evaluate(cursorOf)),
+      'Actionable hero controls should use native cursors');
+    await menu.focus();
+    await page.keyboard.press('Enter');
+    const nav = page.getByRole('navigation',{name:'Portfolio navigation',exact:true});
+    assert(await nav.isVisible(),'Navigation failed');
+    assert(await nav.evaluate(el => el.contains(document.activeElement)), 'Open navigation should receive keyboard focus');
+    assert(!/url\(/.test(await nav.getByRole('link').first().evaluate(cursorOf)), 'Keep link cursors in the open menu');
+    assert(!/url\(/.test(await page.locator('.tm-explorer-menu-scrim').evaluate(cursorOf)), 'Keep a native cursor on the open menu scrim');
     await page.keyboard.press('Escape');
+    assert(await menu.evaluate(el => document.activeElement === el), 'Escape should return focus to the menu toggle');
     assert.equal(await page.locator('.tm-explorer-nav').count(),0,'Escape failed');
     for(const id of ['home','posters','project','process','about','services','contact-form'])
       assert.equal(await page.locator('#'+id).count(),1,'Section missing: '+id);
@@ -402,6 +475,7 @@ try {
       const box = await page.locator('.tm-explorer-moon').boundingBox();
       const from = { x: box.x + box.width * .4, y: box.y + box.height * .38 };
       const beforeSwipe = await angle(page);
+      assert(!/url\(/.test(await page.locator('.tm-explorer-hero').evaluate(cursorOf)), 'Touch-only view should use native input');
       await swipe(session, from, { x: from.x + box.width * .22, y: from.y });
       assert.equal(await angle(page), beforeSwipe, 'A horizontal swipe must leave the surface alone');
       await swipe(session, from, { x: from.x, y: from.y - 140 });
@@ -430,7 +504,9 @@ try {
         clip: { x: Math.floor(box.x - .14 * box.width), y: Math.floor(box.y - .08 * box.height),
           width: Math.floor(1.28 * box.width), height: Math.floor(1.09 * box.height) },
       });
-      await page.mouse.move(box.x+box.width*.4,box.y+box.height*.3);
+      const reducedPoint = {x: Math.round(box.x + box.width * .4), y: Math.round(box.y + box.height * .3)};
+      await page.mouse.move(reducedPoint.x, reducedPoint.y);
+      await inspectStar(page, reducedPoint);
       await page.mouse.down();
       await page.mouse.move(box.x+box.width*.72,box.y+box.height*.45,{steps:8});
       await page.mouse.up();
@@ -441,18 +517,24 @@ try {
       await page.waitForFunction(()=>document.querySelector('.tm-explorer-moon')?.dataset.animating==='true');
       const before=await angle(page);await wait(page,900);
       assert(delta(before,await angle(page))>1,'Automatic rotation failed');
-      await page.mouse.move(box.x + box.width * .96, box.y + box.height * .31);
+      const star = {x: Math.round(box.x + box.width * .89), y: Math.round(box.y + box.height * .30)};
+      await page.mouse.move(star.x, star.y);
       await wait(page, 320);
-      await page.screenshot({ path:'editorial-snapshots/hero-1440-dust.png' });
-      await page.getByRole('button',{name:/Pause lunar animation/i}).click();
+      await inspectStar(page, star, true);
+      await page.emulateMedia({reducedMotion:'reduce'});
+      await page.waitForFunction(()=>document.querySelector('.tm-explorer-moon')?.dataset.animating==='false');
       const stopped=await angle(page), stoppedDust=await page.evaluate(sampleDust);
       await page.mouse.move(box.x+box.width*.3,box.y+box.height*.2);
       await wait(page,250);
-      assert.equal(await angle(page),stopped,'Pause should stop rotation');
-      assert.deepEqual(await page.evaluate(sampleDust),stoppedDust,'Paused dust should stay still as the pointer moves');
-      await page.getByRole('button',{name:/Resume lunar animation/i}).click();
+      assert.equal(await angle(page),stopped,'Switching to reduced motion should stop rotation');
+      assert.deepEqual(await page.evaluate(sampleDust),stoppedDust,'Reduced motion should hold cursor-displaced grains still');
+      await page.emulateMedia({reducedMotion:'no-preference'});
+      await page.waitForFunction(()=>document.querySelector('.tm-explorer-moon')?.dataset.animating==='true');
       await page.locator('#posters').scrollIntoViewIfNeeded();
       await page.waitForFunction(()=>document.querySelector('.tm-explorer-moon')?.dataset.animating==='false');
+      assert(/url\(/.test(await page.locator('#posters').evaluate(cursorOf)), 'The star should continue across portfolio backgrounds');
+      assert(!/url\(/.test(await page.locator('.tm-ma-primary-paper').first().evaluate(cursorOf)), 'Keep the original poster action cursor');
+      assert(!/url\(/.test(await page.locator('#contact-form input[type="text"]').evaluate(cursorOf)), 'Keep a native text-entry cursor');
       const offscreen=await angle(page);await wait(page,250);
       assert.equal(await angle(page),offscreen,'Offscreen suspension failed');
       await page.getByRole('button',{name:'Open LUMERA case study',exact:true}).click();
@@ -521,5 +603,5 @@ try {
     assert(lit[side].light > unlit[side].light + 4, 'The 2D lunar grains should follow the cursor on the ' + side);
   }
   await fallback.close();
-  console.log('PASS: fine lunar grains, cursor lighting on all four sides, neutral light on exit, independent rotation, responsive portfolio and motion preferences.');
+  console.log('PASS: responsive proportional lettering, native star cursor, fine lunar grains, cursor lighting on all four sides, neutral light on exit, independent rotation, responsive portfolio and motion preferences.');
 }finally{await browser.close();}
