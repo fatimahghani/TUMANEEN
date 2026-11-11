@@ -30,7 +30,7 @@ function moonLooksToward(direction) {
   const yaw = Number(lookYaw);
   const pitch = Number(lookPitch);
   if (direction === 0) return Math.abs(yaw) < .15 && Math.abs(pitch) < .15;
-  return direction * yaw > 1 && direction * pitch > 1;
+  return direction * yaw > 13 && direction * pitch > 6;
 }
 
 function moonLookIsStill() {
@@ -217,6 +217,7 @@ try {
       await page.mouse.up();
       assert(Math.min(delta(beforeDrag,await angle(page)),delta(await angle(page),beforeDrag))>10,'Moon drag failed');
       await canvas.focus();await page.keyboard.press('Home');
+      await canvas.evaluate(el=>el.blur());
       await page.emulateMedia({reducedMotion:'no-preference'});
       await page.waitForFunction(()=>document.querySelector('.tm-explorer-moon')?.dataset.animating==='true');
       const before=await angle(page);await wait(page,900);
