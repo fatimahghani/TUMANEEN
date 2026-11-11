@@ -142,15 +142,25 @@ async function replayParticles(side) {
   const box = await page.locator('.tm-explorer-moon[data-render-mode="webgl"]').boundingBox();
   assert(box, 'WebGL surface should be ready for particle replay');
   await page.emulateMedia({reducedMotion: 'no-preference'});
-  await page.clock.runFor(128);
+  // Chromium delivers the media-change event asynchronously. Begin at the first
+  // moving frame, so the renderer starts at the same longitude in every replay.
+  let firstAngle = 0;
+  for (let frame = 0; frame < 60 && firstAngle === 0; frame++) {
+    await page.clock.runFor(16);
+    firstAngle = await angle(page);
+  }
+  assert(firstAngle > 0 && firstAngle <= .13, 'Replay must begin on the first 16ms rotation step');
   if (side) {
     const [x, y] = directions[side];
     await page.mouse.move(box.x + box.width * (.5 + .46 * x), box.y + box.height * (.5 + .46 * y));
+  } else {
+    await page.mouse.move(-4, -4);
   }
   const start = await page.evaluate(sampleDust);
   await page.clock.runFor(640);
   const end = await page.evaluate(sampleDust);
-  const rotation = await angle(page);
+  const rotation = delta(firstAngle, await angle(page));
+  assert(Math.abs(rotation - 4.8) < .002, 'A 640ms replay must advance the 48-second spin by 4.8 degrees');
   const surface = await sampleSurface(page, box);
   if (side === 'left' || side === 'right') {
     await page.screenshot({path: `editorial-snapshots/moon-light-${side}.png`, clip: {
