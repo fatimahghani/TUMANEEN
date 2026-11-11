@@ -4,9 +4,9 @@ The hero is not a screenshot of the approved design. Its layers are independentl
 
 - `ReadingNookHero.tsx`: semantic H1, eight real SVG text characters, HTML Visual Explorer tagline, navigation and motion controls.
 - `ReadingNookHero.css` lays out the full-screen cream sky and its fine paper grain. The masthead uses Bodoni Moda and the tagline uses Fraunces.
-- `RotatingMoon.tsx` projects the NASA map onto a charcoal-black sphere. Fixed side lighting reveals the craters as the surface completes one revolution every 48 seconds.
-- `lunarDust.ts` sends fine grains outward from the face and rim. Nearby grains deflect around the cursor and ease back into the stream as it passes.
-- `RotatingMoon.css`: viewport-dependent moon position and round silhouette, plus a static fallback.
+- `particleMoon.ts` draws the moon with individually shaded WebGL points. The NASA map gives each grain its tone, so the packed center shows the lunar maria and craters. Along the upper-right limb the grains thin out, exposing the sky between them.
+- `lunarDust.ts` carries finer grains outward from the dissolving rim. Moving the cursor across the surface or plume displaces nearby grains.
+- `RotatingMoon.tsx` coordinates the 48-second rotation, dust motion, pause control and visibility. `RotatingMoon.css` positions the moon at each viewport size. `lunarFallback.ts` draws the same grain set in 2D when WebGL is unavailable.
 - `astronaut.webp` is a 2169 × 661 transparent foreground. A woman wearing a cream astronaut helmet with an opaque mirrored visor sits facing right on a sunlit rock ledge, her arms resting on her raised knees.
 
 The reference is an art-direction target, not a claim of pixel-identical rendering on every viewport. The layout adapts for narrow and ultrawide screens without a centered portrait card.
