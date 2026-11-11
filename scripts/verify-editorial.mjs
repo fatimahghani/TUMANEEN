@@ -2,7 +2,11 @@ import fs from 'node:fs';
 import assert from 'node:assert/strict';
 import { chromium } from 'playwright';
 
-const browser = await chromium.launch({ headless: true, args: ['--enable-unsafe-swiftshader'] });
+const browser = await chromium.launch({
+  channel: process.env.PLAYWRIGHT_CHROMIUM_CHANNEL,
+  headless: true,
+  args: ['--enable-unsafe-swiftshader'],
+});
 const base = 'http://127.0.0.1:4173/';
 const sizes = [[320,700],[375,812],[768,1024],[1024,768],[1280,800],[1440,900],[1920,1080],[2560,1080]];
 fs.mkdirSync('editorial-snapshots', { recursive: true });
