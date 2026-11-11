@@ -41,11 +41,10 @@
   border-radius: 50%;
   background-color: #171716;
   background-image:
-    radial-gradient(ellipse at 78% 82%, rgba(7,7,8,.86), rgba(7,7,8,.29) 63%, transparent 90%),
+    radial-gradient(circle at center, rgba(7,7,8,.08) 12%, rgba(7,7,8,.29) 63%, rgba(7,7,8,.80) 100%),
     var(--moon-texture);
   background-size: cover, 210% 100%;
   background-position: center, 50% center;
-  box-shadow: inset 1px 1px 4px rgba(218,216,206,.33);
   filter: grayscale(1) brightness(.38) contrast(1.06);
 }
 .tm-retro-moon-fallback[data-grains] {
