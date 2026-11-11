@@ -3,7 +3,9 @@ import './HeroTypography.css';
 
 const WORD = 'TUMANEEN';
 const MEASURE_SIZE = 100;
-const ROW_GAP = 8;
+const ROW_GAP = 9;
+const TRACKING = -2;
+const SERIF_CLEARANCE = 1.1;
 
 // Measure the ink at the font's native proportions. Keep the font's pair
 // kerning, with a small optical clearance between neighboring serifs.
@@ -18,7 +20,7 @@ function measureLine(letters: SVGTextElement[], ctx: CanvasRenderingContext2D) {
     } else {
       const previous = letters[index - 1].textContent || '';
       const advance = ctx.measureText(previous + char).width - ink.width;
-      pen = Math.max(pen + advance - 1.3, lastRight + 1.4 + ink.actualBoundingBoxLeft);
+      pen = Math.max(pen + advance + TRACKING, lastRight + SERIF_CLEARANCE + ink.actualBoundingBoxLeft);
     }
     lastRight = pen + ink.actualBoundingBoxRight;
     ascent = Math.max(ascent, ink.actualBoundingBoxAscent);

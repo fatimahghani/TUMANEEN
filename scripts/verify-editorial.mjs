@@ -59,7 +59,7 @@ async function sampleSurface(page, box) {
     clip: { x: Math.floor(box.x), y: Math.floor(box.y), width: Math.floor(box.width), height: Math.floor(box.height) },
     style: `
       .tm-explorer-moon { background: #ff00ff !important; }
-      .tm-lunar-dust, .tm-explorer-foreground, .tm-explorer-tagline { visibility: hidden !important; }
+      .tm-lunar-dust, .tm-explorer-foreground, .tm-explorer-tagline, .tm-comet-cursor { visibility: hidden !important; }
     `,
   });
   return page.evaluate(async encoded => {
@@ -176,44 +176,75 @@ async function replayParticles(side) {
   return { rotation, surface, released, end };
 }
 
-// Hardware cursors are excluded from browser captures. On the demonstration frame
-// only, composite the cursor image from computed CSS at its real pointer hotspot.
-async function inspectStar(page, point, capture = false) {
-  const geometry = await page.evaluate(async ({point, capture}) => {
-    const hit = document.elementFromPoint(point.x, point.y);
-    const value = getComputedStyle(hit).cursor;
-    const cursor = value.match(/^url\("([^"]+)"\)\s+([\d.]+)\s+([\d.]+)\s*,/);
-    if (!cursor) return { value };
-    const image = new Image();
-    image.src = cursor[1];
-    await image.decode();
-    const hotspot = [Number(cursor[2]), Number(cursor[3])];
-    const canvas = document.createElement('canvas');
-    canvas.width = image.naturalWidth; canvas.height = image.naturalHeight;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(image, 0, 0);
-    const sample = (x, y) => [...ctx.getImageData(x, y, 1, 1).data];
-    if (capture) {
-      image.id = 'qa-star-capture';
-      image.alt = '';
-      Object.assign(image.style, {position: 'fixed', width: canvas.width + 'px', height: canvas.height + 'px',
-        left: (point.x - hotspot[0]) + 'px', top: (point.y - hotspot[1]) + 'px', pointerEvents: 'none', zIndex: '10000'});
-      document.body.append(image);
-    }
-    return {value, width: canvas.width, height: canvas.height, hotspot, center: sample(...hotspot), corner: sample(0, 0)};
-  }, {point, capture});
-  assert(geometry.width >= 16 && geometry.width <= 40 && geometry.width === geometry.height,
-    'The star cursor must decode as a small square image');
-  assert.deepEqual(geometry.hotspot, [geometry.width / 2, geometry.height / 2], 'The light and click hotspots must coincide');
-  assert(geometry.center[0] > 190 && geometry.center[3] > 200 && geometry.corner[3] < 24,
-    'Cursor should have a luminous center and transparent margins');
-  if (capture) {
-    try {
-      await page.screenshot({path: 'editorial-snapshots/hero-1440-star.png'});
-    } finally {
-      await page.locator('#qa-star-capture').evaluate(el => el.remove());
-    }
+// Advance real pointer events on a fixed clock to capture the rendered trail
+// mid-flight. A slow software GPU must not decide when the trail has expired.
+async function checkComet() {
+  const page = await browser.newPage({viewport: {width: 1440, height: 900}});
+  await page.clock.install({time: new Date('2026-01-01T00:00:00Z')});
+  await page.clock.pauseAt(new Date('2026-01-01T00:01:00Z'));
+  await page.goto(base, {waitUntil: 'networkidle'});
+  await page.clock.runFor(80);
+  const moon = await page.locator('.tm-explorer-moon[data-render-mode="webgl"]').boundingBox();
+  const overlay = page.locator('.tm-comet-cursor');
+  const head = overlay.locator('.tm-comet-head');
+  const path = overlay.locator('.tm-comet-trail');
+  const getShape = () => path.evaluate(el => el.getAttribute('d') || '');
+  const bounds = () => head.evaluate(el => {
+    const r = el.getBoundingClientRect();
+    return {x: r.x + r.width / 2, y: r.y + r.height / 2, width: r.width};
+  });
+  const start = {x: Math.round(moon.x + .66 * moon.width), y: Math.round(moon.y + .49 * moon.height)};
+  const end = {x: Math.round(moon.x + .84 * moon.width), y: Math.round(moon.y + .28 * moon.height)};
+  await page.mouse.move(start.x, start.y);
+  await page.clock.runFor(480);
+  assert.equal(await overlay.getAttribute('data-visible'), 'true', 'A fine-pointer move should reveal the comet');
+  assert.equal(await overlay.evaluate(el => getComputedStyle(el).pointerEvents), 'none');
+  assert.equal(await overlay.getAttribute('aria-hidden'), 'true');
+  const normal = await bounds();
+  assert(normal.width >= 7 && normal.width <= 10, 'The glowing cursor head should be a small dot');
+  assert(Math.hypot(start.x - normal.x, start.y - normal.y) < 2, 'The head should settle on the actual pointer');
+
+  for (let step = 1; step <= 6; step++) {
+    const t = step / 6;
+    await page.mouse.move(Math.round(start.x + t * (end.x - start.x)),
+      Math.round(start.y + t * (end.y - start.y) - 18 * Math.sin(Math.PI * t)));
+    await page.clock.runFor(16);
   }
+  const moving = await bounds(), ribbon = await getShape();
+  assert(moving.x > start.x && moving.x < end.x - 1, 'The comet should ease behind the moving pointer');
+  assert(ribbon && await path.evaluate(el => el.getTotalLength() > 12), 'Movement should leave a visible tapered path');
+  await page.screenshot({path: 'editorial-snapshots/hero-1440-comet.png'});
+  await page.clock.runFor(800);
+  const settled = await bounds();
+  assert(Math.hypot(end.x - settled.x, end.y - settled.y) < 2, 'The head should catch up at rest');
+  assert.equal(await getShape(), '', 'The moving ribbon should disappear after its short lifetime');
+
+  const menu = page.getByRole('button',{name:'Open navigation',exact:true});
+  const menuBox = await menu.boundingBox();
+  await page.mouse.move(menuBox.x + menuBox.width / 2, menuBox.y + menuBox.height / 2);
+  await page.clock.runFor(480);
+  assert.equal(await overlay.getAttribute('data-hover'), 'true', 'Links and buttons should switch to the ring');
+  await head.evaluate(el => el.getAnimations().forEach(animation => animation.finish()));
+  const ring = await bounds();
+  assert(ring.width >= 38 && ring.width <= 42, 'The active control cursor should expand to a 40px ring');
+  assert.equal(await head.evaluate(el => getComputedStyle(el).backgroundColor), 'rgba(0, 0, 0, 0)', 'The ring center should be open');
+
+  await page.keyboard.press('Shift');
+  assert.equal(await overlay.getAttribute('data-visible'), 'false', 'Keyboard navigation should hide the decorative pointer');
+  await page.mouse.move(start.x, start.y);
+  await page.clock.runFor(32);
+  assert.equal(await overlay.getAttribute('data-visible'), 'true', 'A mouse move should restore the comet');
+  await page.mouse.move(-4, -4);
+  assert.equal(await page.locator('html[data-tm-comet-active]').count(), 0, 'Leaving the page should restore the native cursor');
+
+  const field = page.locator('#contact-form input[type="text"]');
+  await field.evaluate(el => el.scrollIntoView({block: 'center', behavior: 'instant'}));
+  const fieldBox = await field.boundingBox();
+  await page.mouse.move(fieldBox.x + fieldBox.width / 2, fieldBox.y + fieldBox.height / 2);
+  await page.clock.runFor(320);
+  assert(['auto', 'text'].includes(await field.evaluate(el => getComputedStyle(el).cursor)), 'Keep native text editing');
+  assert.equal(await overlay.getAttribute('data-visible'),'false','Hide the comet inside editable fields');
+  await page.close();
 }
 
 async function swipe(session, from, to) {
@@ -360,8 +391,10 @@ try {
     assert(layout.titleText.includes('TUMANEEN'),'Accessible headline missing');
     assert.equal(layout.tagline,'VisualExplorer','Tagline wording changed');
     assert.deepEqual(layout.layers,[1,2,3,4],'Scene order changed');
-    assert(layout.font.includes('Bodoni Moda'),'Literary serif display face missing');
-    assert.equal(layout.weight,'700','Display metrics must match the actual serif weight');
+    assert(layout.font.includes('Fraunces Masthead'),'Use the portfolio’s custom-cut Fraunces masthead');
+    assert.equal(layout.weight,'540','Optical fitting should measure the actual display cut');
+    assert(await page.evaluate(() => [...document.fonts].some(face =>
+      face.family.includes('Fraunces Masthead') && face.status === 'loaded')), 'The local masthead font must load');
 
     // Inspect visible ink in the chosen weight, not a larger font line box.
     const typography=await page.locator('.tm-explorer-masthead').evaluate(svg=>{
@@ -455,15 +488,15 @@ try {
     const next = page.getByRole('link',{name:'Explore the poster archive',exact:true});
     assert(await next.isVisible(),'Keep the archive link');
     const cursorOf = el => getComputedStyle(el).cursor;
-    assert(!/url\(/.test(await menu.evaluate(cursorOf)) && !/url\(/.test(await next.evaluate(cursorOf)),
-      'Actionable hero controls should use native cursors');
+    assert(await menu.evaluate(cursorOf) !== 'none' && await next.evaluate(cursorOf) !== 'none',
+      'Reduced motion should keep native cursors over controls');
     await menu.focus();
     await page.keyboard.press('Enter');
     const nav = page.getByRole('navigation',{name:'Portfolio navigation',exact:true});
     assert(await nav.isVisible(),'Navigation failed');
     assert(await nav.evaluate(el => el.contains(document.activeElement)), 'Open navigation should receive keyboard focus');
-    assert(!/url\(/.test(await nav.getByRole('link').first().evaluate(cursorOf)), 'Keep link cursors in the open menu');
-    assert(!/url\(/.test(await page.locator('.tm-explorer-menu-scrim').evaluate(cursorOf)), 'Keep a native cursor on the open menu scrim');
+    assert(await nav.getByRole('link').first().evaluate(cursorOf) !== 'none', 'Keep link cursors in the open menu');
+    assert(await page.locator('.tm-explorer-menu-scrim').evaluate(cursorOf) !== 'none', 'Keep a native cursor on the open menu scrim');
     await page.keyboard.press('Escape');
     assert(await menu.evaluate(el => document.activeElement === el), 'Escape should return focus to the menu toggle');
     assert.equal(await page.locator('.tm-explorer-nav').count(),0,'Escape failed');
@@ -485,11 +518,16 @@ try {
       const box = await page.locator('.tm-explorer-moon').boundingBox();
       const from = { x: box.x + box.width * .4, y: box.y + box.height * .38 };
       const beforeSwipe = await angle(page);
-      assert(!/url\(/.test(await page.locator('.tm-explorer-hero').evaluate(cursorOf)), 'Touch-only view should use native input');
+      assert(await page.locator('.tm-explorer-hero').evaluate(cursorOf) !== 'none', 'Touch-only view should use native input');
       await swipe(session, from, { x: from.x + box.width * .22, y: from.y });
       assert.equal(await angle(page), beforeSwipe, 'A horizontal swipe must leave the surface alone');
       await swipe(session, from, { x: from.x, y: from.y - 140 });
       await page.waitForFunction(() => document.querySelector('.tm-explorer-hero').getBoundingClientRect().top < -30);
+      await page.emulateMedia({reducedMotion:'no-preference'});
+      await page.waitForFunction(() => document.querySelector('.tm-explorer-moon')?.dataset.animating === 'true');
+      await session.send('Input.dispatchTouchEvent', {type: 'touchStart', touchPoints: [{x: from.x, y: from.y}]});
+      await session.send('Input.dispatchTouchEvent', {type: 'touchEnd', touchPoints: []});
+      assert.equal(await page.locator('html[data-tm-comet-active]').count(), 0, 'A real touch must not start a cursor trail');
       await session.detach();
     }
 
@@ -516,7 +554,7 @@ try {
       });
       const reducedPoint = {x: Math.round(box.x + box.width * .4), y: Math.round(box.y + box.height * .3)};
       await page.mouse.move(reducedPoint.x, reducedPoint.y);
-      await inspectStar(page, reducedPoint);
+      assert.equal(await page.locator('html[data-tm-comet-active]').count(), 0, 'Reduced motion should keep the system pointer');
       await page.mouse.down();
       await page.mouse.move(box.x+box.width*.72,box.y+box.height*.45,{steps:8});
       await page.mouse.up();
@@ -527,10 +565,8 @@ try {
       await page.waitForFunction(()=>document.querySelector('.tm-explorer-moon')?.dataset.animating==='true');
       const before=await angle(page);await wait(page,900);
       assert(delta(before,await angle(page))>1,'Automatic rotation failed');
-      const star = {x: Math.round(box.x + box.width * .89), y: Math.round(box.y + box.height * .30)};
-      await page.mouse.move(star.x, star.y);
-      await wait(page, 320);
-      await inspectStar(page, star, true);
+      await page.mouse.move(box.x + box.width * .89, box.y + box.height * .30);
+      await page.waitForSelector('html[data-tm-comet-active]');
       await page.emulateMedia({reducedMotion:'reduce'});
       await page.waitForFunction(()=>document.querySelector('.tm-explorer-moon')?.dataset.animating==='false');
       const stopped=await angle(page), stoppedDust=await page.evaluate(sampleDust);
@@ -542,9 +578,11 @@ try {
       await page.waitForFunction(()=>document.querySelector('.tm-explorer-moon')?.dataset.animating==='true');
       await page.locator('#posters').scrollIntoViewIfNeeded();
       await page.waitForFunction(()=>document.querySelector('.tm-explorer-moon')?.dataset.animating==='false');
-      assert(/url\(/.test(await page.locator('#posters').evaluate(cursorOf)), 'The star should continue across portfolio backgrounds');
-      assert(!/url\(/.test(await page.locator('.tm-ma-primary-paper').first().evaluate(cursorOf)), 'Keep the original poster action cursor');
-      assert(!/url\(/.test(await page.locator('#contact-form input[type="text"]').evaluate(cursorOf)), 'Keep a native text-entry cursor');
+      const posters = page.locator('#posters');
+      const posterBounds = await posters.boundingBox();
+      await page.mouse.move(posterBounds.x + 3, Math.min(720, Math.max(120, posterBounds.y + 140)));
+      await page.waitForSelector('.tm-comet-cursor[data-visible=true]');
+      assert.equal(await posters.evaluate(cursorOf), 'none', 'The comet should continue across portfolio backgrounds');
       const offscreen=await angle(page);await wait(page,250);
       assert.equal(await angle(page),offscreen,'Offscreen suspension failed');
       await page.getByRole('button',{name:'Open LUMERA case study',exact:true}).click();
@@ -564,6 +602,7 @@ try {
     await page.close();
   }
 
+  await checkComet();
   const control = await replayParticles(null);
   const opposite = { left: 'right', right: 'left', top: 'bottom', bottom: 'top' };
   for (const side of Object.keys(directions)) {
@@ -613,5 +652,5 @@ try {
     assert(lit[side].light > unlit[side].light + 4, 'The 2D lunar grains should follow the cursor on the ' + side);
   }
   await fallback.close();
-  console.log('PASS: responsive proportional lettering, native star cursor, fine lunar grains, cursor lighting on all four sides, neutral light on exit, independent rotation, responsive portfolio and motion preferences.');
+  console.log('PASS: locally served editorial lettering, pointer-following comet and hover ring, fine lunar grains, cursor lighting on all four sides, neutral light on exit, independent rotation, responsive portfolio and motion preferences.');
 }finally{await browser.close();}

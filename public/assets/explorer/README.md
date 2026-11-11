@@ -3,8 +3,8 @@
 The hero is composed of editable type, canvas particles and a transparent foreground.
 
 - `ReadingNookHero.tsx` arranges the hero, menu, Visual Explorer tagline and link to the poster archive.
-- `ReadingNookHero.css` lays out the full-screen cream sky and its fine paper grain. `ExplorerMasthead.tsx` and `HeroTypography.css` set the Bodoni Moda wordmark and Fraunces tagline.
-- `HeroStarCursor.css` defines the portfolio’s glowing star pointer. Over the hero, its center marks the position used for the lunar light. Links and text fields use their familiar cursors.
+- `ReadingNookHero.css` lays out the full-screen cream sky and its fine paper grain. `ExplorerMasthead.tsx` and `HeroTypography.css` set the Fraunces wordmark and the Visual Explorer caption. The six distinct letters in the masthead use a locally bundled display cut of Fraunces.
+- `CometCursor.tsx` and `CometCursor.css` draw a glowing point with a short tapered trail, inspired by Daniel Ingrassia’s portfolio (https://ingrassiadaniel.it/). The point opens into a ring over links and buttons. Text fields, reduced motion and touch keep the system’s usual pointer behavior.
 - `particleMoon.ts` draws the moon with individually shaded WebGL points. The NASA map gives each grain its tone, so the packed center shows the lunar maria and craters. A silver highlight follows the direction of the cursor all the way around the rim. With the cursor outside the hero, the light returns to center.
 - `lunarDust.ts` carries grains outward around the rim. The dust and the surface share one grain diameter in `lunarGrain.ts`. Moving the cursor across either layer lights that side and displaces nearby grains.
 - `RotatingMoon.tsx` coordinates the 48-second rotation, dust motion and visibility. `RotatingMoon.css` positions the moon at each viewport size. `lunarFallback.ts` draws the same grain set in 2D when WebGL is unavailable.
