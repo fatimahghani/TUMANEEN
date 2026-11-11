@@ -2,7 +2,11 @@ import fs from 'node:fs';
 import assert from 'node:assert/strict';
 import { chromium } from 'playwright';
 
-const browser = await chromium.launch({ headless: true, args: ['--enable-unsafe-swiftshader'] });
+const browser = await chromium.launch({
+  channel: process.env.PLAYWRIGHT_CHROMIUM_CHANNEL,
+  headless: true,
+  args: ['--enable-unsafe-swiftshader'],
+});
 const base = 'http://127.0.0.1:4173/';
 const sizes = [[320,700],[375,812],[768,1024],[1024,768],[1280,800],[1440,900],[1920,1080],[2560,1080]];
 fs.mkdirSync('editorial-snapshots', { recursive: true });
@@ -35,7 +39,7 @@ try {
       const h=hero.getBoundingClientRect(),m=moon.getBoundingClientRect();
       return {width:h.width,height:h.height,overflow:document.documentElement.scrollWidth-innerWidth,
         round:Math.abs(m.width-m.height),moonWidth:m.width,moonTop:m.top-h.top,
-        imageLoaded:image.naturalWidth>0,imageSource:image.getAttribute('src'),
+        imageWidth:image.naturalWidth,imageSource:image.getAttribute('src'),
         titleText:title.textContent,letters:title.querySelectorAll('svg text').length,tagline:tag.textContent,
         font:getComputedStyle(title.querySelector('text')).fontFamily,
         weight:getComputedStyle(title.querySelector('text')).fontWeight,
@@ -53,7 +57,7 @@ try {
       : Math.min(.39 * width, .74 * height);
     assert(Math.abs(layout.moonWidth-expectedMoon)<3,'Moon should use the smaller approved diameter');
     assert(layout.moonTop>=height*.29,'Moon should leave open space below the masthead');
-    assert(layout.imageLoaded&&layout.imageSource.endsWith('/astronaut.webp'),'Isolated foreground failed');
+    assert(layout.imageWidth>=1920&&layout.imageSource.endsWith('/astronaut.webp'),'High-resolution explorer foreground failed to load');
     assert.equal(layout.flatImages,1,'No flattened hero image');
     assert.equal(layout.oldPoster,0,'Old red poster returned');
     assert.equal(layout.letters,8,'Eight editable letters required');
@@ -98,7 +102,7 @@ try {
       const moon=getComputedStyle(hero.querySelector('.tm-explorer-moon'));
       const tag=getComputedStyle(hero.querySelector('.tm-explorer-tagline'));
       const sky=hero.querySelector('.tm-explorer-sky'),skyStyle=getComputedStyle(sky);
-      return {opacity:Number(grain.opacity),events:grain.pointerEvents,grain:grain.backgroundImage,
+      return {opacity:Number(grain.opacity),events:grain.pointerEvents,grain:grain.backgroundImage,grainLayer:Number(grain.zIndex),
         foreground:image.filter,moon:moon.filter,type:tag.filter,
         lineHeight:parseFloat(tag.lineHeight)/parseFloat(tag.fontSize),
         skyEvents:skyStyle.pointerEvents,skyLayer:Number(skyStyle.zIndex),skyHidden:sky.getAttribute('aria-hidden'),
@@ -108,6 +112,7 @@ try {
         animatedStars:[...sky.querySelectorAll('.tm-explorer-star')].some(el=>getComputedStyle(el).animationName!=='none')};
     });
     assert(finish.opacity>.02&&finish.opacity<.04,'Grain must remain subtle');
+    assert.equal(finish.grainLayer,0,'Film grain should stay in the sky behind the lettering and artwork');
     assert.equal(finish.events,'none','Filter intercepts clicks');
     assert(finish.grain.includes('data:image/svg+xml'),'Static grain missing');
     assert(finish.foreground.includes('sepia')&&!finish.foreground.includes('blur'),'Foreground grade not sharp');

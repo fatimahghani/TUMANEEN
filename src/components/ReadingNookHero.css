@@ -4,7 +4,7 @@
 .tm-site .tm-explorer-hero {
   --explorer-cream: #f1e2ce;
   --explorer-burgundy: #641613;
-  --explorer-film-grain: .033;
+  --explorer-film-grain: .038;
   position: relative;
   isolation: isolate;
   width: 100%;
@@ -118,12 +118,13 @@
 }
 .tm-explorer-film-grain {
   position: absolute;
-  z-index: 3;
+  z-index: 0;
   inset: 0;
   pointer-events: none;
   opacity: var(--explorer-film-grain);
   mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.88' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)'/%3E%3C/svg%3E");
+  /* A seamless tile of translucent umber flecks gives the cream sky paper grain. */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='grain' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.48' numOctaves='2' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 .24 0 0 0 0 .17 0 0 0 0 .12 6 0 0 0 -2.7'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)'/%3E%3C/svg%3E");
   background-size: 160px 160px;
 }
 .tm-site .tm-explorer-tagline {
