@@ -27,10 +27,10 @@ export const RotatingMoon: React.FC<{ paused?: boolean }> = ({ paused = false })
     const dust = createLunarDust(dustCanvas);
     let pointer: { x: number; y: number } | null = null;
     let surface: ReturnType<typeof createParticleMoon> | null = null;
-    let ready = false, visible = true, angle = 0, frame = 0, previousTime = 0;
+    let visible = true, angle = 0, frame = 0, previousTime = 0;
 
     const draw = (elapsed = 0) => {
-      if (ready) surface?.draw(angle, elapsed, pointer, canAnimate());
+      surface?.draw(angle, elapsed, pointer, canAnimate());
       dust.draw(elapsed, pointer);
       host.dataset.angle = (angle * 360 / TAU).toFixed(3);
     };
@@ -53,7 +53,6 @@ export const RotatingMoon: React.FC<{ paused?: boolean }> = ({ paused = false })
     };
     wakeRef.current = wake;
     const setReady = (loaded: boolean) => {
-      ready = loaded;
       host.dataset.renderMode = loaded ? 'webgl' : 'fallback';
       if (visible && !document.hidden) draw();
     };
@@ -67,7 +66,7 @@ export const RotatingMoon: React.FC<{ paused?: boolean }> = ({ paused = false })
       dust.resize(diameter, dpr);
       draw();
     };
-    const trackDust = (event: PointerEvent) => {
+    const trackPointer = (event: PointerEvent) => {
       if (event.pointerType === 'touch' || !event.isPrimary || !canAnimate()) return;
       const bounds = host.getBoundingClientRect();
       if (bounds.width <= 0) return;
@@ -76,7 +75,7 @@ export const RotatingMoon: React.FC<{ paused?: boolean }> = ({ paused = false })
         y: 2 * (event.clientY - bounds.top) / bounds.height - 1,
       };
     };
-    const releaseDust = () => { pointer = null; };
+    const releasePointer = () => { pointer = null; };
     const onLost = (event: Event) => { event.preventDefault(); surface?.useFallback(); };
     const onRestored = () => setGeneration(value => value + 1);
     const observer = new IntersectionObserver(([entry]) => {
@@ -86,9 +85,10 @@ export const RotatingMoon: React.FC<{ paused?: boolean }> = ({ paused = false })
     const sizing = new ResizeObserver(resize);
     observer.observe(host);
     sizing.observe(host);
-    hero.addEventListener('pointermove', trackDust, { passive: true });
-    hero.addEventListener('pointerleave', releaseDust);
-    hero.addEventListener('pointercancel', releaseDust);
+    hero.addEventListener('pointermove', trackPointer, { passive: true });
+    hero.addEventListener('pointerleave', releasePointer);
+    hero.addEventListener('pointercancel', releasePointer);
+    window.addEventListener('blur', releasePointer);
     canvas.addEventListener('webglcontextlost', onLost);
     canvas.addEventListener('webglcontextrestored', onRestored);
     document.addEventListener('visibilitychange', wake);
@@ -100,9 +100,10 @@ export const RotatingMoon: React.FC<{ paused?: boolean }> = ({ paused = false })
       wakeRef.current = () => {};
       observer.disconnect();
       sizing.disconnect();
-      hero.removeEventListener('pointermove', trackDust);
-      hero.removeEventListener('pointerleave', releaseDust);
-      hero.removeEventListener('pointercancel', releaseDust);
+      hero.removeEventListener('pointermove', trackPointer);
+      hero.removeEventListener('pointerleave', releasePointer);
+      hero.removeEventListener('pointercancel', releasePointer);
+      window.removeEventListener('blur', releasePointer);
       canvas.removeEventListener('webglcontextlost', onLost);
       canvas.removeEventListener('webglcontextrestored', onRestored);
       document.removeEventListener('visibilitychange', wake);
@@ -114,7 +115,7 @@ export const RotatingMoon: React.FC<{ paused?: boolean }> = ({ paused = false })
 
   return (
     <div className="tm-retro-moon tm-explorer-moon" ref={hostRef} role="img"
-      aria-label="A black moon built from fine grains. Its right edge dissolves into drifting lunar dust."
+      aria-label="A rotating charcoal moon made of tiny grains. A silver light follows the cursor around its rim."
       data-render-mode="loading" data-angle="0" data-animating="false" data-rotation-seconds={PERIOD}
       style={{ '--moon-texture': `url("${MAP}")` } as React.CSSProperties}>
       <canvas className="tm-retro-moon-fallback" ref={fallbackRef} aria-hidden="true" />

@@ -1,12 +1,13 @@
+import { GRAIN_DIAMETER } from './lunarGrain';
+
 type PointerPosition = { x: number; y: number };
 
 const CANVAS_SCALE = 1.5;
 const FIELD_RADIUS = .27;
-const MAX_GRAINS = 7200;
+const MAX_GRAINS = 9000;
 const OPACITY_STEPS = 8;
-// The same ink is visible on both sides of the limb. Occasional lighter
-// fragments pick up the warm light on the dark surface.
-const INK = ['#181817', '#282725', '#3a3733', '#504c46', '#746e66', '#9d9486'];
+// The lit end of the scale picks up the warm tint of the paper sky.
+const INK = ['#242322', '#393733', '#57544f', '#7b7770', '#a39d92', '#d1c9bc'];
 
 function makeGrains() {
   let seed = 49317;
@@ -16,28 +17,23 @@ function makeGrains() {
   }
 
   return Array.from({ length: MAX_GRAINS }, () => {
-    const stray = random() < .055;
-    // A continuous arc, concentrated on the windward upper-right shoulder.
-    const arc = random() < .45 ? (random() + random()) * .5 : random();
-    const angle = stray ? random() * Math.PI * 2 : -2.04 + 3.39 * arc;
+    const angle = random() * Math.PI * 2;
     const nx = Math.cos(angle), ny = Math.sin(angle);
-    const irregularity = .019 * Math.sin(5 * angle + 1) + .013 * Math.sin(11 * angle);
-    const origin = .845 + .145 * Math.sqrt(random()) + irregularity;
-    const windX = nx + (stray ? 0 : .84);
-    const windY = ny - (stray ? 0 : .27);
-    const length = Math.hypot(windX, windY);
-    const reach = .12 + .55 * random() ** 1.6;
+    const irregularity = .016 * Math.sin(5 * angle + 1) + .009 * Math.sin(11 * angle);
+    const origin = .875 + .113 * Math.sqrt(random()) + irregularity;
+    const reach = .075 + .50 * random() ** 1.8;
+    const crosswind = .11 * Math.sin(3 * angle + .7) + .16 * (random() - .5);
     return {
+      nx, ny,
       originX: nx * origin,
       originY: ny * origin,
-      travelX: reach * windX / length,
-      travelY: reach * windY / length,
+      travelX: reach * (nx - crosswind * ny),
+      travelY: reach * (ny + crosswind * nx),
       curl: (random() - .5) * .17 + .075 * Math.sin(3 * angle),
       life: random(),
       speed: 1 / (3.1 + random() * 3.5),
-      ink: Math.floor(random() ** 1.55 * INK.length),
-      size: .53 + .83 * random() ** 2 + (random() < .025 ? .48 : 0),
-      opacity: .57 + .39 * random(),
+      tone: random() ** 1.8 * 1.55,
+      opacity: .48 + .41 * random(),
       dx: 0, dy: 0, px: 0, py: 0,
     };
   });
@@ -48,11 +44,12 @@ export function createLunarDust(canvas: HTMLCanvasElement) {
   const grains = makeGrains();
   const batches: number[][] = Array.from({ length: INK.length * OPACITY_STEPS }, () => []);
   let radius = 0, side = 0, count = 0;
+  let lightX = 0, lightY = 0;
 
   function resize(diameter: number, dpr: number) {
     radius = diameter * .5;
     side = Math.max(1, diameter * CANVAS_SCALE);
-    count = Math.min(MAX_GRAINS, Math.max(2000, Math.round(diameter * 10.2)));
+    count = Math.min(MAX_GRAINS, Math.max(2400, Math.round(diameter * 12)));
     const pixels = Math.max(1, Math.min(2200, Math.round(side * Math.min(dpr, 1.6))));
     if (canvas.width !== pixels || canvas.height !== pixels) {
       canvas.width = pixels;
@@ -68,7 +65,10 @@ export function createLunarDust(canvas: HTMLCanvasElement) {
     const step = Math.min(.1, Math.max(0, dt));
     const repel = 1 - Math.exp(-18 * step);
     const settle = 1 - Math.exp(-5 * step);
-    const scale = Math.max(.90, Math.min(1.32, radius / 280));
+    const lightEase = 1 - Math.exp(-14 * step);
+    const distance = pointer ? Math.max(1, Math.hypot(pointer.x, pointer.y)) : 1;
+    lightX += ((pointer ? pointer.x / distance : 0) - lightX) * lightEase;
+    lightY += ((pointer ? pointer.y / distance : 0) - lightY) * lightEase;
     const center = side * .5;
 
     for (let i = 0; i < count; i++) {
@@ -102,7 +102,9 @@ export function createLunarDust(canvas: HTMLCanvasElement) {
       if (!opacity) continue;
       grain.px = center + x * radius;
       grain.py = center + y * radius;
-      batches[grain.ink * OPACITY_STEPS + opacity - 1].push(i);
+      const facing = Math.max(0, grain.nx * lightX + grain.ny * lightY);
+      const ink = Math.min(INK.length - 1, Math.round(grain.tone + facing ** 3 * 4.2));
+      batches[ink * OPACITY_STEPS + opacity - 1].push(i);
     }
 
     // A few dozen shared paths draw thousands of flecks at subpixel positions.
@@ -114,8 +116,7 @@ export function createLunarDust(canvas: HTMLCanvasElement) {
       ctx.beginPath();
       for (const index of batch) {
         const grain = grains[index];
-        const w = grain.size * scale;
-        ctx.rect(grain.px - w * .5, grain.py - w * .5, w, w);
+        ctx.rect(grain.px - GRAIN_DIAMETER / 2, grain.py - GRAIN_DIAMETER / 2, GRAIN_DIAMETER, GRAIN_DIAMETER);
       }
       ctx.fill();
     }
@@ -124,6 +125,8 @@ export function createLunarDust(canvas: HTMLCanvasElement) {
 
   function clear() {
     ctx?.clearRect(0, 0, side, side);
+    lightX = 0;
+    lightY = 0;
     for (const grain of grains) {
       grain.dx = 0;
       grain.dy = 0;
