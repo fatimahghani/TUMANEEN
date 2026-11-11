@@ -3,7 +3,8 @@ import { createLunarDust } from './lunarDust';
 import './RotatingMoon.css';
 
 // NASA SVS CGI Moon Kit; attribution in public/assets/retro/README.md.
-const MAP = import.meta.env.BASE_URL + 'assets/retro/moon-nasa-lroc-2k.jpg';
+// Resolve from the document so the CSS fallback also works from a bundled stylesheet.
+const MAP = new URL(import.meta.env.BASE_URL + 'assets/retro/moon-nasa-lroc-2k.jpg', document.baseURI).href;
 const TAU = Math.PI * 2;
 const PERIOD = 48;
 
