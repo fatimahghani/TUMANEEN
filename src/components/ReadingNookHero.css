@@ -1,19 +1,16 @@
-@import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@96,700&display=swap');
 
-/* Full-screen, live Visual Explorer. The finish is deliberately light:
-   no scratches, blur, distressed borders, extra copy or flattened cover. */
+/* Full-viewport live HTML/SVG composition. No flattened concept image. */
 .tm-site .tm-explorer-hero {
   --explorer-cream: #f1e2ce;
   --explorer-burgundy: #641613;
-  --explorer-film-grain: .027;
+  --explorer-film-grain: .033;
   position: relative;
   isolation: isolate;
   width: 100%;
   height: 100svh;
   min-height: 460px;
   padding: 0;
-  /* Unlike hidden, clip does not make this a scroll container when the
-     keyboard focuses the intentionally oversized moon canvas. */
   overflow: clip;
   color: var(--explorer-burgundy);
   background: radial-gradient(ellipse at 52% 43%, #faf0e1 0%, var(--explorer-cream) 75%, #e9d8c0 100%);
@@ -25,24 +22,25 @@
   z-index: 0;
   inset: 0;
   pointer-events: none;
-  background: radial-gradient(ellipse at 50% 45%, transparent 45%, rgba(70, 42, 32, .055) 100%);
+  background: radial-gradient(ellipse at 50% 45%, transparent 50%, rgba(70,42,32,.04) 100%);
 }
 .tm-explorer-heading {
   position: absolute;
   z-index: 1;
   left: 3.5%;
-  top: 1.6%;
+  top: 6%;
   width: 93%;
-  height: 75%;
+  height: 47%;
   margin: 0;
   pointer-events: none;
 }
 .tm-explorer-masthead { width: 100%; height: 100%; display: block; overflow: visible; }
 .tm-explorer-masthead[data-type-ready='false'] { visibility: hidden; }
 .tm-explorer-masthead text {
-  font-family: 'Anton', Impact, 'Arial Narrow', sans-serif !important;
-  font-weight: 400 !important;
+  font-family: 'Bodoni Moda', 'Bodoni MT', 'Didot', Georgia, serif !important;
+  font-weight: 700 !important;
   font-style: normal;
+  font-optical-sizing: none;
   font-synthesis: none;
   fill: var(--explorer-burgundy);
   letter-spacing: 0 !important;
@@ -53,6 +51,56 @@
   padding: 0; margin: -1px; overflow: hidden;
   clip: rect(0,0,0,0); white-space: nowrap; border: 0;
 }
+
+/* Sparse static celestial details: every star is a simple HTML span. */
+.tm-explorer-sky {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: clip;
+  pointer-events: none;
+  user-select: none;
+}
+.tm-explorer-star {
+  position: absolute;
+  width: var(--star-size);
+  height: var(--star-size);
+  transform: translate(-50%, -50%);
+  background: #97715c;
+  opacity: .48;
+}
+.tm-explorer-star--cross {
+  clip-path: polygon(50% 0,60% 40%,100% 50%,60% 60%,50% 100%,40% 60%,0 50%,40% 40%);
+}
+.tm-explorer-star--dot { border-radius: 50%; opacity: .35; }
+.tm-explorer-stardust {
+  position: absolute;
+  top: 54%;
+  width: 29%;
+  height: 14%;
+  border-radius: 50%;
+  opacity: .30;
+  transform: rotate(-17deg);
+  background-image:
+    radial-gradient(ellipse at 52% 55%, rgba(255,253,241,.85), transparent 58%),
+    radial-gradient(ellipse at 30% 55%, rgba(152,126,94,.16), transparent 67%);
+}
+.tm-explorer-stardust::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background-image:
+    radial-gradient(circle, rgba(115,91,67,.32) .55px, transparent .9px),
+    radial-gradient(circle, rgba(255,255,247,.9) .65px, transparent 1.1px);
+  background-size: 13px 17px, 19px 23px;
+  background-position: 0 0, 7px 11px;
+  -webkit-mask-image: radial-gradient(ellipse, #000 12%, transparent 68%);
+  mask-image: radial-gradient(ellipse, #000 12%, transparent 68%);
+}
+.tm-explorer-stardust--left { left: 4%; }
+.tm-explorer-stardust--right { right: 3%; top: 60%; width: 30%; transform: rotate(-19deg); }
+
 .tm-explorer-foreground {
   position: absolute;
   z-index: 3;
@@ -65,9 +113,8 @@
   user-select: none;
   filter: sepia(.12) saturate(.88) contrast(1.045) brightness(1.025);
 }
-/* Grade only this live canvas/fallback. The original lunar map is unchanged. */
 .tm-site .tm-explorer-hero .tm-explorer-moon {
-  filter: sepia(.055) saturate(.86) contrast(1.025) brightness(1.015);
+  filter: sepia(.04) saturate(.83) contrast(1.025) brightness(1.025);
 }
 .tm-explorer-film-grain {
   position: absolute;
@@ -104,7 +151,7 @@
 }
 .tm-explorer-menu-button {
   position: absolute; z-index: 8; left: 10px; top: 14px;
-  width: 40px; height: 40px; display: grid; place-items: center;
+  width: 44px; height: 44px; display: grid; place-items: center;
   border: 0; border-radius: 0; background: transparent;
   color: var(--explorer-burgundy); cursor: pointer;
 }
@@ -137,23 +184,30 @@
 .tm-explorer-hero :is(button,a):focus-visible { outline: 2px solid var(--explorer-burgundy); outline-offset: 3px; }
 
 @media (min-aspect-ratio: 2/1) {
-  .tm-explorer-heading { height: 72%; }
+  .tm-explorer-heading { top: 5%; height: 47%; }
   .tm-explorer-foreground { width: auto; height: 43%; min-width: 54%; }
   .tm-site .tm-explorer-tagline { font-size: clamp(28px, 7svh, 65px); }
 }
+@media (max-width: 1100px) and (orientation: portrait) {
+  .tm-explorer-heading { top: 7%; height: 38%; }
+  .tm-explorer-stardust { top: 51%; width: 40%; opacity: .20; }
+  .tm-explorer-stardust--right { top: 65%; }
+}
 @media (max-width: 760px) and (orientation: portrait) {
   .tm-site .tm-explorer-hero { min-height: 580px; }
-  .tm-explorer-heading { left: 3%; width: 94%; top: 7%; height: 40%; }
+  .tm-explorer-heading { left: 3%; width: 94%; top: 9%; height: 32%; }
   .tm-explorer-foreground { width: 172%; max-width: none; left: -41%; bottom: -1px; }
   .tm-site .tm-explorer-tagline { left: 6%; bottom: 5%; font-size: clamp(31px, 8.2vw, 50px); }
   .tm-explorer-tagline-rule { width: 40px; left: calc(100% + 14px); }
   .tm-explorer-controls { right: 3%; bottom: 3%; gap: 4px; }
   .tm-explorer-controls a, .tm-explorer-controls button { color: #fff1d9; }
   .tm-explorer-menu-button { top: 10px; left: 10px; }
+  .tm-explorer-star { opacity: .32; }
+  .tm-explorer-star:nth-of-type(3n) { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .tm-explorer-hero *, .tm-explorer-hero *::before, .tm-explorer-hero *::after { animation: none !important; transition: none !important; }
 }
 @media (forced-colors: active) {
-  .tm-explorer-film-grain, .tm-explorer-hero::before { display: none; }
+  .tm-explorer-sky, .tm-explorer-film-grain, .tm-explorer-hero::before { display: none; }
 }

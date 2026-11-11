@@ -1,10 +1,11 @@
-/* A round, independently rendered moon. Its size never distorts with the viewport. */
+/* Smaller round moon, rendered independently of the live text and sky.
+   The original 48-second 360-degree WebGL renderer is unchanged. */
 .tm-explorer-hero .tm-explorer-moon {
   position: absolute;
   z-index: 2;
   left: 50%;
-  top: 20.5%;
-  width: min(66vw, 126svh);
+  top: 31%;
+  width: min(39vw, 74svh);
   aspect-ratio: 1;
   transform: translateX(-50%);
   border-radius: 50%;
@@ -45,9 +46,12 @@
 }
 .tm-explorer-moon[data-render-mode='webgl'] .tm-retro-moon-fallback { display: none; }
 .tm-explorer-moon[data-render-mode='fallback'] canvas { display: none; }
+@media (max-width: 1100px) and (orientation: portrait) {
+  .tm-explorer-hero .tm-explorer-moon { top: 33%; width: min(84vw, 64svh); }
+}
 @media (max-width: 760px) and (orientation: portrait) {
-  .tm-explorer-hero .tm-explorer-moon { top: 31%; width: 132vw; }
+  .tm-explorer-hero .tm-explorer-moon { top: 34%; width: min(98vw, 60svh); }
 }
 @media (min-aspect-ratio: 2/1) {
-  .tm-explorer-hero .tm-explorer-moon { top: 17%; width: 123svh; }
+  .tm-explorer-hero .tm-explorer-moon { top: 30%; width: 72svh; }
 }
