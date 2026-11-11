@@ -76,7 +76,7 @@ body { background-color: var(--tm-ivory); }
   background: var(--tm-ink);
   color: var(--tm-blush);
 }
-.tm-site [data-editorial-nav] button:focus-visible { outline-color: var(--tm-burgundy); }
+.tm-site [data-editorial-nav] .tm-floating-surface button:focus-visible { outline-color: var(--tm-burgundy); }
 .tm-explorer-nav a { color: var(--tm-burgundy); border-bottom: 1px solid var(--tm-rule-dark); }
 .tm-explorer-nav a:last-child { border-bottom: 0; }
 
@@ -175,6 +175,7 @@ body { background-color: var(--tm-ivory); }
   background: var(--tm-blush) !important;
 }
 .tm-site .tm-service-card h3 { color: var(--tm-burgundy); line-height: 1.12; }
+.tm-service-card > div:first-child > div:first-child > span:last-child { color: var(--tm-muted); }
 .tm-site .tm-service-card li { color: var(--tm-ink); line-height: 1.55; }
 
 /* The colophon reverses the cover's headline and paper inks. */
@@ -211,6 +212,14 @@ body { background-color: var(--tm-ivory); }
   padding: clamp(1.1rem, 4vw, 3.5rem);
 }
 .tm-ma-viewer-head, .tm-epok-overlay-head { color: var(--tm-muted); border-color: var(--tm-rule-dark); }
+.tm-epok-overlay-head button, .tm-ma-viewer-head button {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  min-height: 2.75rem;
+  color: var(--tm-burgundy);
+  cursor: pointer;
+}
 .tm-ma-viewer-notes h3, .tm-epok-overlay-panel h2, .tm-epok-study-header h2, .tm-epok-study-meta h3 { color: var(--tm-burgundy); }
 .tm-epok-study-header h2 em, .tm-epok-overlay-panel h2 em {
   color: var(--tm-burgundy);

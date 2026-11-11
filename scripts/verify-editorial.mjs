@@ -130,8 +130,12 @@ async function checkChapters(page, width) {
     const presentation = await section.evaluate(el => {
       const heading = el.querySelector('h2');
       const bounds = el.getBoundingClientRect();
-      const tone = value => {
+      const tone = (value, background) => {
         const ctx = document.createElement('canvas').getContext('2d');
+        if (background) {
+          ctx.fillStyle = background;
+          ctx.fillRect(0, 0, 1, 1);
+        }
         ctx.fillStyle = value;
         ctx.fillRect(0, 0, 1, 1);
         const [r,g,b] = [...ctx.getImageData(0, 0, 1, 1).data].map(channel => {
@@ -141,13 +145,20 @@ async function checkChapters(page, width) {
         return .2126*r + .7152*g + .0722*b;
       };
       const background = getComputedStyle(el).backgroundColor;
-      const a = tone(background), b = tone(getComputedStyle(heading).color);
-      return {background, contrast:(Math.max(a,b)+.05)/(Math.min(a,b)+.05), font: getComputedStyle(heading).fontFamily,
+      const contrast = (foreground, surface) => {
+        const a = tone(surface), b = tone(foreground, surface);
+        return (Math.max(a,b) + .05) / (Math.min(a,b) + .05);
+      };
+      const selectedService = el.querySelector('.tm-service-card[data-selected="true"]');
+      const toolsLabel = selectedService?.querySelector(':scope > div:first-child > div:first-child > span:last-child');
+      return {background, contrast:contrast(getComputedStyle(heading).color, background), font: getComputedStyle(heading).fontFamily,
+        toolsContrast: toolsLabel ? contrast(getComputedStyle(toolsLabel).color, getComputedStyle(selectedService).backgroundColor) : null,
         left: bounds.left, right: bounds.right, overflow: document.documentElement.scrollWidth - innerWidth};
     });
     assert.equal(presentation.background, background, id + ' chapter palette');
     assert(presentation.font.includes('Bodoni Moda'), id + ' chapter typography');
     assert(presentation.contrast >= 3, id + ' chapter heading should be readable against its surface');
+    if (id === 'services') assert(presentation.toolsContrast >= 4.5, 'The selected service tools must be readable against the cream card');
     assert(presentation.left >= -1 && presentation.right <= width + 1 && presentation.overflow <= 2,
       id + ' must fit the viewport');
     await page.screenshot({path: `editorial-snapshots/chapter-${width}-${id}.png`, animations: 'disabled'});
