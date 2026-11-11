@@ -4,7 +4,6 @@ import { RotatingMoon } from './RotatingMoon';
 import { ExplorerMasthead } from './ExplorerMasthead';
 import { ExplorerSky } from './ExplorerSky';
 import './ReadingNookHero.css';
-import './HeroStarCursor.css';
 
 type Section = 'home' | 'project' | 'about' | 'services' | 'posters' | 'process';
 interface ReadingNookHeroProps {

@@ -12,6 +12,7 @@ import {
 import { CaseStudyModal } from './components/CaseStudyModal';
 import { ReadingNookHero } from './components/ReadingNookHero';
 import './EditorialSystem.css';
+import { CometCursor } from './components/CometCursor';
 import { ProcessSection } from './components/ProcessSection';
 import { ProjectsSection } from './components/ProjectsSection';
 import { PosterSection } from './components/PosterSection';
@@ -153,6 +154,7 @@ export default function App() {
 
   return (
     <div className="tm-site min-h-screen flex flex-col">
+      <CometCursor />
       {/* A short printed-page flick, without the previous cinematic flash. */}
       <AnimatePresence>
         {activeTransitionKey !== null && (
