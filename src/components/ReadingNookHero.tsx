@@ -79,7 +79,7 @@ export const ReadingNookHero: React.FC<ReadingNookHeroProps> = ({ onSelectNav, o
         </>
       )}
       <div className="tm-explorer-controls">
-        <button type="button" className="tm-explorer-motion" aria-label={paused ? 'Resume moon rotation' : 'Pause moon rotation'} aria-pressed={paused} onClick={() => setPaused((value) => !value)}>
+        <button type="button" className="tm-explorer-motion" aria-label={paused ? 'Resume lunar animation' : 'Pause lunar animation'} aria-pressed={paused} onClick={() => setPaused((value) => !value)}>
           {paused ? <Play size={17} strokeWidth={1.5} /> : <Pause size={17} strokeWidth={1.5} />}
         </button>
         <a href="#posters" className="tm-explorer-next" aria-label="Explore the poster archive" onClick={(event) => navigate(event, 'posters')}>
