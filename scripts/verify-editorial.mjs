@@ -47,9 +47,50 @@ async function checkLunarTone(page) {
       levels.push((rgba[i] + rgba[i + 1] + rgba[i + 2]) / 3);
     }
     levels.sort((a, b) => a - b);
-    return [levels[Math.floor(levels.length * .1)], levels[Math.floor(levels.length * .9)]];
+    return [.1, .6, .85].map(quantile => levels[Math.floor(levels.length * quantile)]);
   }, png.toString('base64'));
-  assert(tone[1] < 95 && tone[1] - tone[0] > 4, 'Expected a charcoal face with visible terrain, got ' + tone);
+  assert(tone[1] < 95 && tone[2] - tone[0] > 4, 'Expected a charcoal face with visible terrain, got ' + tone);
+}
+
+// A contrasting test backing distinguishes gaps in the lunar body from bright grains
+// painted on an opaque disk. Compare corresponding regions just inside each limb.
+async function checkParticleLimb(page, box) {
+  const png = await page.screenshot({
+    clip: { x: Math.floor(box.x), y: Math.floor(box.y), width: Math.floor(box.width), height: Math.floor(box.height) },
+    style: `
+      .tm-explorer-moon { background: #ff00ff !important; }
+      .tm-lunar-dust, .tm-explorer-foreground, .tm-explorer-tagline { visibility: hidden !important; }
+    `,
+  });
+  const samples = await page.evaluate(async encoded => {
+    const image = new Image();
+    image.src = 'data:image/png;base64,' + encoded;
+    await image.decode();
+    const canvas = document.createElement('canvas');
+    const w = canvas.width = image.width, h = canvas.height = image.height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(image, 0, 0);
+    const pixels = ctx.getImageData(0, 0, w, h).data;
+    const left = { count: 0, gaps: 0, transitions: 0 };
+    const right = { count: 0, gaps: 0, transitions: 0 };
+    const isGap = offset => pixels[offset] - pixels[offset + 1] > 85;
+    for (let y = Math.floor(h * .18); y < h * .62; y++) {
+      const ny = (y + .5) * 2 / h - 1;
+      for (let x = 1; x < w - 1; x++) {
+        const nx = (x + .5) * 2 / w - 1;
+        const r2 = nx * nx + ny * ny;
+        if (r2 < .88 ** 2 || r2 > .984 ** 2) continue;
+        const side = nx < 0 ? left : right;
+        const pixel = 4 * (y * w + x);
+        side.count++;
+        side.gaps += Number(isGap(pixel));
+        side.transitions += Number(isGap(pixel) !== isGap(pixel + 4));
+      }
+    }
+    return { west: left.gaps / left.count, east: right.gaps / right.count, edges: right.transitions / right.count };
+  }, png.toString('base64'));
+  assert(samples.east > samples.west + .035 && samples.edges > .02,
+    'Expected the right limb to break into discrete, see-through grains: ' + JSON.stringify(samples));
 }
 
 // Read actual dust pixels, including those that have crossed the silhouette.
@@ -60,17 +101,20 @@ function sampleDust() {
   const moonWidth = document.querySelector('.tm-explorer-moon').getBoundingClientRect().width;
   const rim = width * moonWidth / canvas.getBoundingClientRect().width / 2;
   const rgba = ctx.getImageData(0, 0, width, height).data;
-  let exterior = 0, checksum = 2166136261;
+  let exterior = 0, rightExterior = 0, checksum = 2166136261;
   for (let py = 0; py < height; py++) {
     for (let px = 0; px < width; px++) {
       const alpha = rgba[4 * (py * width + px) + 3];
       if (!alpha) continue;
       checksum = Math.imul(checksum ^ (py * width + px), 16777619) ^ alpha;
       const dx = px - width / 2, dy = py - height / 2;
-      if (dx * dx + dy * dy > rim * rim) exterior++;
+      if (dx * dx + dy * dy > rim * rim) {
+        exterior++;
+        if (dx > 0) rightExterior++;
+      }
     }
   }
-  return { exterior, checksum };
+  return { exterior, rightExterior, checksum };
 }
 
 // Replay the same frames twice so outward travel and cursor deflection can be
@@ -93,14 +137,19 @@ async function replayParticles(hover) {
   await page.clock.runFor(512);
   const end = await page.evaluate(sampleDust);
   const rotation = await angle(page);
-  const face = await page.screenshot({
+  const farFace = await page.screenshot({
     clip: {x: Math.floor(box.x + .31 * box.width), y: Math.floor(box.y + .26 * box.height),
       width: Math.floor(.25 * box.width), height: Math.floor(.22 * box.height)},
     style: '.tm-lunar-dust { visibility: hidden !important; }',
   });
+  const brushedFace = await page.screenshot({
+    clip: { x: Math.floor(box.x + box.width * .86), y: Math.floor(box.y + box.height * .29),
+      width: Math.floor(box.width * .08), height: Math.floor(box.height * .10) },
+    style: '.tm-lunar-dust { visibility: hidden !important; }',
+  });
   await page.close();
   assert(end.exterior > 20 && end.checksum !== start.checksum, 'Dust should travel beyond the moon rim');
-  return { rotation, face, end };
+  return { rotation, farFace, brushedFace, end };
 }
 
 async function swipe(session, from, to) {
@@ -313,7 +362,7 @@ try {
 
     if (width === 375) {
       const session = await page.context().newCDPSession(page);
-      const box = await canvas.boundingBox();
+      const box = await page.locator('.tm-explorer-moon').boundingBox();
       const from = { x: box.x + box.width * .4, y: box.y + box.height * .38 };
       const beforeSwipe = await angle(page);
       await swipe(session, from, { x: from.x + box.width * .22, y: from.y });
@@ -331,7 +380,15 @@ try {
       const reducedDust = await page.evaluate(sampleDust);
       // This fixed viewport and DPR previously painted about 1,400 exterior pixels.
       assert(reducedDust.exterior > 2800, 'The denser particle stream should remain visible beyond the rim');
-      const box=await canvas.boundingBox();
+      const box=await page.locator('.tm-explorer-moon').boundingBox();
+      await checkParticleLimb(page, box);
+      assert(reducedDust.rightExterior > reducedDust.exterior * .65,
+        'Most of the escaping material should continue the dissolving right limb');
+      await page.screenshot({
+        path: 'editorial-snapshots/moon-grains-detail.png',
+        clip: { x: Math.floor(box.x - .03 * box.width), y: Math.floor(box.y - .08 * box.height),
+          width: Math.floor(1.28 * box.width), height: Math.floor(1.09 * box.height) },
+      });
       await page.mouse.move(box.x+box.width*.4,box.y+box.height*.3);
       await page.mouse.down();
       await page.mouse.move(box.x+box.width*.72,box.y+box.height*.45,{steps:8});
@@ -377,7 +434,8 @@ try {
   const control = await replayParticles(false);
   const hovered = await replayParticles(true);
   assert.equal(control.rotation, hovered.rotation, 'The same 48-second spin should run independently of pointer position');
-  assert(control.face.equals(hovered.face), 'Cursor movement must not turn or tilt the visible lunar surface');
+  assert(control.farFace.equals(hovered.farFace), 'The crater field away from the cursor should continue its independent rotation');
+  assert(!control.brushedFace.equals(hovered.brushedFace), 'The pointer should disturb the grains forming the moon under the cursor');
   assert.notEqual(control.end.checksum, hovered.end.checksum, 'Pointer proximity should displace the dust');
 
   // Keep a readable black moon without WebGL or web fonts.
@@ -401,5 +459,5 @@ try {
   assert.equal(await fallback.locator('.tm-explorer-star').count(),14,'CSS sky should work without WebGL');
   await fallback.screenshot({path:'editorial-snapshots/hero-fallback.png'});
   await fallback.close();
-  console.log('PASS: black textured moon, outward and cursor-reactive dust, independent rotation, touch scrolling, motion preferences, eight viewport sizes and original portfolio.');
+  console.log('PASS: porous lunar silhouette, locally disturbed surface grains, escaping plume, independent rotation, responsive portfolio and motion preferences.');
 }finally{await browser.close();}
