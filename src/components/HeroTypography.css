@@ -39,6 +39,12 @@
   font-synthesis: none;
   letter-spacing: 0 !important;
   fill: var(--explorer-burgundy);
+  /* Keep Bodoni’s hairlines legible over the paper grain on small displays. */
+  stroke: var(--explorer-burgundy);
+  stroke-width: .5px;
+  vector-effect: non-scaling-stroke;
+  paint-order: stroke fill;
+  stroke-linejoin: round;
   text-rendering: geometricPrecision;
 }
 

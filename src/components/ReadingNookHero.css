@@ -144,7 +144,7 @@
 @media (max-width: 760px) and (orientation: portrait) {
   .tm-site .tm-explorer-hero { min-height: 580px; }
   .tm-explorer-foreground { width: 172%; max-width: none; left: -41%; bottom: -1px; }
-  .tm-explorer-next { right: 3%; bottom: 3%; color: #fff1d9; }
+  .tm-explorer-next { right: 3%; bottom: 3%; color: #fff7ec; mix-blend-mode: difference; }
   .tm-explorer-menu-button { top: 10px; left: 10px; }
   .tm-explorer-star { opacity: .32; }
   .tm-explorer-star:nth-of-type(3n) { display: none; }
