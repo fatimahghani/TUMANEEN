@@ -474,6 +474,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
                           <button
                             key={srv.id}
                             type="button"
+                            aria-pressed={active}
                             onClick={() => setSelectedServiceId(srv.id)}
                             className={`px-3.5 py-3 text-xs font-mono text-left transition-colors border cursor-pointer truncate ${
                               active

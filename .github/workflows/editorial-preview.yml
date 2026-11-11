@@ -28,6 +28,12 @@ jobs:
           fi
       - name: Build preview
         run: npm run build
+      - name: Upload the built portfolio for review
+        uses: actions/upload-artifact@v4
+        with:
+          name: portfolio-preview
+          path: dist/
+          retention-days: 3
       - name: Serve preview
         run: |
           npm run preview -- --host 127.0.0.1 --port 4173 >/tmp/tumaneen-vite.log 2>&1 &

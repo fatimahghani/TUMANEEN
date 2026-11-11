@@ -1,9 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@96,700&display=swap');
-
 /* Full-viewport live HTML/SVG composition. No flattened concept image. */
 .tm-site .tm-explorer-hero {
-  --explorer-cream: #f1e2ce;
-  --explorer-burgundy: #641613;
+  --explorer-cream: var(--tm-ivory);
+  --explorer-burgundy: var(--tm-burgundy);
   --explorer-film-grain: .038;
   position: relative;
   isolation: isolate;
