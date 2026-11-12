@@ -295,6 +295,29 @@ async function seekProjectGallery(section, fraction) {
   return state;
 }
 
+async function checkGalleryFocus(target) {
+  const state = await target.evaluate(async button => {
+    const section = document.querySelector('#project');
+    const track = section.querySelector('.tm-hung-strip');
+    const label = el => el?.getAttribute('aria-label') || el?.textContent?.trim().slice(0, 80) || el?.tagName;
+    const deadline = performance.now() + 5000;
+    let result, stableFrames = 0;
+    do {
+      await new Promise(resolve => requestAnimationFrame(resolve));
+      const rect = button.getBoundingClientRect();
+      const x = rect.x + rect.width / 2, y = rect.y + rect.height / 2;
+      const focused = document.activeElement === button;
+      const aperture = section.querySelector('.tm-hung-window').getBoundingClientRect();
+      const inRail = !track.contains(button) || (x >= aperture.left && x <= aperture.right);
+      stableFrames = focused && inRail && x >= 0 && x <= innerWidth && y >= 0 && y <= innerHeight ? stableFrames + 1 : 0;
+      result = {intended:label(button), active:label(document.activeElement), rect:rect.toJSON(), aperture:aperture.toJSON(),
+        trackScrollLeft:track.scrollLeft, sectionTop:section.getBoundingClientRect().top, scrollY, stableFrames};
+    } while (stableFrames < 3 && performance.now() < deadline);
+    return result;
+  });
+  assert.equal(state.stableFrames, 3, `Keyboard focus must reach the visible gallery control: ${JSON.stringify(state)}`);
+}
+
 async function checkProjectGallery(page, width) {
   await page.emulateMedia({reducedMotion:'no-preference'});
   const section = page.locator('#project');
@@ -372,20 +395,22 @@ async function checkProjectGallery(page, width) {
   assert.equal(await thumbs.nth(1).getAttribute('aria-pressed'),'true','The next poster plate must open with the keyboard');
   await page.keyboard.press('Escape');
   await posterStudy.waitFor({state:'hidden'});
+  await checkGalleryFocus(lastCover);
 
   await page.emulateMedia({reducedMotion:'reduce'});
   await page.locator('#project[data-gallery-mode="native"]').waitFor();
+  await page.waitForFunction(() => getComputedStyle(document.querySelector('#project .tm-hung-strip')).transform === 'none');
   assert.notEqual(await stage.evaluate(el => getComputedStyle(el).position), 'sticky', 'Reduced motion should release the gallery');
+  await checkGalleryFocus(lastCover);
+  await page.keyboard.press('Home');
   for (const cover of await covers.all()) {
-    await cover.focus();
-    await page.waitForFunction(() => {
-      const rect = document.activeElement.getBoundingClientRect();
-      const x = rect.x + rect.width / 2, y = rect.y + rect.height / 2;
-      return x >= 0 && x <= innerWidth && y >= 0 && y <= innerHeight;
-    });
+    await checkGalleryFocus(cover);
+    // The title button follows its cover and precedes the next study in tab order.
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Tab');
   }
   const indexButton = section.getByRole('button',{name:/view index/i});
-  await indexButton.focus();
+  await checkGalleryFocus(indexButton);
   await page.keyboard.press('Enter');
   const index = page.locator('.tm-epok-overlay[role="dialog"]');
   await index.waitFor({state:'visible'});
@@ -394,7 +419,7 @@ async function checkProjectGallery(page, width) {
   assert(await index.locator('.tm-epok-index-row').first().evaluate(el => el === document.activeElement), 'Tab should reach the first index entry');
   await page.keyboard.press('Escape');
   await index.waitFor({state:'hidden'});
-  assert(await indexButton.evaluate(el => el === document.activeElement), 'Closing the index should restore focus');
+  await checkGalleryFocus(indexButton);
 }
 
 // Run real gestures last. Touch momentum can continue moving the page after

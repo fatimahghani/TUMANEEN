@@ -74,6 +74,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
     const header = document.querySelector<HTMLElement>('[data-editorial-nav]');
     let travel = 0;
     let frame = 0;
+    let focusFrame = 0;
 
     const offset = () => Math.max(0, Math.min(travel, -section.getBoundingClientRect().top));
     const paint = () => {
@@ -86,7 +87,40 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
         paint();
       });
     };
+    const revealNative = (control: HTMLElement) => {
+      const study = control.closest<HTMLElement>('.tm-hung-study');
+      if (!study || section.dataset.galleryMode !== 'native') return;
+      const rail = track.getBoundingClientRect();
+      const card = study.getBoundingClientRect();
+      const limit = track.scrollWidth - track.clientWidth;
+      if (limit > 0 && (card.left < rail.left - 1 || card.right > rail.right + 1)) {
+        const left = Math.min(limit, Math.max(0, track.scrollLeft + card.left - rail.left));
+        track.scrollTo({ left, behavior: 'instant' });
+      }
+      const rect = control.getBoundingClientRect();
+      const top = (header?.offsetHeight ?? 0) + 8;
+      const bottom = window.innerHeight - 8;
+      let delta = 0;
+      if (rect.height > bottom - top) delta = (rect.top + rect.bottom - top - bottom) / 2;
+      else if (rect.top < top) delta = rect.top - top;
+      else if (rect.bottom > bottom) delta = rect.bottom - bottom;
+      if (Math.abs(delta) > 1) window.scrollBy({ top: delta, behavior: 'instant' });
+    };
+    const keepNativeFocusVisible = (control: HTMLElement) => {
+      revealNative(control);
+      // Focus can trigger a browser scroll after focusin. Recheck once, using
+      // the final layout, without following a control the user has since left.
+      cancelAnimationFrame(focusFrame);
+      focusFrame = requestAnimationFrame(() => {
+        if (document.activeElement === control) revealNative(control);
+      });
+    };
     const measure = () => {
+      const wasPinned = section.dataset.galleryMode === 'pinned';
+      const focused = document.activeElement;
+      const keepFocus = wasPinned && !motion.matches && focused instanceof HTMLElement &&
+        track.contains(focused) && section.getBoundingClientRect().bottom > 0 &&
+        section.getBoundingClientRect().top < window.innerHeight;
       section.style.setProperty('--gallery-header', `${header?.offsetHeight ?? 96}px`);
       section.dataset.galleryMode = motion.matches ? 'pinned' : 'native';
       travel = motion.matches ? Math.max(0, track.scrollWidth - aperture.clientWidth) : 0;
@@ -96,13 +130,18 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
         paint();
       } else {
         track.style.removeProperty('transform');
+        if (keepFocus) keepNativeFocusVisible(focused);
       }
     };
 
     // A clipped viewport cannot acquire a second, browser-managed scrollLeft
     // when Tab moves to an offscreen print. Move along the page's scroll axis.
     const revealFocusedStudy = (event: FocusEvent) => {
-      if (!travel || !(event.target instanceof Element)) return;
+      if (!(event.target instanceof HTMLElement) || !event.target.matches(':focus-visible')) return;
+      if (!travel) {
+        keepNativeFocusVisible(event.target);
+        return;
+      }
       const study = event.target.closest<HTMLElement>('.tm-hung-study');
       if (!study) return;
       const current = offset();
@@ -127,7 +166,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
       if (event.key === 'End') next = studies.length - 1;
       const target = studies[Math.max(0, Math.min(next, studies.length - 1))];
       event.preventDefault();
-      target?.querySelector<HTMLButtonElement>('button')?.focus({ preventScroll: Boolean(travel) });
+      target?.querySelector<HTMLButtonElement>('button')?.focus({ preventScroll: true });
     };
 
     measure();
@@ -148,6 +187,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
       track.removeEventListener('focusin', revealFocusedStudy);
       track.removeEventListener('keydown', handleRailKeys);
       cancelAnimationFrame(frame);
+      cancelAnimationFrame(focusFrame);
     };
   }, []);
 

@@ -9,7 +9,7 @@
   isolation: isolate;
   background: #d9d6d2;
   color: #272321;
-  overflow: hidden;
+  overflow: clip;
   background-image:
     radial-gradient(ellipse at 50% 2%, rgba(255,255,255,.30), transparent 70%),
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' opacity='.025' filter='url(%23g)'/%3E%3C/svg%3E");
@@ -315,6 +315,9 @@
    existing four-column layout or touch-scrollable strip remains available. */
 .tm-hanging-gallery[data-gallery-mode="native"] .tm-hung-running {
   padding-top: calc(var(--gallery-header) + 12px);
+}
+.tm-hanging-gallery[data-gallery-mode="native"] .tm-hung-strip:has(:focus-visible) {
+  scroll-snap-type: none;
 }
 #project[data-gallery-mode="pinned"] {
   height: calc(100svh + var(--gallery-travel, 0px));
