@@ -77,6 +77,13 @@
 .tm-explorer-stardust--left { left: 4%; }
 .tm-explorer-stardust--right { right: 3%; top: 60%; width: 30%; transform: rotate(-19deg); }
 
+.tm-explorer-foreground-crop {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  overflow: clip;
+  pointer-events: none;
+}
 .tm-explorer-foreground {
   position: absolute;
   z-index: 3;
@@ -90,7 +97,13 @@
   filter: sepia(.12) saturate(.88) contrast(1.045) brightness(1.025);
 }
 .tm-site .tm-explorer-hero .tm-explorer-moon {
-  filter: sepia(.04) saturate(.83) contrast(1.025) brightness(1.025);
+  filter: sepia(.04) saturate(.83) contrast(1.025) brightness(var(--lunar-exposure, 1.025));
+}
+/* The actual lunar surface crosses the horizontal edge of the cover.
+   Foreground art stays cropped to the page it was printed on. */
+@media (prefers-reduced-motion: no-preference) {
+  .tm-site .tm-explorer-hero { isolation: auto; overflow: clip visible; }
+  .tm-site #project.tm-hanging-gallery { isolation: auto; }
 }
 .tm-explorer-film-grain {
   position: absolute;

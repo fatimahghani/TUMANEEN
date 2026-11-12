@@ -259,6 +259,100 @@ async function swipe(session, from, to) {
   await dispatch('touchEnd', []);
 }
 
+// Scroll the document itself. The project boundary is measured afresh because
+// changing the motion preference can change the gallery's section height.
+async function seekHeroScroll(page, fraction) {
+  await page.locator('#project').evaluate(async (project, progress) => {
+    let stable = 0;
+    const deadline = performance.now() + 5000;
+    do {
+      const boundary = scrollY + project.getBoundingClientRect().top;
+      const destination = Math.round(boundary * progress);
+      if (Math.abs(scrollY - destination) > 1) {
+        stable = 0;
+        window.scrollTo({top:destination, behavior:'instant'});
+      } else stable++;
+      await new Promise(resolve => requestAnimationFrame(resolve));
+    } while (stable < 3 && performance.now() < deadline);
+    if (stable < 3) throw new Error('Moon capture could not settle at ' + progress + ' of the cover');
+  }, fraction);
+}
+
+async function checkLunarScroll(page, width) {
+  const project = page.locator('#project');
+  const moon = page.locator('.tm-explorer-moon');
+  const orbit = project.locator('canvas.tm-lunar-orbit');
+  const height = page.viewportSize().height;
+  const body = () => moon.evaluate(el => {
+    const rect = el.getBoundingClientRect();
+    return {x:rect.x + rect.width / 2, y:rect.y + rect.height / 2, diameter:rect.width,
+      projectTop:document.querySelector('#project').getBoundingClientRect().top, scroll:scrollY,
+      overflow:document.documentElement.scrollWidth - innerWidth};
+  });
+  // Measure pixels actually painted into the gallery decoration, including
+  // sparse, antialiased grains. A canvas that is sized but blank has zero span.
+  const footprint = () => orbit.evaluate(canvas => {
+    const thumb = document.createElement('canvas');
+    thumb.width = 300;
+    thumb.height = Math.max(1, Math.round(300 * canvas.height / Math.max(1, canvas.width)));
+    const ctx = thumb.getContext('2d');
+    if (canvas.width && canvas.height) ctx.drawImage(canvas, 0, 0, thumb.width, thumb.height);
+    const rgba = ctx.getImageData(0, 0, thumb.width, thumb.height).data;
+    let count = 0, left = thumb.width, right = -1;
+    for (let i = 3; i < rgba.length; i += 4) {
+      if (rgba[i] < 3) continue;
+      const x = ((i - 3) / 4) % thumb.width;
+      left = Math.min(left, x);
+      right = Math.max(right, x);
+      count++;
+    }
+    return {count, span:Math.max(0, right-left+1)/thumb.width};
+  });
+  await page.emulateMedia({reducedMotion:'no-preference'});
+  await page.locator('#project[data-gallery-mode="pinned"]').waitFor();
+  await page.mouse.move(-4, -4);
+  const positions = [], paint = [];
+  for (let frame = 0; frame <= 21; frame++) {
+    await seekHeroScroll(page, frame / 21);
+    positions.push(await body());
+    if (frame >= 10) paint.push(await footprint());
+    if (width === 1440 || [7,12,21].includes(frame)) {
+      const prefix = width === 1440 ? 'lunar-scroll' : 'lunar-phone';
+      await page.screenshot({path:`editorial-snapshots/${prefix}-${String(frame).padStart(2,'0')}.png`});
+    }
+  }
+  const origin = positions[0], moving = positions[7], full = paint.at(-1);
+  assert(moving.x > origin.x + width*.04 && moving.y > origin.y + height*.015 && moving.diameter < origin.diameter,
+    'The same moon must shrink and move lower-right in the viewport: ' + JSON.stringify({origin,moving}));
+  assert(positions.slice(7,14).some(p => p.x > width*.60 && p.y > height*.60 && p.y > p.projectTop),
+    'The lower-right moon must cross the visible boundary into Projects');
+  assert(positions.every(p => p.overflow <= 2), 'Lunar travel must stay inside the page width');
+  assert(full.count > 100 && full.span > .48 && paint.some(p => p.count > 5 && p.span < full.span*.88),
+    'A compact field of visible grains must spread into a wide composition: ' + JSON.stringify(paint));
+  await seekProjectGallery(project, .65);
+  assert((await footprint()).span >= full.span*.95, 'The finished lunar shape must persist behind the moving gallery');
+  const reachable = await project.locator('.tm-hung-paper').evaluateAll(covers =>
+    covers.some(cover => {
+      const box = cover.getBoundingClientRect();
+      const hit = document.elementFromPoint(box.x + box.width/2, box.y + box.height/2);
+      return hit && cover.contains(hit);
+    }));
+  assert(reachable, 'The lunar background must leave the framed projects clickable');
+  await seekHeroScroll(page, 7/21);
+  const reverse = await body();
+  assert(Math.abs(moving.x-reverse.x) < 3 && Math.abs(moving.y-reverse.y) < 3,
+    'Scrolling back must retrace the lunar path');
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await page.locator('#project[data-gallery-mode="native"]').waitFor();
+  await seekHeroScroll(page, 7/21);
+  const still = await body();
+  assert(Math.abs(still.x-origin.x) < 3 && Math.abs(still.y+still.scroll-origin.y) < 3,
+    'Reduced motion should leave the moon in its original cover position: ' + JSON.stringify({origin,still}));
+  await seekHeroScroll(page, 1);
+  const staticArt = await footprint();
+  assert(staticArt.count > 100 && staticArt.span > .48, 'Reduced motion should show the completed gallery artwork');
+}
+
 async function seekProjectGallery(section, fraction) {
   const state = await section.evaluate(async (el, progress) => {
     const track = el.querySelector('.tm-hung-strip');
@@ -747,6 +841,8 @@ try {
       assert.equal(await angle(page), beforeSwipe, 'A horizontal swipe must leave the surface alone');
       await swipe(session, from, { x: from.x, y: from.y - 140 });
       await page.waitForFunction(() => document.querySelector('.tm-explorer-hero').getBoundingClientRect().top < -30);
+      // Start the separate tap check on the original moon after the swipe.
+      await seekHeroScroll(page, 0);
       await page.emulateMedia({reducedMotion:'no-preference'});
       await page.waitForFunction(() => document.querySelector('.tm-explorer-moon')?.dataset.animating === 'true');
       await session.send('Input.dispatchTouchEvent', {type: 'touchStart', touchPoints: [{x: from.x, y: from.y}]});
@@ -812,6 +908,7 @@ try {
       await page.locator('.tm-explorer-hero').scrollIntoViewIfNeeded();
     }
     if (width === 375 || width === 1440) {
+      await checkLunarScroll(page, width);
       await checkProjectGallery(page, width);
       await checkChapters(page, width);
       await checkProjectScrollInput(page, width);

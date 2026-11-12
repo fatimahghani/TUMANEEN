@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createParticleMoon } from './particleMoon';
 import { createLunarDust } from './lunarDust';
+import { followLunarOrbit } from './lunarOrbit';
 import './RotatingMoon.css';
 
 // NASA SVS CGI Moon Kit; attribution in public/assets/retro/README.md.
@@ -24,14 +25,14 @@ export const RotatingMoon: React.FC = () => {
     const dust = createLunarDust(dustCanvas);
     let pointer: { x: number; y: number } | null = null;
     let surface: ReturnType<typeof createParticleMoon> | null = null;
-    let visible = true, angle = 0, frame = 0, previousTime = 0;
+    let visible = true, bodyVisible = true, angle = 0, frame = 0, previousTime = 0;
 
     const draw = (elapsed = 0) => {
       surface?.draw(angle, elapsed, pointer, canAnimate());
       dust.draw(elapsed, pointer);
       host.dataset.angle = (angle * 360 / TAU).toFixed(3);
     };
-    const canAnimate = () => visible && !document.hidden && !motion.matches;
+    const canAnimate = () => visible && bodyVisible && !document.hidden && !motion.matches;
     const tick = (now: number) => {
       const elapsed = previousTime ? Math.min((now - previousTime) / 1000, .1) : 0;
       previousTime = now;
@@ -56,7 +57,9 @@ export const RotatingMoon: React.FC = () => {
     surface = createParticleMoon(canvas, fallback, MAP, setReady);
 
     const resize = () => {
-      const diameter = host.getBoundingClientRect().width;
+      // Particle resolution follows the original composition, independently
+      // of the scroll transform that carries the moon into the gallery.
+      const diameter = host.offsetWidth;
       const dpr = Math.min(devicePixelRatio || 1, 1.6);
       surface?.resize(diameter, dpr);
       dust.resize(diameter, dpr);
@@ -81,6 +84,11 @@ export const RotatingMoon: React.FC = () => {
     const sizing = new ResizeObserver(resize);
     observer.observe(host);
     sizing.observe(host);
+    const galleryOrbit = document.querySelector<HTMLCanvasElement>('#project .tm-lunar-orbit');
+    const stopOrbit = galleryOrbit && followLunarOrbit(hero, host, galleryOrbit, motion, value => {
+      bodyVisible = value;
+      wake();
+    });
     hero.addEventListener('pointermove', trackPointer, { passive: true });
     hero.addEventListener('pointerleave', releasePointer);
     hero.addEventListener('pointercancel', releasePointer);
@@ -93,6 +101,7 @@ export const RotatingMoon: React.FC = () => {
     wake();
     return () => {
       cancelAnimationFrame(frame);
+      stopOrbit?.();
       observer.disconnect();
       sizing.disconnect();
       hero.removeEventListener('pointermove', trackPointer);
