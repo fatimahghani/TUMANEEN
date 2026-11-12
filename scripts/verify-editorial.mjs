@@ -391,10 +391,10 @@ try {
     assert(layout.titleText.includes('TUMANEEN'),'Accessible headline missing');
     assert.equal(layout.tagline,'VisualExplorer','Tagline wording changed');
     assert.deepEqual(layout.layers,[1,2,3,4],'Scene order changed');
-    assert(layout.font.includes('Fraunces Masthead'),'Use the portfolio’s custom-cut Fraunces masthead');
-    assert.equal(layout.weight,'540','Optical fitting should measure the actual display cut');
+    assert(layout.font.includes('Tumaneen Titling'),'Use the original TUMANEEN lettering');
+    assert.equal(layout.weight,'400','Optical fitting should measure the actual display cut');
     assert(await page.evaluate(() => [...document.fonts].some(face =>
-      face.family.includes('Fraunces Masthead') && face.status === 'loaded')), 'The local masthead font must load');
+      face.family.includes('Tumaneen Titling') && face.status === 'loaded')), 'The local masthead font must load');
 
     // Inspect visible ink in the chosen weight, not a larger font line box.
     const typography=await page.locator('.tm-explorer-masthead').evaluate(svg=>{
