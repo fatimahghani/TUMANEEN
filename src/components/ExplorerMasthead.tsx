@@ -71,7 +71,8 @@ export const ExplorerMasthead: React.FC = () => {
       if (disposed) return;
       const bounds = svg.getBoundingClientRect();
       const clearance = Math.max(11, Math.min(26, bounds.width * .024));
-      const height = Math.min(bounds.height, moon.getBoundingClientRect().top - bounds.top - clearance);
+      const moonTop = hero.getBoundingClientRect().top + moon.offsetTop;
+      const height = Math.min(bounds.height, moonTop - bounds.top - clearance);
       if (height <= 0 || bounds.width <= 0) return;
       const style = getComputedStyle(letters[0]);
       ctx.font = `${style.fontStyle} ${style.fontWeight} ${MEASURE_SIZE}px ${style.fontFamily}`;

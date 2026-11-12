@@ -48,7 +48,21 @@
 }
 .tm-hung-shell {
   position: relative;
-  z-index: 1;
+  z-index: 3;
+}
+.tm-lunar-orbit {
+  position: absolute;
+  z-index: -1;
+  left: 50%;
+  top: 0;
+  width: 100vw;
+  height: 100%;
+  max-width: none;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+@media (forced-colors: active) {
+  .tm-lunar-orbit { visibility: hidden; }
 }
 @media (max-width: 1050px) {
   .tm-projects.tm-epok-gallery.tm-hanging-gallery::before,
