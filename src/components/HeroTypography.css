@@ -11,8 +11,7 @@
   position: absolute;
   z-index: 1;
   top: max(22px, 3%);
-  left: 4.6%;
-  width: 90.8%;
+  inset-inline: max(3.5%, 56px);
   height: 32%;
   margin: 0;
   pointer-events: none;
@@ -75,19 +74,24 @@
   text-shadow: 0 1px 1px #26190f, 0 1px 5px rgb(34 22 15 / 72%);
   pointer-events: none;
 }
+.tm-explorer-tagline-line {
+  font-family: Baskerville, 'Baskerville Old Face', 'Times New Roman', Times, serif;
+  font-style: italic;
+  font-weight: 400;
+  font-kerning: normal;
+}
 .tm-explorer-tagline-line:first-child {
   grid-row: 1;
   grid-column: 2;
-  padding-inline-start: .27em;
-  font: 600 clamp(11px, .82vw, 14px)/1.2 'Helvetica Neue', Arial, sans-serif;
-  text-transform: uppercase;
-  letter-spacing: .27em;
+  font-size: clamp(17px, 1.7vw, 27px);
+  line-height: 1;
+  letter-spacing: -.02em;
 }
 .tm-explorer-tagline-line:nth-child(2) {
   grid-row: 2;
   grid-column: 1 / -1;
-  font: italic 400 clamp(42px, 4.8vw, 78px)/.98 Baskerville, 'Baskerville Old Face', 'Times New Roman', Times, serif;
-  font-kerning: normal;
+  font-size: clamp(42px, 4.8vw, 78px);
+  line-height: .98;
   letter-spacing: -.047em;
 }
 .tm-explorer-tagline-line:nth-child(2)::first-letter {
@@ -110,6 +114,10 @@
   grid-column: 3;
 }
 @media (max-width: 1100px) and (orientation: portrait) {
+  .tm-explorer-hero .tm-explorer-heading {
+    top: max(60px, 4.2%);
+    inset-inline: 3.5%;
+  }
   .tm-site .tm-explorer-hero .tm-explorer-tagline {
     /* The height of the rock below the caption follows the image width. */
     bottom: clamp(14px, 2.7vw, 30px);
@@ -122,11 +130,6 @@
   .tm-explorer-tagline-line:nth-child(2) { font-size: clamp(34px, 5.8vw, 42px); }
 }
 @media (max-width: 600px) and (orientation: portrait) {
-  .tm-explorer-hero .tm-explorer-heading {
-    left: 5%;
-    width: 90%;
-    top: max(32px, 4.2%);
-  }
   .tm-site .tm-explorer-hero .tm-explorer-tagline {
     left: 6%;
     column-gap: .48rem;
