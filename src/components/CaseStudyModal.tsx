@@ -26,7 +26,18 @@ export const CaseStudyModal: React.FC<CaseStudyModalProps> = ({
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const slideRefs = useRef<(HTMLElement | null)[]>([]);
 
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const isOpen = Boolean(project);
   const totalItems = project ? project.slides.length : 0;
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    closeButtonRef.current?.focus({ preventScroll: true });
+    return () => { document.body.style.overflow = previousOverflow; };
+  }, [isOpen]);
 
   useEffect(() => {
     setShowGrid(false);
@@ -48,6 +59,18 @@ export const CaseStudyModal: React.FC<CaseStudyModalProps> = ({
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!project) return;
       if (e.key === 'Escape') onClose();
+      if (e.key === 'Tab' && dialogRef.current) {
+        const controls = Array.from(dialogRef.current.querySelectorAll<HTMLElement>('button:not(:disabled), a[href]'))
+          .filter(control => control.getClientRects().length > 0);
+        const first = controls[0], last = controls[controls.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last?.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first?.focus();
+        }
+      }
       if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
         e.preventDefault();
         scrollToSlide(Math.min(totalItems - 1, activeSlide + 1));
@@ -95,6 +118,7 @@ export const CaseStudyModal: React.FC<CaseStudyModalProps> = ({
 
   return (
     <div
+      ref={dialogRef}
       className="tm-case-modal fixed inset-0 z-[800] h-svh w-screen bg-[#5D182B] text-[#F0E4D2] overflow-hidden select-none"
       role="dialog"
       aria-modal="true"
@@ -168,6 +192,7 @@ export const CaseStudyModal: React.FC<CaseStudyModalProps> = ({
         </button>
 
         <button
+          ref={closeButtonRef}
           onClick={onClose}
           className="pointer-events-auto p-1.5 bg-[#5D182B] text-[#F0E4D2] hover:bg-[#F0E4D2] hover:text-[#5D182B] transition-colors cursor-pointer shadow-lg"
           aria-label="Close Slides"

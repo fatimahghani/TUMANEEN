@@ -259,9 +259,123 @@ async function swipe(session, from, to) {
   await dispatch('touchEnd', []);
 }
 
+async function checkProjectGallery(page, width) {
+  await page.emulateMedia({reducedMotion:'no-preference'});
+  const section = page.locator('#project');
+  const stage = section.locator('.tm-hung-shell');
+  const covers = section.locator('.tm-hung-paper');
+  await page.locator('#project[data-gallery-mode="pinned"]').waitFor();
+  const {start, travel} = await section.evaluate(el => ({
+    start: el.getBoundingClientRect().top + scrollY,
+    travel: el.querySelector('.tm-hung-strip').scrollWidth - el.querySelector('.tm-hung-window').clientWidth,
+  }));
+  assert(travel > 150, 'The gallery must have real horizontal travel');
+  const seek = async fraction => {
+    await page.evaluate(async y => {
+      window.scrollTo({top:y, behavior:'instant'});
+      await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    }, start + travel * fraction);
+  };
+  let initial;
+  for (const [name, fraction] of [['start',0],['middle',.5],['end',1]]) {
+    await seek(fraction);
+    const frame = await stage.evaluate(async el => {
+      const view = el.querySelector('.tm-hung-window').getBoundingClientRect();
+      const sheets = [...el.querySelectorAll('.tm-hung-paper')];
+      const visible = sheets.filter(sheet => {
+        const b = sheet.getBoundingClientRect();
+        return b.right > view.left && b.left < view.right;
+      });
+      await Promise.all(visible.map(sheet => sheet.querySelector('img').decode()));
+      return {top:el.getBoundingClientRect().top, first:sheets[0].getBoundingClientRect().left,
+        last:sheets.at(-1).getBoundingClientRect().right, left:view.left, right:view.right,
+        bodyOverflow:document.documentElement.scrollWidth-innerWidth};
+    });
+    if (!initial) initial = frame;
+    assert(Math.abs(frame.top-initial.top) < 3, 'The gallery stage must stay pinned while the sheets advance');
+    assert(Math.abs((initial.first-frame.first) - travel*fraction) < 4, 'The sheets must move horizontally with page scroll');
+    assert(frame.bodyOverflow <= 2, 'The gallery should never widen the document');
+    if (fraction === 0) assert(Math.abs(frame.first-frame.left) < 4, 'First case study should start at the gallery edge');
+    if (fraction === 1) assert(Math.abs(frame.last-frame.right) < 4, 'Last case study should finish at the gallery edge');
+    await page.screenshot({path:`editorial-snapshots/projects-${width}-${name}.png`, animations:'disabled'});
+    if (fraction === 0) {
+      const {height} = page.viewportSize();
+      if (width === 375) {
+        const touch = await page.context().newCDPSession(page);
+        await swipe(touch, {x:width/2,y:height*.65}, {x:width/2,y:height*.47});
+        await touch.detach();
+      } else {
+        await page.mouse.move(width/2, height*.6);
+        await page.mouse.wheel(0, 160);
+      }
+      await page.waitForFunction(x => document.querySelector('#project .tm-hung-paper').getBoundingClientRect().left < x - 20, frame.first);
+      await page.keyboard.press('Shift');
+    }
+  }
+  if (width === 1440) {
+    for (let frame = 0; frame <= 24; frame++) {
+      await seek(frame / 24);
+      const number = String(frame).padStart(2, '0');
+      await page.screenshot({path:`editorial-snapshots/projects-scroll-${number}.png`, animations:'disabled'});
+    }
+  }
+  const posters = page.locator('#posters');
+  await seek(1 + page.viewportSize().height * .6 / travel);
+  assert((await posters.boundingBox()).y < page.viewportSize().height * .6, 'Scrolling past the last project must reveal Posters');
+
+  await seek(0);
+  const firstCover = section.getByRole('button',{name:'Open LUMERA case study',exact:true});
+  const lastCover = section.getByRole('button',{name:'Open Poster Typography case study',exact:true});
+  await firstCover.focus();
+  await page.keyboard.press('Enter');
+  const caseStudy = page.locator('.tm-case-modal');
+  await caseStudy.waitFor({state:'visible'});
+  await page.keyboard.press('Escape');
+  await caseStudy.waitFor({state:'hidden'});
+  await firstCover.focus();
+  await page.keyboard.press('End');
+  assert(await lastCover.evaluate(el => el === document.activeElement), 'End should focus the last project');
+  await page.waitForFunction(() => {
+    const last = document.querySelector('#project .tm-hung-study:last-child button').getBoundingClientRect();
+    return last.x >= -1 && last.right <= innerWidth + 1;
+  });
+  await page.keyboard.press('Enter');
+  const posterStudy = page.locator('.tm-epok-study-overlay');
+  await posterStudy.waitFor({state:'visible'});
+  const thumbs = posterStudy.locator('.tm-epok-study-thumbnails button');
+  assert.equal(await thumbs.count(),3,'Grouped posters changed');
+  await page.keyboard.press('ArrowRight');
+  assert.equal(await thumbs.nth(1).getAttribute('aria-pressed'),'true','The next poster plate must open with the keyboard');
+  await page.keyboard.press('Escape');
+  await posterStudy.waitFor({state:'hidden'});
+
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await page.locator('#project[data-gallery-mode="native"]').waitFor();
+  assert.notEqual(await stage.evaluate(el => getComputedStyle(el).position), 'sticky', 'Reduced motion should release the gallery');
+  for (const cover of await covers.all()) {
+    await cover.focus();
+    await page.waitForFunction(() => {
+      const rect = document.activeElement.getBoundingClientRect();
+      const x = rect.x + rect.width / 2, y = rect.y + rect.height / 2;
+      return x >= 0 && x <= innerWidth && y >= 0 && y <= innerHeight;
+    });
+  }
+  const indexButton = section.getByRole('button',{name:/view index/i});
+  await indexButton.focus();
+  await page.keyboard.press('Enter');
+  const index = page.locator('.tm-epok-overlay[role="dialog"]');
+  await index.waitFor({state:'visible'});
+  assert.equal(await index.locator('.tm-epok-index-row').count(),4,'The index should include all four studies');
+  await page.keyboard.press('Tab');
+  assert(await index.locator('.tm-epok-index-row').first().evaluate(el => el === document.activeElement), 'Tab should reach the first index entry');
+  await page.keyboard.press('Escape');
+  await index.waitFor({state:'hidden'});
+  assert(await indexButton.evaluate(el => el === document.activeElement), 'Closing the index should restore focus');
+}
+
 async function checkChapters(page, width) {
   const paper = 'rgb(241, 226, 206)', wine = 'rgb(100, 22, 19)', night = 'rgb(27, 27, 26)';
-  const chapters = [['posters', paper], ['project', night], ['process', paper],
+  const chapters = [['project', night], ['posters', paper], ['process', paper],
     ['about', paper], ['services', paper], ['contact-form', wine]];
   for (const [id, background] of chapters) {
     const section = page.locator('#' + id);
@@ -524,8 +638,8 @@ try {
     assert.equal(await page.locator('.tm-explorer-motion').count(),0,'Remove the lunar pause control');
     assert.equal(await page.getByRole('button',{name:/(?:pause|resume).*lunar/i}).count(),0);
     const menu = page.getByRole('button',{name:'Open navigation',exact:true});
-    const next = page.getByRole('link',{name:'Explore the poster archive',exact:true});
-    assert(await next.isVisible(),'Keep the archive link');
+    const next = page.getByRole('link',{name:'Explore selected projects',exact:true});
+    assert(await next.isVisible() && await next.getAttribute('href') === '#project','The cover arrow should lead to selected projects');
     const cursorOf = el => getComputedStyle(el).cursor;
     assert(await menu.evaluate(cursorOf) !== 'none' && await next.evaluate(cursorOf) !== 'none',
       'Reduced motion should keep native cursors over controls');
@@ -539,8 +653,9 @@ try {
     await page.keyboard.press('Escape');
     assert(await menu.evaluate(el => document.activeElement === el), 'Escape should return focus to the menu toggle');
     assert.equal(await page.locator('.tm-explorer-nav').count(),0,'Escape failed');
-    for(const id of ['home','posters','project','process','about','services','contact-form'])
-      assert.equal(await page.locator('#'+id).count(),1,'Section missing: '+id);
+    const chapterIds = ['home','project','posters','process','about','services','contact-form'];
+    const renderedChapters = await page.locator(chapterIds.map(id => '#'+id).join(',')).evaluateAll(nodes => nodes.map(el => el.id));
+    assert.deepEqual(renderedChapters, chapterIds, 'Projects should follow the cover, then posters and process');
     assert.equal(await page.locator('.tm-ma-exhibit').count(),6,'Archive changed');
     assert.equal(await page.locator('.tm-ma-primary-paper img,.tm-ma-secondary-paper img').count(),8,'Original posters changed');
     assert.equal(await page.locator('.tm-hung-study').count(),4,'Case studies changed');
@@ -624,17 +739,10 @@ try {
       assert.equal(await posters.evaluate(cursorOf), 'none', 'The comet should continue across portfolio backgrounds');
       const offscreen=await angle(page);await wait(page,250);
       assert.equal(await angle(page),offscreen,'Offscreen suspension failed');
-      await page.getByRole('button',{name:'Open LUMERA case study',exact:true}).click();
-      await page.locator('.tm-case-modal').waitFor({state:'visible'});
-      await page.keyboard.press('Escape');await page.locator('.tm-case-modal').waitFor({state:'hidden'});
-      await page.getByRole('button',{name:'Open Poster Typography case study',exact:true}).click();
-      await page.locator('.tm-epok-study-overlay').waitFor({state:'visible'});
-      assert.equal(await page.locator('.tm-epok-study-thumbnails button').count(),3,'Grouped posters changed');
-      await page.keyboard.press('Escape');await page.locator('.tm-epok-study-overlay').waitFor({state:'hidden'});
       await page.locator('.tm-explorer-hero').scrollIntoViewIfNeeded();
     }
     if (width === 375 || width === 1440) {
-      await page.emulateMedia({reducedMotion: 'reduce'});
+      await checkProjectGallery(page, width);
       await checkChapters(page, width);
     }
     assert.deepEqual(errors,[],'Browser error');

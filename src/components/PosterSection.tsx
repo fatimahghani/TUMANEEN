@@ -261,7 +261,7 @@ export const PosterSection: React.FC = () => {
       <div className="tm-ma-content">
         <header className="tm-ma-running-head">
           <div className="tm-ma-running-heading">
-            <span>01 / POSTER ARCHIVE</span>
+            <span>02 / POSTER ARCHIVE</span>
             <h2 id="tm-ma-title">Studies in print</h2>
           </div>
           <span>TUMANEEN / COLLECTED WORKS</span>

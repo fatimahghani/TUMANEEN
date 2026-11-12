@@ -19,11 +19,22 @@ import { PosterSection } from './components/PosterSection';
 import { AboutSection } from './components/AboutSection';
 import { ServicesSection } from './components/ServicesSection';
 
-type NavSectionId = 'home' | 'project' | 'about' | 'services' | 'posters' | 'process' | 'contact-form';
+type ChapterId = 'home' | 'project' | 'posters' | 'process' | 'about' | 'services';
+type NavSectionId = ChapterId | 'contact-form';
+
+const chapters: { id: ChapterId; label: string; mobileLabel?: string }[] = [
+  { id: 'home', label: 'Home' },
+  { id: 'project', label: 'Selected Work', mobileLabel: 'Work' },
+  { id: 'posters', label: 'Posters' },
+  { id: 'process', label: 'Process' },
+  { id: 'about', label: 'About' },
+  { id: 'services', label: 'Services' },
+];
 
 export default function App() {
-  const [activeNav, setActiveNav] = useState<'home' | 'posters' | 'project' | 'process' | 'about' | 'services'>('home');
+  const [activeNav, setActiveNav] = useState<ChapterId>('home');
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+  const caseStudyTrigger = useRef<HTMLElement | null>(null);
   const [isAllProjectsOpen, setIsAllProjectsOpen] = useState<boolean>(false);
   const [showFloatingHeader, setShowFloatingHeader] = useState<boolean>(false);
 
@@ -50,37 +61,37 @@ export default function App() {
   }, [clearTransitionTimers]);
 
   useEffect(() => {
+    const sections = chapters.map(({ id }) => ({ id, el: document.getElementById(id) })).reverse();
     const handleScroll = () => {
-      const y = window.scrollY;
-      setShowFloatingHeader(y > window.innerHeight * 0.65);
-
-      // Keep active top-header indicator synced with scroll position
-      const sections: Array<{ id: 'home' | 'posters' | 'project' | 'process' | 'about' | 'services'; el: HTMLElement | null }> = [
-        { id: 'home', el: document.getElementById('home') },
-        { id: 'posters', el: document.getElementById('posters') },
-        { id: 'project', el: document.getElementById('project') },
-        { id: 'process', el: document.getElementById('process') },
-        { id: 'about', el: document.getElementById('about') },
-        { id: 'services', el: document.getElementById('services') },
-      ];
-      const viewportMid = window.scrollY + window.innerHeight * 0.38;
-      for (let i = sections.length - 1; i >= 0; i--) {
-        const item = sections[i];
-        if (item.el && item.el.offsetTop <= viewportMid) {
-          setActiveNav(item.id);
-          break;
-        }
-      }
+      setShowFloatingHeader(window.scrollY > window.innerHeight * 0.65);
+      const readingLine = window.innerHeight * 0.38;
+      const current = sections.find(({ el }) => el && el.getBoundingClientRect().top <= readingLine);
+      if (current) setActiveNav(current.id);
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll);
     handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
   }, []);
 
   const activeModalProject = useMemo(
     () => PORTFOLIO_PROJECTS.find((p) => p.id === selectedProjectId) || null,
     [selectedProjectId]
   );
+
+  const openCaseStudy = (id: string, trigger: HTMLElement | null) => {
+    caseStudyTrigger.current = trigger;
+    setSelectedProjectId(id);
+  };
+
+  const closeCaseStudy = () => {
+    setSelectedProjectId(null);
+    const trigger = caseStudyTrigger.current;
+    requestAnimationFrame(() => trigger?.focus({ preventScroll: true }));
+  };
 
   const handleNextModalProject = () => {
     if (!selectedProjectId) return;
@@ -98,18 +109,7 @@ export default function App() {
 
   const scrollToSection = useCallback(
     (sectionId: NavSectionId) => {
-      if (
-        sectionId === 'home' ||
-        sectionId === 'project' ||
-        sectionId === 'posters' ||
-        sectionId === 'process' ||
-        sectionId === 'about' ||
-        sectionId === 'services'
-      ) {
-        setActiveNav(sectionId);
-      } else if (sectionId === 'contact-form') {
-        setActiveNav('services');
-      }
+      setActiveNav(sectionId === 'contact-form' ? 'services' : sectionId);
 
       clearTransitionTimers();
       const transitionKey = Date.now();
@@ -172,7 +172,7 @@ export default function App() {
 
       {/* PERSISTENT ARCHITECTURAL STUDIO HEADER ON SCROLL */}
       <header
-        aria-label="Site header" data-editorial-nav="true"
+        aria-label="Site header" data-editorial-nav="true" inert={!!selectedProjectId}
         className={`fixed top-0 inset-x-0 z-[700] transition-all duration-500 ${
           showFloatingHeader && !selectedProjectId
             ? 'opacity-100 translate-y-0 pointer-events-auto'
@@ -198,16 +198,7 @@ export default function App() {
 
             {/* Center Editorial Section Index (Desktop & Tablet) */}
             <nav aria-label="Floating navigation" className="hidden md:flex items-center gap-6 lg:gap-8">
-              {(
-                [
-                  { id: 'home', label: 'Home' },
-                  { id: 'posters', label: 'Posters' },
-                  { id: 'project', label: 'Selected Work' },
-                  { id: 'process', label: 'Process' },
-                  { id: 'about', label: 'About' },
-                  { id: 'services', label: 'Services' },
-                ] as const
-              ).map((item) => {
+              {chapters.map((item) => {
                 const isCurrent = activeNav === item.id;
                 return (
                   <button
@@ -250,16 +241,7 @@ export default function App() {
             aria-label="Mobile section navigation"
             className="md:hidden flex items-center gap-5 px-4 py-2 border-t border-[#F0E4D2]/10 overflow-x-auto no-scrollbar"
           >
-            {(
-              [
-                { id: 'home', label: 'Home' },
-                { id: 'posters', label: 'Posters' },
-                { id: 'project', label: 'Work' },
-                { id: 'process', label: 'Process' },
-                { id: 'about', label: 'About' },
-                { id: 'services', label: 'Services' },
-              ] as const
-            ).map((item) => {
+            {chapters.map((item) => {
               const isCurrent = activeNav === item.id;
               return (
                 <button
@@ -271,7 +253,7 @@ export default function App() {
                     isCurrent ? 'text-[#F0E4D2]' : 'text-[#F0E4D2]/65'
                   }`}
                 >
-                  <span>{item.label}</span>
+                  <span>{item.mobileLabel ?? item.label}</span>
                   {isCurrent && (
                     <span className="absolute inset-x-0 -bottom-0.5 h-px bg-[#F0E4D2]" />
                   )}
@@ -282,7 +264,7 @@ export default function App() {
         </div>
       </header>
 
-      <main className="flex-1">
+      <main className="flex-1" inert={!!selectedProjectId}>
         {/* ISSUE COVER — SHANAKHT / THE VISUAL NOTEBOOK */}
         <div
           id="home"
@@ -295,19 +277,19 @@ export default function App() {
           />
         </div>
 
-        {/* 01 / THE POSTER ARCHIVE */}
-        <div className={revealedSection?.id === 'posters' ? 'section-reveal-active' : undefined}>
-          <PosterSection />
-        </div>
-
-        {/* 3. PROJECTS SECTION (02 · SELECTED CASE STUDIES) */}
+        {/* 01 / SELECTED CASE STUDIES */}
         <div className={revealedSection?.id === 'project' ? 'section-reveal-active' : undefined}>
           <ProjectsSection
-            onSelectProject={(id) => setSelectedProjectId(id)}
+            onSelectProject={openCaseStudy}
             isAllProjectsOpen={isAllProjectsOpen}
             onOpenAllProjects={() => setIsAllProjectsOpen(true)}
             onCloseAllProjects={() => setIsAllProjectsOpen(false)}
           />
+        </div>
+
+        {/* 02 / THE POSTER ARCHIVE */}
+        <div className={revealedSection?.id === 'posters' ? 'section-reveal-active' : undefined}>
+          <PosterSection />
         </div>
 
         {/* 4. PROCESS SECTION (03 · THE PROCESS) */}
@@ -338,7 +320,7 @@ export default function App() {
 
       <CaseStudyModal
         project={activeModalProject}
-        onClose={() => setSelectedProjectId(null)}
+        onClose={closeCaseStudy}
         onNextProject={handleNextModalProject}
         onPrevProject={handlePrevModalProject}
         onSelectScope={handleSelectScopeFromModal}
