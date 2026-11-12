@@ -335,6 +335,7 @@ async function checkChapters(page, width) {
 }
 
 try {
+  let brushAtlasUrl;
   for (const [width,height] of sizes) {
     const page = await browser.newPage({viewport:{width,height},reducedMotion:'reduce',deviceScaleFactor:1,hasTouch:width===375});
     if (width === 375 || width === 1440) {
@@ -391,14 +392,16 @@ try {
     assert(layout.titleText.includes('TUMANEEN'),'Accessible headline missing');
     assert.equal(layout.tagline,'VisualExplorer','Tagline wording changed');
     assert.deepEqual(layout.layers,[1,2,3,4],'Scene order changed');
-    assert(layout.font.includes('Tumaneen Titling'),'Use the original TUMANEEN lettering');
+    assert(layout.font.includes('Tumaneen Brush'),'Use the hand-painted TUMANEEN lettering');
     assert.equal(layout.weight,'400','Optical fitting should measure the actual display cut');
     assert(await page.evaluate(() => [...document.fonts].some(face =>
-      face.family.includes('Tumaneen Titling') && face.status === 'loaded')), 'The local masthead font must load');
+      face.family.includes('Tumaneen Brush') && face.status === 'loaded')), 'The local masthead font must load');
 
     // Inspect visible ink in the chosen weight, not a larger font line box.
+    await page.waitForSelector('.tm-explorer-masthead[data-paint-ready="true"]');
     const typography=await page.locator('.tm-explorer-masthead').evaluate(svg=>{
       const ctx=document.createElement('canvas').getContext('2d');
+      const patterns = [...svg.querySelectorAll('pattern')];
       const letters=[...svg.querySelectorAll('text')].map(el=>{
         const style=getComputedStyle(el);
         ctx.font=`${style.fontStyle} ${style.fontWeight} 100px ${style.fontFamily}`;
@@ -409,13 +412,22 @@ try {
         const bottom=new DOMPoint(x+m.actualBoundingBoxRight,y+m.actualBoundingBoxDescent).matrixTransform(matrix);
         const baseline=new DOMPoint(x,y).matrixTransform(matrix).y;
         return {letter:el.textContent,x:top.x,y:top.y,right:bottom.x,bottom:bottom.y,width:bottom.x-top.x,height:bottom.y-top.y,
-          baseline, scaleRatio:matrix.a / matrix.d};
+          baseline, scaleRatio:matrix.a / matrix.d, paintId: style.fill.match(/url\(["']?[^)"']*#([^)"']+)["']?\)/)?.[1]};
       });
       const m=document.querySelector('.tm-explorer-moon').getBoundingClientRect();
-      return {letters,clips:svg.querySelectorAll('clipPath').length,moon:{x:m.x,y:m.y,width:m.width}};
+      const atlas = svg.querySelector('image')?.href.baseVal;
+      return {letters,clips:svg.querySelectorAll('clipPath').length,moon:{x:m.x,y:m.y,width:m.width},
+        patternIds: patterns.filter(p => p.querySelector('image, use')).map(p => p.id),
+        atlasUrl: atlas && new URL(atlas, document.baseURI).href};
     });
     assert.equal(typography.clips,0,'Do not clip letters');
     assert.equal(typography.letters.map(l=>l.letter).join(''),'TUMANEEN');
+    const paintByLetter = new Map(typography.letters.map(l => [l.letter, l.paintId]));
+    assert.equal(new Set(typography.patternIds).size, 6, 'Each distinct capital needs its own brush tile');
+    assert.deepEqual(new Set(paintByLetter.values()), new Set(typography.patternIds), 'Every brush tile must paint live type');
+    assert(typography.letters.every(l => l.paintId === paintByLetter.get(l.letter)), 'Repeated capitals must use the matching tile');
+    assert(typography.atlasUrl, 'The SVG must reference the painted atlas');
+    brushAtlasUrl = typography.atlasUrl;
     const narrow = portrait && width <= 600;
     const lines = narrow
       ? [typography.letters.slice(0, 4), typography.letters.slice(4)]
@@ -622,8 +634,10 @@ try {
     }
   }
 
-  // Keep a readable black moon without WebGL or web fonts.
+  // Keep the title and moon readable when the brush artwork and WebGL are unavailable.
   const fallback=await browser.newPage({viewport:{width:1280,height:800}});
+  let blockedAtlas = false;
+  await fallback.route(brushAtlasUrl, route => { blockedAtlas = true; return route.abort(); });
   await fallback.route('**/fonts.googleapis.com/**',route=>route.abort());
   await fallback.route('**/fonts.gstatic.com/**',route=>route.abort());
   await fallback.addInitScript(()=>{
@@ -640,6 +654,14 @@ try {
   await fallback.waitForFunction(() => document.querySelector('.tm-explorer-moon')?.dataset.animating === 'true');
   assert((await fallback.evaluate(sampleDust)).exterior > 20, 'Dust should work with the CSS fallback');
   assert(await fallback.locator('.tm-explorer-masthead').isVisible(),'Font fallback missing');
+  assert(blockedAtlas, 'The fallback must exercise a failed brush atlas request');
+  const fallbackInk = await fallback.locator('.tm-explorer-masthead text').evaluateAll(letters =>
+    letters.map(el => el.textContent).join('') === 'TUMANEEN' && letters.every(el => {
+      const fill = getComputedStyle(el).fill;
+      return CSS.supports('color', fill) && fill !== 'transparent' && !fill.endsWith(', 0)') && el.getBoundingClientRect().height > 20;
+    }));
+  assert(fallbackInk, 'All eight letters should have visible solid ink when the atlas fails');
+  assert.notEqual(await fallback.locator('.tm-explorer-masthead').getAttribute('data-paint-ready'), 'true');
   assert.equal(await fallback.locator('.tm-explorer-star').count(),14,'CSS sky should work without WebGL');
   await fallback.screenshot({path:'editorial-snapshots/hero-fallback.png'});
   const fallbackBox = await fallback.locator('.tm-explorer-moon').boundingBox();

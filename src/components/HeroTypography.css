@@ -1,7 +1,7 @@
-/* Six original engraved capitals, drawn specifically for the cover. */
+/* Brush outlines stay legible while their paint texture loads. */
 @font-face {
-  font-family: 'Tumaneen Titling';
-  src: url('../assets/fonts/Tumaneen-Titling.woff') format('woff');
+  font-family: 'Tumaneen Brush';
+  src: url('../assets/fonts/Tumaneen-Brush.woff') format('woff');
   font-style: normal;
   font-weight: 400;
   font-display: swap;
@@ -10,7 +10,7 @@
 .tm-explorer-hero .tm-explorer-heading {
   position: absolute;
   z-index: 1;
-  top: max(51px, 6.5%);
+  top: max(22px, 3%);
   left: 4.6%;
   width: 90.8%;
   height: 32%;
@@ -36,11 +36,11 @@
   clip: auto;
   overflow: visible;
   color: var(--explorer-burgundy);
-  font: 400 min(14.5vw, 21svh)/1 'Tumaneen Titling', 'Fraunces', Georgia, serif;
+  font: 400 min(14.5vw, 21svh)/1 'Tumaneen Brush', Impact, 'Arial Narrow', sans-serif;
   letter-spacing: -.025em;
 }
 .tm-explorer-masthead text {
-  font-family: 'Tumaneen Titling', 'Fraunces', Georgia, serif !important;
+  font-family: 'Tumaneen Brush', Impact, 'Arial Narrow', sans-serif !important;
   font-size: 100px;
   font-weight: 400 !important;
   font-style: normal;
@@ -49,6 +49,14 @@
   letter-spacing: 0 !important;
   fill: var(--explorer-burgundy);
   text-rendering: geometricPrecision;
+}
+
+.tm-explorer-masthead[data-paint-ready='true'] text {
+  fill: var(--brush-paint);
+}
+@media (forced-colors: active) {
+  .tm-explorer-masthead text,
+  .tm-explorer-masthead[data-paint-ready='true'] text { fill: CanvasText; }
 }
 
 .tm-site .tm-explorer-hero .tm-explorer-tagline {
@@ -117,7 +125,7 @@
   .tm-explorer-hero .tm-explorer-heading {
     left: 5%;
     width: 90%;
-    top: max(60px, 7.5%);
+    top: max(32px, 4.2%);
   }
   .tm-site .tm-explorer-hero .tm-explorer-tagline {
     left: 6%;

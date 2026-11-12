@@ -1,14 +1,36 @@
-import React, { useLayoutEffect, useRef } from 'react';
+import React, { useId, useLayoutEffect, useRef } from 'react';
+import brushTexture from '../assets/fonts/brush-atlas.webp';
+import atlas from '../assets/fonts/brush-atlas.json';
 import './HeroTypography.css';
 
 const WORD = 'TUMANEEN';
 const MEASURE_SIZE = 100;
 const ROW_GAP = 9;
 const TRACKING = -2;
-const SERIF_CLEARANCE = 1.1;
+const INK_CLEARANCE = 1.1;
 
-// Measure the ink at the font's native proportions. Keep the font's pair
-// kerning, with a small optical clearance between neighboring serifs.
+// Register each scan to the font's baseline. A text element's SVG bounding
+// box also includes its side bearings, so it cannot align the bristles.
+function BrushPatterns({ id }: { id: string }) {
+  const unit = MEASURE_SIZE / atlas.unitsPerEm;
+  return (
+    <defs>
+      <image id={id} href={brushTexture} width={atlas.width} height={atlas.height} />
+      {Object.entries(atlas.glyphs).map(([letter, column]) => (
+        <pattern
+          key={letter} id={`${id}-${letter}`} patternUnits="userSpaceOnUse"
+          x={0} y={-atlas.baseline * unit}
+          width={atlas.cellWidth * unit} height={atlas.height * unit}
+          viewBox={`${column * atlas.cellWidth} 0 ${atlas.cellWidth} ${atlas.height}`}
+        >
+          <use href={`#${id}`} />
+        </pattern>
+      ))}
+    </defs>
+  );
+}
+
+// Preserve the brush proportions with a small gap between the inked edges.
 function measureLine(letters: SVGTextElement[], ctx: CanvasRenderingContext2D) {
   let pen = 0, lastRight = 0;
   let ascent = 0, descent = 0;
@@ -20,7 +42,7 @@ function measureLine(letters: SVGTextElement[], ctx: CanvasRenderingContext2D) {
     } else {
       const previous = letters[index - 1].textContent || '';
       const advance = ctx.measureText(previous + char).width - ink.width;
-      pen = Math.max(pen + advance + TRACKING, lastRight + SERIF_CLEARANCE + ink.actualBoundingBoxLeft);
+      pen = Math.max(pen + advance + TRACKING, lastRight + INK_CLEARANCE + ink.actualBoundingBoxLeft);
     }
     lastRight = pen + ink.actualBoundingBoxRight;
     ascent = Math.max(ascent, ink.actualBoundingBoxAscent);
@@ -31,6 +53,7 @@ function measureLine(letters: SVGTextElement[], ctx: CanvasRenderingContext2D) {
 }
 
 export const ExplorerMasthead: React.FC = () => {
+  const paintId = useId().replace(/:/g, '') + '-brush';
   const svgRef = useRef<SVGSVGElement>(null);
 
   useLayoutEffect(() => {
@@ -66,7 +89,9 @@ export const ExplorerMasthead: React.FC = () => {
       svg.setAttribute('viewBox', `0 0 ${bounds.width} ${bounds.height}`);
       lines.forEach((line, row) => {
         const spare = bounds.width - line.width * scale;
-        const left = portrait.matches ? (row ? spare : 0) : spare * .5;
+        // Keep the narrower brush letters together as one stacked title.
+        const stagger = portrait.matches ? Math.min(spare / 2, bounds.width * .025) : 0;
+        const left = spare / 2 + (row ? stagger : -stagger);
         const baseline = top + (row * (capHeight + ROW_GAP) + line.ascent) * scale;
         for (const { element, x } of line.glyphs) {
           element.parentElement?.setAttribute('transform', `translate(${left + x * scale} ${baseline}) scale(${scale})`);
@@ -80,6 +105,15 @@ export const ExplorerMasthead: React.FC = () => {
       scheduled = requestAnimationFrame(fit);
     };
     fit();
+    const paint = new Image();
+    paint.src = brushTexture;
+    Promise.all([paint.decode(), document.fonts.load(`400 ${MEASURE_SIZE}px "Tumaneen Brush"`, WORD)])
+      .then(([, faces]) => {
+        if (disposed || !faces.length) return;
+        fit();
+        svg.dataset.paintReady = 'true';
+      })
+      .catch(() => { /* Keep the solid, readable lettering when an asset is unavailable. */ });
     document.fonts.ready.then(() => { if (!disposed) schedule(); });
     document.fonts.addEventListener('loadingdone', schedule);
     const observer = new ResizeObserver(schedule);
@@ -96,9 +130,13 @@ export const ExplorerMasthead: React.FC = () => {
   return (
     <h1 id="tm-hero-title" className="tm-explorer-heading">
       <svg ref={svgRef} className="tm-explorer-masthead" aria-hidden="true" focusable="false" data-type-ready="false">
+        <BrushPatterns id={paintId} />
         {[...WORD].map((letter, index) => (
           <g key={index}>
-            <text x="0" y="0" fontSize={MEASURE_SIZE} data-explorer-letter={letter}>{letter}</text>
+            <text
+              x="0" y="0" fontSize={MEASURE_SIZE} data-explorer-letter={letter}
+              style={{ '--brush-paint': `url(#${paintId}-${letter})` } as React.CSSProperties}
+            >{letter}</text>
           </g>
         ))}
       </svg>
