@@ -259,26 +259,62 @@ async function swipe(session, from, to) {
   await dispatch('touchEnd', []);
 }
 
+async function seekProjectGallery(section, fraction) {
+  const state = await section.evaluate(async (el, progress) => {
+    const track = el.querySelector('.tm-hung-strip');
+    const aperture = el.querySelector('.tm-hung-window');
+    const first = el.querySelector('.tm-hung-paper');
+    const sample = () => {
+      const sectionTop = el.getBoundingClientRect().top;
+      const travel = track.scrollWidth - aperture.clientWidth;
+      const offset = Math.min(travel, Math.max(0, travel * progress));
+      const transform = getComputedStyle(track).transform;
+      return {sectionTop, pageY:scrollY, targetY:scrollY + sectionTop + travel * progress,
+        travel, expectedOffset:offset, trackX:new DOMMatrixReadOnly(transform === 'none' ? undefined : transform).m41,
+        transform, first:first.getBoundingClientRect().left, expectedFirst:aperture.getBoundingClientRect().left - offset};
+    };
+    let reading = sample(), targetY = reading.targetY, stableFrames = 0;
+    window.scrollTo({top:targetY, behavior:'instant'});
+    const deadline = performance.now() + 5000;
+    do {
+      await new Promise(resolve => requestAnimationFrame(resolve));
+      reading = sample();
+      // Recalculate the destination if a late font or image resize changes the rail.
+      if (Math.abs(reading.targetY - targetY) > 1) {
+        targetY = reading.targetY;
+        window.scrollTo({top:targetY, behavior:'instant'});
+      }
+      const atTarget = Math.abs(reading.pageY - targetY) < 1.1 &&
+        Math.abs(reading.trackX + reading.expectedOffset) < 2 &&
+        Math.abs(reading.first - reading.expectedFirst) < 4;
+      stableFrames = atTarget ? stableFrames + 1 : 0;
+    } while (stableFrames < 3 && performance.now() < deadline);
+    return {...reading, stableFrames};
+  }, fraction);
+  assert.equal(state.stableFrames, 3, `Project gallery failed to settle at ${fraction}: ${JSON.stringify(state)}`);
+  return state;
+}
+
 async function checkProjectGallery(page, width) {
   await page.emulateMedia({reducedMotion:'no-preference'});
   const section = page.locator('#project');
   const stage = section.locator('.tm-hung-shell');
   const covers = section.locator('.tm-hung-paper');
   await page.locator('#project[data-gallery-mode="pinned"]').waitFor();
-  const {start, travel} = await section.evaluate(el => ({
-    start: el.getBoundingClientRect().top + scrollY,
-    travel: el.querySelector('.tm-hung-strip').scrollWidth - el.querySelector('.tm-hung-window').clientWidth,
-  }));
+  await page.evaluate(() => window.scrollTo({top:0, behavior:'instant'}));
+  await page.getByRole('link',{name:'Explore selected projects',exact:true}).focus();
+  await page.keyboard.press('Enter');
+  await page.waitForFunction(() => {
+    const project = document.querySelector('#project');
+    return Math.abs(project.getBoundingClientRect().top) < 2 &&
+      !project.closest('.section-reveal-active') && !document.querySelector('.tm-page-turn-flash');
+  });
+  const {travel} = await seekProjectGallery(section, 0);
   assert(travel > 150, 'The gallery must have real horizontal travel');
-  const seek = async fraction => {
-    await page.evaluate(async y => {
-      window.scrollTo({top:y, behavior:'instant'});
-      await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-    }, start + travel * fraction);
-  };
+  const seek = fraction => seekProjectGallery(section, fraction);
   let initial;
   for (const [name, fraction] of [['start',0],['middle',.5],['end',1]]) {
-    await seek(fraction);
+    const settled = await seek(fraction);
     const frame = await stage.evaluate(async el => {
       const view = el.querySelector('.tm-hung-window').getBoundingClientRect();
       const sheets = [...el.querySelectorAll('.tm-hung-paper')];
@@ -293,24 +329,12 @@ async function checkProjectGallery(page, width) {
     });
     if (!initial) initial = frame;
     assert(Math.abs(frame.top-initial.top) < 3, 'The gallery stage must stay pinned while the sheets advance');
-    assert(Math.abs((initial.first-frame.first) - travel*fraction) < 4, 'The sheets must move horizontally with page scroll');
+    assert(Math.abs((initial.first-frame.first) - settled.travel*fraction) < 4,
+      `The sheets must move horizontally with page scroll: ${JSON.stringify({initialFirst:initial.first, frameFirst:frame.first, ...settled})}`);
     assert(frame.bodyOverflow <= 2, 'The gallery should never widen the document');
     if (fraction === 0) assert(Math.abs(frame.first-frame.left) < 4, 'First case study should start at the gallery edge');
     if (fraction === 1) assert(Math.abs(frame.last-frame.right) < 4, 'Last case study should finish at the gallery edge');
     await page.screenshot({path:`editorial-snapshots/projects-${width}-${name}.png`, animations:'disabled'});
-    if (fraction === 0) {
-      const {height} = page.viewportSize();
-      if (width === 375) {
-        const touch = await page.context().newCDPSession(page);
-        await swipe(touch, {x:width/2,y:height*.65}, {x:width/2,y:height*.47});
-        await touch.detach();
-      } else {
-        await page.mouse.move(width/2, height*.6);
-        await page.mouse.wheel(0, 160);
-      }
-      await page.waitForFunction(x => document.querySelector('#project .tm-hung-paper').getBoundingClientRect().left < x - 20, frame.first);
-      await page.keyboard.press('Shift');
-    }
   }
   if (width === 1440) {
     for (let frame = 0; frame <= 24; frame++) {
@@ -332,7 +356,7 @@ async function checkProjectGallery(page, width) {
   await caseStudy.waitFor({state:'visible'});
   await page.keyboard.press('Escape');
   await caseStudy.waitFor({state:'hidden'});
-  await firstCover.focus();
+  await page.waitForFunction(() => document.activeElement === document.querySelector('#project .tm-hung-paper'));
   await page.keyboard.press('End');
   assert(await lastCover.evaluate(el => el === document.activeElement), 'End should focus the last project');
   await page.waitForFunction(() => {
@@ -371,6 +395,26 @@ async function checkProjectGallery(page, width) {
   await page.keyboard.press('Escape');
   await index.waitFor({state:'hidden'});
   assert(await indexButton.evaluate(el => el === document.activeElement), 'Closing the index should restore focus');
+}
+
+// Run real gestures last. Touch momentum can continue moving the page after
+// touchEnd and must not carry over into exact capture positions or keyboard tests.
+async function checkProjectScrollInput(page, width) {
+  await page.emulateMedia({reducedMotion:'no-preference'});
+  const section = page.locator('#project[data-gallery-mode="pinned"]');
+  await section.waitFor();
+  const start = await seekProjectGallery(section, 0);
+  const {height} = page.viewportSize();
+  if (width === 375) {
+    const touch = await page.context().newCDPSession(page);
+    await swipe(touch, {x:width/2,y:height*.65}, {x:width/2,y:height*.47});
+    await touch.detach();
+  } else {
+    await page.mouse.move(width/2, height*.6);
+    await page.mouse.wheel(0, 160);
+  }
+  await page.waitForFunction(({first, pageY}) =>
+    scrollY > pageY + 20 && document.querySelector('#project .tm-hung-paper').getBoundingClientRect().left < first - 20, start);
 }
 
 async function checkChapters(page, width) {
@@ -744,6 +788,7 @@ try {
     if (width === 375 || width === 1440) {
       await checkProjectGallery(page, width);
       await checkChapters(page, width);
+      await checkProjectScrollInput(page, width);
     }
     assert.deepEqual(errors,[],'Browser error');
     await page.close();
