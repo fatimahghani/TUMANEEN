@@ -1,0 +1,15 @@
+{
+  "width": 2112,
+  "height": 616,
+  "cellWidth": 352,
+  "baseline": 602,
+  "unitsPerEm": 700,
+  "glyphs": {
+    "T": 0,
+    "U": 1,
+    "M": 2,
+    "A": 3,
+    "N": 4,
+    "E": 5
+  }
+}
