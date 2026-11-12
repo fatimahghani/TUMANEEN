@@ -8,6 +8,7 @@ const MEASURE_SIZE = 100;
 const ROW_GAP = 9;
 const TRACKING = -2;
 const INK_CLEARANCE = 1.1;
+const BRUSH_WIDTH_FACTOR = 1.6;
 
 // Register each scan to the font's baseline. A text element's SVG bounding
 // box also includes its side bearings, so it cannot align the bristles.
@@ -30,7 +31,7 @@ function BrushPatterns({ id }: { id: string }) {
   );
 }
 
-// Preserve the brush proportions with a small gap between the inked edges.
+// Measure the original ink edges before widening the whole line.
 function measureLine(letters: SVGTextElement[], ctx: CanvasRenderingContext2D) {
   let pen = 0, lastRight = 0;
   let ascent = 0, descent = 0;
@@ -83,18 +84,20 @@ export const ExplorerMasthead: React.FC = () => {
       }
       const capHeight = Math.max(...lines.map(line => line.ascent + line.descent));
       const totalHeight = lines.length * capHeight + (lines.length - 1) * ROW_GAP;
-      const scale = Math.min(bounds.width / Math.max(...lines.map(line => line.width)), height / totalHeight);
-      const top = (height - totalHeight * scale) * (portrait.matches ? .66 : .56);
-      // Screen-space coordinates give every glyph the same scale in both axes.
+      const widthFit = bounds.width / Math.max(...lines.map(line => line.width));
+      const scaleY = Math.min(widthFit, height / totalHeight);
+      // Widen the painted strokes and their texture together, up to the side margins.
+      const scaleX = Math.min(widthFit, scaleY * BRUSH_WIDTH_FACTOR);
+      const top = (height - totalHeight * scaleY) * (portrait.matches ? .66 : .56);
       svg.setAttribute('viewBox', `0 0 ${bounds.width} ${bounds.height}`);
       lines.forEach((line, row) => {
-        const spare = bounds.width - line.width * scale;
+        const spare = Math.max(0, bounds.width - line.width * scaleX);
         // Keep the narrower brush letters together as one stacked title.
         const stagger = portrait.matches ? Math.min(spare / 2, bounds.width * .025) : 0;
         const left = spare / 2 + (row ? stagger : -stagger);
-        const baseline = top + (row * (capHeight + ROW_GAP) + line.ascent) * scale;
+        const baseline = top + (row * (capHeight + ROW_GAP) + line.ascent) * scaleY;
         for (const { element, x } of line.glyphs) {
-          element.parentElement?.setAttribute('transform', `translate(${left + x * scale} ${baseline}) scale(${scale})`);
+          element.parentElement?.setAttribute('transform', `translate(${left + x * scaleX} ${baseline}) scale(${scaleX} ${scaleY})`);
         }
       });
       svg.dataset.typeReady = 'true';

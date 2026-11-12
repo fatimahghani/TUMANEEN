@@ -412,11 +412,14 @@ try {
         const bottom=new DOMPoint(x+m.actualBoundingBoxRight,y+m.actualBoundingBoxDescent).matrixTransform(matrix);
         const baseline=new DOMPoint(x,y).matrixTransform(matrix).y;
         return {letter:el.textContent,x:top.x,y:top.y,right:bottom.x,bottom:bottom.y,width:bottom.x-top.x,height:bottom.y-top.y,
-          baseline, scaleRatio:matrix.a / matrix.d, paintId: style.fill.match(/url\(["']?[^)"']*#([^)"']+)["']?\)/)?.[1]};
+          baseline, scaleX:matrix.a, scaleY:matrix.d, ascent:m.actualBoundingBoxAscent, descent:m.actualBoundingBoxDescent,
+          paintId: style.fill.match(/url\(["']?[^)"']*#([^)"']+)["']?\)/)?.[1]};
       });
       const m=document.querySelector('.tm-explorer-moon').getBoundingClientRect();
+      const menu=document.querySelector('.tm-explorer-menu-button').getBoundingClientRect();
       const atlas = svg.querySelector('image')?.href.baseVal;
       return {letters,clips:svg.querySelectorAll('clipPath').length,moon:{x:m.x,y:m.y,width:m.width},
+        heading:svg.getBoundingClientRect().toJSON(), menu:{right:menu.right, bottom:menu.bottom},
         patternIds: patterns.filter(p => p.querySelector('image, use')).map(p => p.id),
         atlasUrl: atlas && new URL(atlas, document.baseURI).href};
     });
@@ -432,14 +435,33 @@ try {
     const lines = narrow
       ? [typography.letters.slice(0, 4), typography.letters.slice(4)]
       : [typography.letters];
+    const inkWidths = lines.map(line => line.at(-1).right - line[0].x);
+    // Recover the natural row width in font units and measure its height from the ink.
+    const nativeWidth = Math.max(...lines.map((line, i) => inkWidths[i] / line[0].scaleX));
+    const capHeight = Math.max(...lines.map(line => Math.max(...line.map(l => l.ascent)) + Math.max(...line.map(l => l.descent))));
+    const nativeHeight = capHeight * lines.length + 9 * (lines.length - 1);
+    const heading = typography.heading;
+    const clearance = Math.min(26, Math.max(11, heading.width * .024));
+    const availableHeight = Math.min(heading.height, typography.moon.y - heading.top - clearance);
+    const widthFit = heading.width / nativeWidth;
+    const expectedY = Math.min(widthFit, availableHeight / nativeHeight);
+    const expectedExpansion = Math.min(1.60, widthFit / expectedY);
+    if (width === 1440 || width === 375) {
+      assert(inkWidths[0] >= width * (width === 1440 ? .82 : .72),
+        `The first row at ${width}px should fill the cover (actual ink width: ${inkWidths[0].toFixed(1)}px)`);
+    }
     const radius=typography.moon.width/2,cx=typography.moon.x+radius,cy=typography.moon.y+radius;
     for (const line of lines) {
       const baselines = line.map(letter => letter.baseline);
       assert(Math.max(...baselines) - Math.min(...baselines) < 2, 'Each line should share a baseline');
       line.forEach((letter, i) => {
-        assert(letter.width > 8 && letter.height > 20 && Math.abs(letter.scaleRatio - 1) < .02,
-          'Use full, proportionate live letterforms');
+        assert(letter.width > 8 && letter.height > 20 && Math.abs(letter.scaleY - expectedY) < .02,
+          'Widening the glyphs should preserve their fitted height above the moon');
+        assert(Math.abs(letter.scaleX / letter.scaleY - expectedExpansion) < .02,
+          'Each glyph should use the available width up to the 1.60 expansion limit');
         assert(letter.x >= 0 && letter.right <= width && letter.y >= 0, 'Letter cropped by viewport');
+        assert(letter.x >= typography.menu.right || letter.y >= typography.menu.bottom,
+          'Lettering must clear the navigation button');
         if (i) assert(letter.x > line[i - 1].right - .5, 'Adjacent letterforms overlap');
         const dx=Math.abs(Math.min(letter.right,Math.max(letter.x,cx))-cx);
         if(dx<radius)assert(letter.bottom<cy-Math.sqrt(radius*radius-dx*dx)-2,'Moon obscures a letter');
@@ -451,12 +473,17 @@ try {
     }
     const caption = await page.locator('.tm-explorer-tagline').evaluate(el => {
       const [label, title] = el.querySelectorAll('.tm-explorer-tagline-line');
-      return { label: getComputedStyle(label).fontStyle, title: getComputedStyle(title).fontStyle,
-        small: parseFloat(getComputedStyle(label).fontSize), large: parseFloat(getComputedStyle(title).fontSize),
+      const small = getComputedStyle(label), large = getComputedStyle(title);
+      return { label: label.innerText, sameFamily: small.fontFamily === large.fontFamily && large.fontFamily.includes('Baskerville'),
+        bothItalic: small.fontStyle === 'italic' && large.fontStyle === 'italic',
+        regularWeight: small.fontWeight === '400' && large.fontWeight === '400',
+        small: parseFloat(small.fontSize), large: parseFloat(large.fontSize),
         gap: title.getBoundingClientRect().top - label.getBoundingClientRect().bottom };
     });
-    assert(caption.small >= 11 && caption.small < caption.large && caption.label === 'normal' && caption.title === 'italic' && caption.gap >= 2,
-      'Visual and Explorer should have distinct typographic roles');
+    assert(caption.label === 'Visual' && caption.sameFamily && caption.bothItalic && caption.regularWeight,
+      'Visual and Explorer should share the existing regular-weight italic serif, with Visual in title case');
+    assert(caption.small >= 11 && caption.small < caption.large && caption.gap >= 2,
+      'Both words should remain readable on separate lines');
 
     const finish=await page.locator('.tm-explorer-hero').evaluate(hero=>{
       const grain=getComputedStyle(hero.querySelector('.tm-explorer-film-grain'));
