@@ -77,7 +77,7 @@ export const ReadingNookHero: React.FC<ReadingNookHeroProps> = ({ onSelectNav, o
           </nav>
         </>
       )}
-      <a href="#posters" className="tm-explorer-next" aria-label="Explore the poster archive" onClick={(event) => navigate(event, 'posters')}>
+      <a href="#project" className="tm-explorer-next" aria-label="Explore selected projects" onClick={(event) => navigate(event, 'project')}>
         <ArrowRight size={34} strokeWidth={1.2} />
       </a>
     </section>
