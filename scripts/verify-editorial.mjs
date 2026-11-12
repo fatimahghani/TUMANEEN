@@ -279,8 +279,8 @@ async function seekProjectGallery(section, fraction) {
     do {
       await new Promise(resolve => requestAnimationFrame(resolve));
       reading = sample();
-      // Recalculate the destination if a late font or image resize changes the rail.
-      if (Math.abs(reading.targetY - targetY) > 1) {
+      // Layout shifts can move either the rail or the browser's scroll anchor.
+      if (Math.abs(reading.targetY - targetY) > 1 || Math.abs(reading.pageY - reading.targetY) >= 1.1) {
         targetY = reading.targetY;
         window.scrollTo({top:targetY, behavior:'instant'});
       }
@@ -428,7 +428,8 @@ async function checkProjectScrollInput(page, width) {
   await page.emulateMedia({reducedMotion:'no-preference'});
   const section = page.locator('#project[data-gallery-mode="pinned"]');
   await section.waitFor();
-  const start = await seekProjectGallery(section, 0);
+  // Begin inside the pinned section so the gesture measures horizontal motion.
+  const start = await seekProjectGallery(section, 0.1);
   const {height} = page.viewportSize();
   if (width === 375) {
     const touch = await page.context().newCDPSession(page);
