@@ -112,9 +112,7 @@ export const ProcessSection: React.FC = () => {
                   onClick={() => scrollToCardIndex(index)}
                   className="tm-process-card group relative w-[calc(100vw-32px)] sm:w-[460px] md:w-[525px] h-[425px] sm:h-[510px] md:h-[548px] max-h-[calc(100svh-150px)] sm:max-h-[calc(100svh-135px)] shrink-0 overflow-hidden bg-[#8A795D] cursor-pointer shadow-[0_20px_50px_rgba(57,30,37,0.16)]"
                 >
-                  <div className="tm-process-artboard" aria-hidden="true">
-                    <span className="tm-process-artboard-registration">+&nbsp;&nbsp;&nbsp;&nbsp;+&nbsp;&nbsp;&nbsp;&nbsp;+</span>
-                  </div>
+                  <div className="tm-process-artboard" aria-hidden="true" />
                   <div className="tm-process-step-label absolute top-5 left-5 z-10 text-sm font-mono text-[#F0E4D2]">
                     {card.number}
                   </div>

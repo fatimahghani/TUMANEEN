@@ -247,11 +247,6 @@
   position: absolute; right: 16px; top: 26%; writing-mode: vertical-rl;
   font: 500 9px/1.4 'Inter', sans-serif; letter-spacing: .08em; opacity: .55;
 }
-.tm-process-artboard-registration {
-  color: var(--tm-olive);
-  position: absolute; bottom: 21%; left: 25px; font: 500 28px/1 'Inter', sans-serif;
-  opacity: .8; letter-spacing: .1em;
-}
  .tm-process-card > div[class*="backdrop-blur"] {
   backdrop-filter: none;
   border-radius: 0;

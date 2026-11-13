@@ -171,7 +171,6 @@ body { background-color: var(--tm-ivory); }
   text-shadow: none;
 }
 .tm-process-note { color: var(--tm-blush); text-wrap: pretty; }
-.tm-process-artboard-registration { color: var(--tm-blush); opacity: .33; }
 .tm-site .tm-process button[aria-current="step"] { color: var(--tm-burgundy) !important; border-color: var(--tm-burgundy) !important; }
 .tm-site .tm-process button:not([aria-current]):not(:disabled) { color: var(--tm-muted); }
 .tm-site .tm-process button[aria-label]:not(:disabled):hover { background: var(--tm-burgundy); color: var(--tm-blush); }
