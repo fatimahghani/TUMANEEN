@@ -124,27 +124,12 @@ body { background-color: var(--tm-ivory); }
 .tm-ma-exhibit-caption { border-color: var(--tm-rule-dark); }
 .tm-ma-exhibit-caption button { color: var(--tm-burgundy); font-family: var(--tm-caption); }
 .tm-ma-exhibit-caption > span { color: var(--tm-muted); font-size: .66rem; }
-.tm-ma-open-arrow, .tm-hung-open { color: var(--tm-burgundy); background: var(--tm-blush); }
+.tm-ma-open-arrow { color: var(--tm-burgundy); background: var(--tm-blush); }
 .tm-ma-primary-paper::before, .tm-ma-secondary-paper::before { background: #dfc9ae; }
 
-/* Ink captions and soft cast shadows keep the frames legible on paper. */
+/* Selected project boxes sit directly on the lunar paper. */
 .tm-site #project.tm-hanging-gallery { color: var(--tm-ink); }
 .tm-site #project.tm-hanging-gallery::before, .tm-site #project.tm-hanging-gallery::after { content: none; }
-.tm-hung-heading { padding-bottom: .8rem; border-bottom: 1px solid var(--tm-rule-dark); }
-.tm-hung-footer { justify-content: flex-end; border-color: var(--tm-rule-dark); }
-.tm-hung-wire { background: #746454; box-shadow: none; }
-.tm-hung-clip { border-color: #73685d; }
-.tm-hung-clip::before { border-color: #897969; }
-.tm-hung-mobile-cue, .tm-hung-footer button span { color: var(--tm-muted); }
-.tm-site .tm-hung-label button {
-  color: var(--tm-ink);
-  font: 450 clamp(1.05rem, 1.35vw, 1.35rem)/1.25 var(--tm-caption);
-}
-.tm-site .tm-hung-label p { color: var(--tm-muted); font-size: .77rem; }
-.tm-hung-footer button, .tm-hung-footer button:hover { color: var(--tm-burgundy); }
-.tm-hung-label button:hover, .tm-hung-footer button:hover { text-decoration: underline; text-underline-offset: .23em; }
-.tm-site #project :is(button, .tm-hung-strip):focus-visible { outline-color: var(--tm-burgundy); }
-
 /* Five process plates and the studio pages share the same typography. */
 .tm-site .tm-process::before, .tm-site .tm-about-plate::after { content: none; }
 .tm-site .tm-process .sticky { padding-top: max(5rem, 9svh); }

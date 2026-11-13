@@ -412,7 +412,7 @@ async function checkGalleryFocus(target) {
   assert.equal(state.stableFrames, 3, `Keyboard focus must reach the visible gallery control: ${JSON.stringify(state)}`);
 }
 
-async function checkProjectInk(covers) {
+async function checkProjectBoxes(covers, viewportWidth) {
   assert.equal(await covers.count(), 4, 'Each of the four project covers needs an ink frame');
   const frames = await covers.evaluateAll(buttons => Promise.all(buttons.map(async button => {
     const overlay = getComputedStyle(button, '::after');
@@ -438,10 +438,26 @@ async function checkProjectInk(covers) {
         }
       }
     }
-    return { rim, interior, artworkFit: getComputedStyle(button.querySelector('img')).objectFit };
+    const title = button.querySelector('.tm-box-title');
+    const range = document.createRange();
+    range.selectNodeContents(title);
+    const label = range.getBoundingClientRect();
+    const box = button.getBoundingClientRect();
+    return {rim, interior, title:title.textContent.trim(), expected:button.closest('article').dataset.galleryTitle,
+      text:button.innerText.trim(), width:box.width, height:box.height, hasImage:!!button.querySelector('img'),
+      centerX:label.left + label.width/2 - box.left - box.width/2,
+      centerY:label.top + label.height/2 - box.top - box.height/2};
   })));
-  assert(frames.every(frame => frame.rim > 80 && frame.interior < 20 && frame.artworkFit === 'contain'),
-    'Ink should surround each cover and leave its artwork clear: ' + JSON.stringify(frames));
+  assert(frames.every(frame => frame.rim > 80 && frame.interior < 20),
+    'The hand-drawn ink should stay around the edge of each box');
+  const previousWidth = viewportWidth === 375 ? 307.5 : 486;
+  for (const box of frames) {
+    assert(box.title && box.title === box.expected && box.text === box.title && !box.hasImage,
+      'Each box should show its project name as its only content: ' + JSON.stringify(box));
+    assert(box.width < previousWidth && box.height > 0 &&
+      Math.abs(box.centerX) < 3 && Math.abs(box.centerY) < 5,
+      'The compact box should center its project title: ' + JSON.stringify(box));
+  }
 }
 
 async function checkProjectGallery(page, width) {
@@ -459,20 +475,18 @@ async function checkProjectGallery(page, width) {
       !project.closest('.section-reveal-active') && !document.querySelector('.tm-page-turn-flash');
   });
   const {travel} = await seekProjectGallery(section, 0);
-  await checkProjectInk(covers);
-  assert(travel > 150, 'The gallery must have real horizontal travel');
+  await checkProjectBoxes(covers, width);
+  const hasRules = await section.locator('.tm-hung-heading, .tm-hung-footer').evaluateAll(nodes =>
+    nodes.some(el => ['borderTopWidth', 'borderBottomWidth'].some(edge => parseFloat(getComputedStyle(el)[edge]) > 0)));
+  assert.equal(hasRules, false, 'The gallery should have no horizontal dividers');
+  assert(travel > 24, 'The gallery must have horizontal travel');
   const seek = fraction => seekProjectGallery(section, fraction);
   let initial;
   for (const [name, fraction] of [['start',0],['middle',.5],['end',1]]) {
     const settled = await seek(fraction);
-    const frame = await stage.evaluate(async el => {
+    const frame = await stage.evaluate(el => {
       const view = el.querySelector('.tm-hung-window').getBoundingClientRect();
       const sheets = [...el.querySelectorAll('.tm-hung-paper')];
-      const visible = sheets.filter(sheet => {
-        const b = sheet.getBoundingClientRect();
-        return b.right > view.left && b.left < view.right;
-      });
-      await Promise.all(visible.map(sheet => sheet.querySelector('img').decode()));
       return {top:el.getBoundingClientRect().top, first:sheets[0].getBoundingClientRect().left,
         last:sheets.at(-1).getBoundingClientRect().right, left:view.left, right:view.right,
         bodyOverflow:document.documentElement.scrollWidth-innerWidth};
@@ -487,7 +501,7 @@ async function checkProjectGallery(page, width) {
     await page.screenshot({path:`editorial-snapshots/projects-${width}-${name}.png`, animations:'disabled'});
     if (fraction === 0) {
       await section.locator('.tm-hung-study').first().screenshot({
-        path:`editorial-snapshots/project-ink-${width}.png`, animations:'disabled',
+        path:`editorial-snapshots/project-box-${width}.png`, animations:'disabled',
       });
     }
   }
@@ -509,6 +523,7 @@ async function checkProjectGallery(page, width) {
   await page.keyboard.press('Enter');
   const caseStudy = page.locator('.tm-case-modal');
   await caseStudy.waitFor({state:'visible'});
+  await caseStudy.locator('img').first().evaluate(image => image.decode());
   await page.keyboard.press('Escape');
   await caseStudy.waitFor({state:'hidden'});
   await page.waitForFunction(() => document.activeElement === document.querySelector('#project .tm-hung-paper'));
@@ -537,8 +552,6 @@ async function checkProjectGallery(page, width) {
   await page.keyboard.press('Home');
   for (const cover of await covers.all()) {
     await checkGalleryFocus(cover);
-    // The title button follows its cover and precedes the next study in tab order.
-    await page.keyboard.press('Tab');
     await page.keyboard.press('Tab');
   }
   const indexButton = section.getByRole('button',{name:/view index/i});
@@ -898,7 +911,8 @@ try {
     assert.equal(await page.locator('.tm-ma-exhibit').count(),6,'Archive changed');
     assert.equal(await page.locator('.tm-ma-primary-paper img,.tm-ma-secondary-paper img').count(),8,'Original posters changed');
     assert.equal(await page.locator('.tm-hung-study').count(),4,'Case studies changed');
-    assert.equal(await page.locator('.tm-hung-clip').count(),8,'Project clips changed');
+    assert.equal(await page.locator('#project .tm-hung-clip, #project .tm-hung-wire').count(),0,
+      'Project boxes should have no hanging hardware');
 
     if (width === 375 || width === 1440) {
       const sample = await page.evaluate(() => window.lunarGrainSample);

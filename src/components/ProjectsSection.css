@@ -1,9 +1,3 @@
-/*
- * TUMANEEN / HANGING POSTER WALL
- * Four case studies, one horizontal line. Thin wires and black binder clips
- * hold paper sheets like the supplied museum reference; no wooden frames,
- * V-shaped picture hooks, framed mats, or oversized typography.
- */
 .tm-projects.tm-epok-gallery.tm-hanging-gallery {
   position: relative;
   isolation: isolate;
@@ -79,43 +73,33 @@
   }
 }
 
-.tm-hung-running,
 .tm-hung-footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 12px 0;
-  font: 500 10px/1.4 'Inter', sans-serif;
-  letter-spacing: .14em;
-  color: #655c57;
-}
-.tm-hung-running { border-bottom: 1px solid rgba(45,39,35,.22); }
-.tm-hung-footer {
-  padding: 12px 0 clamp(55px, 7vw, 92px);
-  border-top: 1px solid rgba(45,39,35,.20);
+  justify-content: flex-end;
+  padding: 0 0 clamp(24px, 4vw, 56px);
 }
 .tm-hung-footer button {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  border: 0;
+  min-height: 44px;
   padding: 7px 0;
-  background: none;
-  color: #272321;
+  border: 0;
+  background: transparent;
+  color: var(--tm-burgundy);
   font: 500 10px/1.4 'Inter', sans-serif;
   letter-spacing: .11em;
   cursor: pointer;
 }
-.tm-hung-footer button span { color: #7c7069; }
-.tm-hung-footer button:hover { color: #4B2830; }
+.tm-hung-footer button:hover { text-decoration: underline; text-underline-offset: .23em; }
 .tm-hung-strip {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  column-gap: clamp(14px, 2.4vw, 41px);
-  width: 100%;
-  align-items: start;
-  padding: clamp(22px, 2.5vw, 38px) 0 clamp(38px, 5.2vw, 78px);
+  gap: clamp(14px, 2.4vw, 38px);
+  max-width: 72rem;
+  margin-inline: auto;
+  padding-block: clamp(22px, 3vw, 44px);
 }
 .tm-hung-study {
   --frame-ink: url('../assets/frames/project-ink-1.svg');
@@ -127,20 +111,18 @@
 .tm-hung-study:nth-child(4n + 2) { --frame-ink: url('../assets/frames/project-ink-2.svg'); }
 .tm-hung-study:nth-child(4n + 3) { --frame-ink: url('../assets/frames/project-ink-3.svg'); }
 .tm-hung-study:nth-child(4n) { --frame-ink: url('../assets/frames/project-ink-4.svg'); }
-.tm-hung-piece {
-  position: relative;
-  width: 100%;
-  padding-top: clamp(54px, 5vw, 68px);
-}
 .tm-hung-paper {
   position: relative;
-  display: block;
+  display: grid;
+  place-items: center;
   width: 100%;
-  aspect-ratio: 1.10;
+  aspect-ratio: 1.1;
   padding: clamp(12px, 1.45vw, 22px);
   background: transparent;
   border: 0;
   border-radius: 0;
+  color: var(--tm-ink);
+  text-align: center;
   cursor: pointer;
   isolation: isolate;
 }
@@ -165,180 +147,33 @@
 @media (forced-colors: active) {
   .tm-hung-paper::after { background: CanvasText; forced-color-adjust: none; }
 }
-.tm-hung-paper img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  object-position: center;
-  filter: none;
-  transform: none;
-  background: none;
-}
-.tm-hung-open {
-  position: absolute;
-  z-index: 2;
-  right: 12px;
-  bottom: 12px;
-  display: grid;
-  place-items: center;
-  width: 31px;
-  height: 31px;
-  color: #272321;
-  background: rgba(244,241,236,.96);
-  opacity: 0;
-  transition: opacity .2s ease;
-  pointer-events: none;
-}
-.tm-hung-paper:hover .tm-hung-open,
-.tm-hung-paper:focus-visible .tm-hung-open { opacity: 1; }
-
-/* Each sheet hangs from two thin vertical wires and real binder-clip shapes. */
-.tm-hung-hardware {
-  position: absolute;
-  inset: 0 0 auto;
-  height: clamp(54px, 5vw, 68px);
-  z-index: 4;
-  pointer-events: none;
-}
-.tm-hung-anchor {
-  position: absolute;
-  top: 0;
-  left: 11.5%;
-  width: 23px;
-  height: 100%;
-}
-.tm-hung-anchor--right { left: auto; right: 11.5%; }
-.tm-hung-wire {
-  position: absolute;
-  left: 11px;
-  top: 0;
-  width: 1px;
-  height: calc(100% - 11px);
-  background: linear-gradient(90deg, #8f8985, #6c6864);
-  box-shadow: 1px 0 rgba(255,255,255,.36);
-}
-.tm-hung-clip {
-  position: absolute;
-  bottom: -5px;
-  left: 2px;
-  width: 19px;
-  height: 20px;
-  border: 1px solid #101112;
-  border-radius: 1px 1px 3px 3px;
-  background: linear-gradient(90deg, #090a0a, #292b2d 40%, #060707 90%);
-  box-shadow: 1px 2px 3px rgba(0,0,0,.29);
-}
-.tm-hung-clip::before {
-  content: '';
-  position: absolute;
-  left: 5px;
-  top: -7px;
-  width: 7px;
-  height: 9px;
-  border: 1.5px solid #454747;
-  border-bottom: 0;
-  border-radius: 5px 5px 0 0;
-}
-.tm-hung-clip::after {
-  content: '';
-  position: absolute;
-  left: -1px;
-  right: -1px;
-  top: 2px;
-  height: 2px;
-  background: linear-gradient(90deg, #696b6e, #252729 50%, #5e6163);
-}
-.tm-hung-label {
-  padding: 15px 5px 0;
-  text-align: center;
-  min-height: 78px;
-}
-.tm-hung-label-folio {
-  display: block;
-  margin-bottom: 5px;
-  color: #786e67;
-  font: 500 9px/1.35 'Inter', sans-serif;
-  letter-spacing: .14em;
-}
-.tm-hung-label button {
-  display: inline-flex;
-  align-items: baseline;
-  justify-content: center;
-  gap: 5px;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: #272321;
-  font: 450 clamp(15px, 1.35vw, 20px)/1.2 'Fraunces', Georgia, serif;
-  cursor: pointer;
+.tm-box-title {
+  font: 450 clamp(1.125rem, 1.45vw, 1.45rem)/1.2 var(--tm-caption);
   letter-spacing: -.025em;
+  text-wrap: balance;
 }
-.tm-hung-label button svg { flex: none; align-self: center; }
-.tm-hung-label button:hover { color: #4B2830; }
-.tm-hung-label p {
-  margin: 5px auto 0;
-  max-width: 28ch;
-  color: #625951;
-  font: 400 10px/1.45 'Inter', sans-serif;
-}
-.tm-hung-mobile-cue { display: none; }
-.tm-hanging-gallery .tm-hung-paper:focus-visible,
-.tm-hanging-gallery .tm-hung-label button:focus-visible,
-.tm-hanging-gallery .tm-hung-footer button:focus-visible,
-.tm-hanging-gallery .tm-hung-strip:focus-visible {
-  outline: 2px solid #4B2830;
+.tm-hung-paper:hover, .tm-hung-paper:focus-visible { color: var(--tm-burgundy); }
+.tm-hanging-gallery :is(.tm-hung-paper, .tm-hung-strip, .tm-hung-footer button):focus-visible {
+  outline: 2px solid var(--tm-burgundy);
   outline-offset: 3px;
 }
 @media (max-width: 1050px) {
-  .tm-hung-shell { width: calc(100% - 42px); }
   .tm-hung-strip {
     display: flex;
-    flex-wrap: nowrap;
-    gap: clamp(18px, 3vw, 32px);
-    padding: 16px 0 18px;
+    gap: clamp(16px, 3vw, 30px);
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     overscroll-behavior-inline: contain;
     scrollbar-width: thin;
     scrollbar-color: #9b918a transparent;
-    -webkit-overflow-scrolling: touch;
   }
   .tm-hung-study {
-    flex: 0 0 clamp(230px, 35vw, 330px);
+    flex: 0 0 min(68vw, 280px);
     scroll-snap-align: start;
-  }
-  .tm-hung-piece { padding-top: 63px; }
-  .tm-hung-hardware { height: 63px; }
-  .tm-hung-mobile-cue {
-    display: flex;
-    justify-content: flex-end;
-    gap: 9px;
-    color: #756b64;
-    font: 500 9px/1.5 'Inter', sans-serif;
-    letter-spacing: .12em;
-    padding: 2px 0 17px;
-  }
-}
-@media (max-width: 580px) {
-  .tm-hung-shell { width: calc(100% - 28px); }
-  .tm-hung-running, .tm-hung-footer { font-size: 8px; }
-  .tm-hung-running span:last-child { display: none; }
-  .tm-hung-strip { gap: 15px; padding-top: 13px; }
-  .tm-hung-study { flex-basis: min(78vw, 305px); }
-  .tm-hung-piece { padding-top: 58px; }
-  .tm-hung-hardware { height: 58px; }
-  .tm-hung-label button { font-size: 17px; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .tm-hanging-gallery *, .tm-hanging-gallery *::before, .tm-hanging-gallery *::after {
-    transition-duration: .01ms !important;
-    animation-duration: .01ms !important;
   }
 }
 
-/* One vertical pixel moves one pixel along the wall. Without motion the
-   existing four-column layout or touch-scrollable strip remains available. */
+/* The compact row shares the gallery's native page scroll. */
 .tm-hanging-gallery[data-gallery-mode="native"] .tm-hung-heading {
   padding-top: calc(var(--gallery-header) + 16px);
 }
@@ -350,53 +185,37 @@
   overflow: clip;
 }
 #project[data-gallery-mode="pinned"] .tm-hung-shell {
-  --wire-height: clamp(18px, 3.6svh, 48px);
   position: sticky;
   top: 0;
   height: 100svh;
-  padding-top: calc(var(--gallery-header) + 10px);
+  padding-top: var(--gallery-header);
   display: flex;
   flex-direction: column;
-}
-#project[data-gallery-mode="pinned"] .tm-hung-heading {
-  max-width: none;
-  padding-top: .65rem;
+  justify-content: center;
+  gap: clamp(12px, 2svh, 22px);
 }
 #project[data-gallery-mode="pinned"] .tm-hung-window {
-  margin-block: auto;
   overflow: clip;
-  /* Extend the clipping edge slightly to preserve keyboard focus outlines. */
-  overflow-clip-margin: 4px;
+  overflow-clip-margin: 5px;
 }
 #project[data-gallery-mode="pinned"] .tm-hung-strip {
   position: relative;
   display: flex;
   align-items: start;
-  gap: clamp(18px, 3.6vw, 64px);
+  gap: clamp(18px, 3.6vw, 58px);
   width: max-content;
-  padding: .6rem 0;
+  max-width: none;
+  margin: 0;
+  padding-block: 5px;
   overflow: visible;
   scroll-snap-type: none;
 }
 #project[data-gallery-mode="pinned"] .tm-hung-study {
-  width: min(82vw, max(29vw, 54svh), 620px);
   flex: none;
+  width: min(68vw, max(27.5vw, 44svh), 450px);
 }
-#project[data-gallery-mode="pinned"] .tm-hung-piece { padding-top: var(--wire-height); }
-#project[data-gallery-mode="pinned"] .tm-hung-hardware { height: var(--wire-height); }
-#project[data-gallery-mode="pinned"] .tm-hung-paper {
-  max-height: 54svh;
-}
-#project[data-gallery-mode="pinned"] .tm-hung-label {
-  min-height: 0;
-  padding-top: clamp(8px, 1.6svh, 18px);
-}
-#project[data-gallery-mode="pinned"] .tm-hung-mobile-cue { display: none; }
-#project[data-gallery-mode="pinned"] .tm-hung-footer {
-  flex: none;
-  padding: 5px 0 max(8px, env(safe-area-inset-bottom));
-}
-#project[data-gallery-mode="pinned"] .tm-hung-footer button { min-height: 44px; }
+#project[data-gallery-mode="pinned"] .tm-hung-paper { max-height: 48svh; }
+#project[data-gallery-mode="pinned"] .tm-hung-footer { padding: 0; }
 
 /* Existing accessible index and poster case-study viewers. */
 .tm-epok-overlay {
