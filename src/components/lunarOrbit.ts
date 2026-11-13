@@ -1,7 +1,7 @@
 // Each print grain has a place on the little sphere and on the final orbit.
 // Keeping both ends fixed makes travelling back up the page retrace the sweep.
 const TAU = Math.PI * 2;
-const INKS = ['#aa8c73', '#d3b69b', '#e8d5ba', '#f5e6ce'];
+const INKS = ['#8d7d70', '#76685d', '#63574e', '#504943'];
 
 type Grain = {
   fromX: number; fromY: number; toX: number; toY: number;
@@ -100,12 +100,9 @@ export function followLunarOrbit(hero: HTMLElement, moon: HTMLElement, canvas: H
       if (progress === 0) {
         moon.style.removeProperty('transform');
         moon.style.removeProperty('opacity');
-        moon.style.removeProperty('--lunar-exposure');
       } else {
         moon.style.transform = `translate3d(calc(-50% + ${dx}px), ${dy}px, 0) scale(${scale})`;
         moon.style.opacity = String(1 - dissolve);
-        // The charcoal lunar map catches light as it enters the dark wall.
-        moon.style.setProperty('--lunar-exposure', String(1.025 + 2.2 * ease((progress - .19) / .28)));
       }
       if (bodyVisible !== (dissolve < 1)) {
         bodyVisible = dissolve < 1;
@@ -155,6 +152,5 @@ export function followLunarOrbit(hero: HTMLElement, moon: HTMLElement, canvas: H
     motion.removeEventListener('change', resize);
     moon.style.removeProperty('transform');
     moon.style.removeProperty('opacity');
-    moon.style.removeProperty('--lunar-exposure');
   };
 }

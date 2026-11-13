@@ -1,8 +1,6 @@
 /* Full-viewport live HTML/SVG composition. No flattened concept image. */
 .tm-site .tm-explorer-hero {
-  --explorer-cream: var(--tm-ivory);
   --explorer-burgundy: var(--tm-burgundy);
-  --explorer-film-grain: .038;
   position: relative;
   isolation: isolate;
   width: 100%;
@@ -11,17 +9,8 @@
   padding: 0;
   overflow: clip;
   color: var(--explorer-burgundy);
-  background: radial-gradient(ellipse at 52% 43%, #faf0e1 0%, var(--explorer-cream) 75%, #e9d8c0 100%);
 }
 .tm-explorer-hero *, .tm-explorer-hero *::before, .tm-explorer-hero *::after { box-sizing: border-box; }
-.tm-explorer-hero::before {
-  content: '';
-  position: absolute;
-  z-index: 0;
-  inset: 0;
-  pointer-events: none;
-  background: radial-gradient(ellipse at 50% 45%, transparent 50%, rgba(70,42,32,.04) 100%);
-}
 .tm-explorer-sr {
   position: absolute; width: 1px; height: 1px;
   padding: 0; margin: -1px; overflow: hidden;
@@ -97,24 +86,13 @@
   filter: sepia(.12) saturate(.88) contrast(1.045) brightness(1.025);
 }
 .tm-site .tm-explorer-hero .tm-explorer-moon {
-  filter: sepia(.04) saturate(.83) contrast(1.025) brightness(var(--lunar-exposure, 1.025));
+  filter: sepia(.04) saturate(.83) contrast(1.025) brightness(1.025);
 }
 /* The actual lunar surface crosses the horizontal edge of the cover.
    Foreground art stays cropped to the page it was printed on. */
 @media (prefers-reduced-motion: no-preference) {
   .tm-site .tm-explorer-hero { isolation: auto; overflow: clip visible; }
   .tm-site #project.tm-hanging-gallery { isolation: auto; }
-}
-.tm-explorer-film-grain {
-  position: absolute;
-  z-index: 0;
-  inset: 0;
-  pointer-events: none;
-  opacity: var(--explorer-film-grain);
-  mix-blend-mode: multiply;
-  /* A seamless tile of translucent umber flecks gives the cream sky paper grain. */
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='grain' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.48' numOctaves='2' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 .24 0 0 0 0 .17 0 0 0 0 .12 6 0 0 0 -2.7'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)'/%3E%3C/svg%3E");
-  background-size: 160px 160px;
 }
 .tm-explorer-menu-button {
   position: absolute; z-index: 8; left: 10px; top: 14px;
@@ -166,5 +144,5 @@
   .tm-explorer-hero *, .tm-explorer-hero *::before, .tm-explorer-hero *::after { animation: none !important; transition: none !important; }
 }
 @media (forced-colors: active) {
-  .tm-explorer-sky, .tm-explorer-film-grain, .tm-explorer-hero::before { display: none; }
+  .tm-explorer-sky { display: none; }
 }

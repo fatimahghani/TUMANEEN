@@ -261,10 +261,8 @@ export const PosterSection: React.FC = () => {
       <div className="tm-ma-content">
         <header className="tm-ma-running-head">
           <div className="tm-ma-running-heading">
-            <span>02 / POSTER ARCHIVE</span>
-            <h2 id="tm-ma-title">Studies in print</h2>
+            <h2 id="tm-ma-title">Poster archive</h2>
           </div>
-          <span>TUMANEEN / COLLECTED WORKS</span>
         </header>
 
         <div className="tm-ma-exhibition" aria-label="Six poster exhibits on an archival museum wall">
@@ -318,10 +316,6 @@ export const PosterSection: React.FC = () => {
           ))}
         </div>
 
-        <footer className="tm-ma-footer">
-          <span>TUMANEEN / POSTER ARCHIVE</span>
-          <span>06 EXHIBITS · 08 PRINTS</span>
-        </footer>
       </div>
 
       {activePoster && createPortal(
@@ -345,7 +339,6 @@ export const PosterSection: React.FC = () => {
                 <img src={activePoster.src} alt={activePoster.name + ' original full-size poster'} />
               </div>
               <div className="tm-ma-viewer-notes">
-                <span>ORIGINAL ARTWORK</span>
                 <h3 id="tm-ma-viewer-title">{activePoster.name}</h3>
                 <p>{activePoster.project}</p>
                 <p>{activePoster.description}</p>

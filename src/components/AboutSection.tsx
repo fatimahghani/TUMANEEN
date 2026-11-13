@@ -31,20 +31,6 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onContactClick }) =>
         className="pointer-events-none absolute inset-y-0 right-4 sm:right-10 lg:right-16 w-px bg-[#5D182B]/[0.08]"
       />
 
-      {/* Structured Architectural Chapter Rule (04 · Atelier Portrait) */}
-      <div className="w-full max-w-[1280px] mx-auto px-5 sm:px-6 md:px-12 mb-8 sm:mb-10 md:mb-14">
-        <div className="border-t border-b border-[#5D182B]/15 py-3 sm:py-3.5 flex items-center justify-between gap-2 text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.18em] sm:tracking-[0.22em] text-[#945640]">
-          <div className="flex items-center gap-2.5 sm:gap-3">
-            <span className="font-semibold text-[#5D182B]">04 / 06</span>
-            <span className="h-3 w-px bg-[#5D182B]/20" />
-            <span>THE DESIGNER</span>
-          </div>
-          <span className="hidden md:inline font-serif italic normal-case tracking-[0.02em] text-sm text-[#945640]">
-            Independent Multidisciplinary Design Practice
-          </span>
-          <span className="text-[#A87B6C] shrink-0">FATIMAH GHANI</span>
-        </div>
-      </div>
       <div className="w-full max-w-[1280px] mx-auto px-5 sm:px-6 md:px-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10 lg:gap-16 items-center">
           {/* LEFT COLUMN (5 Cols): Original Portfolio Print as an Editorial Plate */}
@@ -52,13 +38,6 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onContactClick }) =>
             <div
               className="tm-about-plate group relative bg-[#945640] text-[#F0E4D2] p-5"
             >
-              {/* Editorial Print Credit */}
-              <div className="flex items-center justify-between border-b border-[#F0E4D2]/25 text-[11px] font-mono uppercase tracking-wider text-[#D9C0A8] pb-2.5 mb-3">
-                <span>FATIMAH GHANI</span>
-                <span>TUMANEEN</span>
-              </div>
-
-              {/* A real portfolio plate, not a generated studio illustration. */}
               <figure className="tm-about-artwork">
                 <div className="tm-about-artwork-window">
                   <img
@@ -68,7 +47,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onContactClick }) =>
                     decoding="async"
                   />
                 </div>
-                <figcaption><span>PLATE III / WAJOOD</span><span>ORIGINAL PRINT STUDY</span></figcaption>
+                <figcaption>Wajood · Urdu poster study</figcaption>
               </figure>
 
             </div>
@@ -76,36 +55,10 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ onContactClick }) =>
 
           {/* RIGHT COLUMN (7 Cols): Short, Clean Bio for Fatimah Ghani */}
           <div className="lg:col-span-7 space-y-6">
-            <div>
-              <div className="text-[11px] font-sans font-medium uppercase tracking-[0.24em] text-[#945640] mb-2.5">
-                04 / THE PERSON BEHIND THE PAGES
-              </div>
-
-              <h2 className="font-display text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight text-[#5D182B] leading-[1.04]">
-                Behind the pages.
-              </h2>
-
-              <div className="font-serif italic text-2xl sm:text-[28px] tracking-[0.01em] text-[#945640] mt-2">
-                Fatimah Ghani · Graphic designer
-              </div>
-            </div>
-
-            <p className="font-sans text-base sm:text-lg text-[#945640] leading-relaxed max-w-[52ch]">
-              I make identities, packaging and visual stories shaped by type, culture and curiosity.
+            <h2 className="font-display">About Fatimah</h2>
+            <p className="font-sans text-base sm:text-lg leading-relaxed max-w-[46ch]">
+              I’m Fatimah Ghani, a graphic designer. I make identities, packaging and posters shaped by type and culture.
             </p>
-
-            {/* Compact 2-Row Specs */}
-            <div className="border-t border-b border-[#D9C0A8] divide-y divide-[#D9C0A8] text-xs sm:text-sm">
-              <div className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-                <span className="font-sans text-[11px] font-medium uppercase tracking-[0.2em] text-[#A87B6C]">
-                  FOCUS
-                </span>
-                <span className="font-serif italic text-base sm:text-lg font-medium text-[#5D182B]">
-                  Brand Identity · Packaging · UI/UX · Motion
-                </span>
-              </div>
-              
-            </div>
 
             {/* Action Buttons */}
             <div className="pt-2 flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3">

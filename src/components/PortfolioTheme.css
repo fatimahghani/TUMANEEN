@@ -14,6 +14,7 @@
   --tm-rose: #d7bda1;
   --tm-headline: 'Bodoni Moda', 'Bodoni MT', Didot, Georgia, serif;
   --tm-caption: 'Fraunces', Georgia, serif;
+  --tm-heading-size: clamp(1.5rem, 1.3rem + .8vw, 2rem);
   --tm-gutter: clamp(20px, 4.1vw, 80px);
   --tm-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.52' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' opacity='.045' filter='url(%23g)'/%3E%3C/svg%3E");
 }
@@ -22,24 +23,49 @@
 body { background-color: var(--tm-ivory); }
 ::selection { background: var(--tm-burgundy); color: var(--tm-blush); }
 
-/* The cover's display cut is reserved for chapter titles and display lettering.
-   Captions and body copy retain their reading faces. */
-.tm-site :is(.tm-ma-running-heading h2, .tm-hung-heading, .tm-process h2, .tm-process .sticky p.font-display, .tm-about h2, .tm-services h2, [data-editorial-contact] h2, .tm-process-card h3),
-.tm-ma-viewer-notes h3, .tm-epok-overlay-panel h2, .tm-epok-study-header h2 {
-  font-family: var(--tm-headline) !important;
-  font-weight: 700 !important;
-  font-optical-sizing: auto;
-  letter-spacing: -.045em !important;
+/* The cover and all six chapters are printed on the same warm paper. */
+.tm-site :is(.tm-explorer-hero, #project.tm-hanging-gallery, #posters.tm-ma-museum,
+             .tm-process, .tm-about, .tm-services, [data-editorial-contact]) {
+  background: var(--tm-ivory) var(--tm-grain) repeat;
+  background-size: 160px 160px;
+}
+.tm-site {
+  --tm-paper-orbit: url('/assets/retro/lunar-paper-wide.webp');
+}
+@media (orientation: portrait) {
+  .tm-site { --tm-paper-orbit: url('/assets/retro/lunar-paper-tall.webp'); }
+}
+.tm-site :is(#posters, .tm-about, .tm-services, [data-editorial-contact]) {
+  isolation: isolate;
+}
+.tm-site :is(#posters, .tm-about, .tm-services, [data-editorial-contact], .tm-process .sticky)::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: .5;
+  pointer-events: none;
+  background: var(--tm-paper-orbit) center / 100% auto no-repeat;
+}
+.tm-site #posters::before { background-position: center 1.5rem; }
+@media (forced-colors: active) {
+  .tm-site :is(#posters, .tm-about, .tm-services, [data-editorial-contact], .tm-process .sticky)::before {
+    display: none;
+  }
 }
 
-.tm-site :is(.tm-ma-running-heading h2, .tm-hung-heading, .tm-about h2, .tm-services h2, [data-editorial-contact] h2) {
+/* Chapter names and captions are small enough to let the prints lead. */
+.tm-site :is(.tm-ma-running-heading h2, .tm-hung-heading, .tm-process h2, .tm-about h2,
+             .tm-services h2, [data-editorial-contact] h2),
+.tm-ma-viewer-notes h3, .tm-epok-overlay-panel h2, .tm-epok-study-header h2 {
+  color: var(--tm-burgundy);
   margin: 0;
-  font-size: clamp(2.75rem, 5.8vw, 6.5rem);
-  line-height: 1.02;
-}
-.tm-site :is(.tm-about h2 + .font-serif, .tm-services h2 + .font-serif, [data-editorial-contact] h2 + .font-serif) {
-  font-family: var(--tm-caption) !important;
-  margin-top: .65rem;
+  font-family: var(--tm-headline) !important;
+  font-size: var(--tm-heading-size);
+  font-weight: 600 !important;
+  font-optical-sizing: auto;
+  line-height: 1.15;
+  letter-spacing: -.035em !important;
 }
 .tm-site :is(.tm-ma-content, .tm-hung-shell) {
   width: min(calc(100% - var(--tm-gutter) * 2), 1480px);
@@ -52,8 +78,7 @@ body { background-color: var(--tm-ivory); }
   background: var(--tm-blush);
   border-color: var(--tm-rule-dark);
 }
-.tm-site [data-editorial-nav] .tm-floating-surface > div:first-child > button:first-child > span:first-child,
-.tm-site [data-editorial-contact] .tm-footer-logotype {
+.tm-site [data-editorial-nav] .tm-floating-surface > div:first-child > button:first-child > span:first-child {
   font-family: var(--tm-headline) !important;
   font-weight: 700 !important;
   letter-spacing: -.055em !important;
@@ -85,12 +110,10 @@ body { background-color: var(--tm-ivory); }
   --ma-paper: var(--tm-blush);
   --ma-ink: var(--tm-ink);
   --ma-rule: var(--tm-rule-dark);
-  background: var(--tm-ivory) var(--tm-grain) repeat;
   color: var(--tm-ink);
 }
-.tm-ma-running-head { padding-block: clamp(3rem, 6.1vw, 6rem) 1.15rem; }
-.tm-ma-running-heading > span, .tm-ma-running-head > span, .tm-ma-footer { color: var(--tm-muted); }
-.tm-site .tm-ma-running-heading h2 { color: var(--tm-burgundy); margin-top: .65rem; }
+.tm-ma-running-head { padding-block: clamp(2.5rem, 5vw, 4rem) 1rem; }
+.tm-ma-exhibition { padding-bottom: clamp(2.5rem, 5vw, 4rem); }
 .tm-ma-number-plaque {
   background: var(--tm-blush);
   color: var(--tm-burgundy);
@@ -104,45 +127,29 @@ body { background-color: var(--tm-ivory); }
 .tm-ma-open-arrow, .tm-hung-open { color: var(--tm-burgundy); background: var(--tm-blush); }
 .tm-ma-primary-paper::before, .tm-ma-secondary-paper::before { background: #dfc9ae; }
 
-/* A dark wall behind the four project prints echoes the lunar surface. */
-.tm-site #project.tm-hanging-gallery {
-  color: var(--tm-blush);
-  background-color: var(--tm-night);
-  background-image: var(--tm-grain), radial-gradient(ellipse at 24% 0%, #3b3732, transparent 62%);
-  background-size: 160px 160px, 100% 100%;
-}
+/* Ink captions and soft cast shadows keep the frames legible on paper. */
+.tm-site #project.tm-hanging-gallery { color: var(--tm-ink); }
 .tm-site #project.tm-hanging-gallery::before, .tm-site #project.tm-hanging-gallery::after { content: none; }
-.tm-hung-running { padding-block: clamp(2.1rem, 4.6vw, 4.4rem) .85rem; }
-.tm-hung-running, .tm-hung-footer { color: var(--tm-mist); border-color: var(--tm-rule-light); }
-.tm-site .tm-hung-heading { color: var(--tm-blush); padding-top: clamp(1.4rem, 3vw, 3rem); }
-.tm-hung-paper { background: var(--tm-blush); box-shadow: 0 2px 3px #0005, 4px 14px 22px #0005; }
-.tm-hung-wire { background: #b7a89a; box-shadow: none; }
-.tm-hung-clip { border-color: #a49d94; }
-.tm-hung-clip::before { border-color: #c3bcb2; }
-.tm-hung-label-folio, .tm-hung-mobile-cue, .tm-hung-footer button span { color: var(--tm-mist); }
+.tm-hung-heading { padding-bottom: .8rem; border-bottom: 1px solid var(--tm-rule-dark); }
+.tm-hung-footer { justify-content: flex-end; border-color: var(--tm-rule-dark); }
+.tm-hung-paper { background: var(--tm-blush); box-shadow: 0 1px 2px #4d382a33, 3px 8px 15px #4d382a26; }
+.tm-hung-wire { background: #746454; box-shadow: none; }
+.tm-hung-clip { border-color: #73685d; }
+.tm-hung-clip::before { border-color: #897969; }
+.tm-hung-mobile-cue, .tm-hung-footer button span { color: var(--tm-muted); }
 .tm-site .tm-hung-label button {
-  color: var(--tm-blush);
-  font: 400 clamp(1.1rem, 1.6vw, 1.65rem)/1.16 var(--tm-caption);
+  color: var(--tm-ink);
+  font: 450 clamp(1.05rem, 1.35vw, 1.35rem)/1.25 var(--tm-caption);
 }
-.tm-site .tm-hung-label p { color: var(--tm-mist); font-size: .73rem; }
-.tm-hung-footer button, .tm-hung-footer button:hover { color: var(--tm-blush); }
+.tm-site .tm-hung-label p { color: var(--tm-muted); font-size: .77rem; }
+.tm-hung-footer button, .tm-hung-footer button:hover { color: var(--tm-burgundy); }
 .tm-hung-label button:hover, .tm-hung-footer button:hover { text-decoration: underline; text-underline-offset: .23em; }
-.tm-site #project :is(button, .tm-hung-strip):focus-visible { outline-color: var(--tm-blush); }
+.tm-site #project :is(button, .tm-hung-strip):focus-visible { outline-color: var(--tm-burgundy); }
 
-/* Studio folios use a common paper, plate edge and typographic rhythm. */
-.tm-site :is(.tm-process, .tm-about, .tm-services) {
-  background-image: var(--tm-grain);
-  background-size: 160px 160px;
-}
+/* Five process plates and the studio pages share the same typography. */
 .tm-site .tm-process::before, .tm-site .tm-about-plate::after { content: none; }
 .tm-site .tm-process .sticky { padding-top: max(5rem, 9svh); }
-.tm-site .tm-process .sticky p.font-display {
-  color: var(--tm-burgundy);
-  font-size: clamp(2.3rem, 3.5vw, 3.15rem);
-  line-height: .99;
-  font-style: normal;
-}
-.tm-process .sticky p.font-display:first-child { margin-bottom: .08em; }
+.tm-process-heading-row > span { color: var(--tm-muted); }
 .tm-process-card { border-color: var(--tm-blush); outline-color: var(--tm-rule-dark); box-shadow: 3px 6px 14px #241b181c; }
 .tm-process-artboard {
   background-color: var(--tm-burgundy);
@@ -150,15 +157,21 @@ body { background-color: var(--tm-ivory); }
   background-size: 160px 160px, 100% 100%;
 }
 .tm-process-card:is([data-step="02"], [data-step="04"]) .tm-process-artboard { background-color: var(--tm-night); }
-.tm-process-artboard-number { color: #f1e2ce46; }
-.tm-process-artboard-registration { color: var(--tm-mist); }
 .tm-process-artboard::before {
   width: 59%;
   border-color: #f1e2ce30;
   box-shadow: 0 0 0 1.2rem #f1e2ce08, 0 0 0 2.4rem #f1e2ce08;
 }
-.tm-site .tm-process-card h3 { font-style: normal; text-shadow: none; }
-.tm-process-card > div[class*="backdrop-blur"] { border-color: #f1e2ce65; background: #201d1ce8 !important; }
+.tm-site .tm-process-card h3 {
+  font-family: var(--tm-headline) !important;
+  font-size: clamp(1.5rem, 2.1vw, 1.875rem);
+  font-weight: 600 !important;
+  font-style: normal;
+  line-height: 1.15;
+  text-shadow: none;
+}
+.tm-process-note { color: var(--tm-blush); text-wrap: pretty; }
+.tm-process-artboard-registration { color: var(--tm-blush); opacity: .33; }
 .tm-site .tm-process button[aria-current="step"] { color: var(--tm-burgundy) !important; border-color: var(--tm-burgundy) !important; }
 .tm-site .tm-process button:not([aria-current]):not(:disabled) { color: var(--tm-muted); }
 .tm-site .tm-process button[aria-label]:not(:disabled):hover { background: var(--tm-burgundy); color: var(--tm-blush); }
@@ -168,32 +181,60 @@ body { background-color: var(--tm-ivory); }
 .tm-site .tm-about button:nth-child(2) { background: transparent; color: var(--tm-burgundy); border-color: var(--tm-rule-dark); }
 .tm-site .tm-about button:first-child:hover { background: var(--tm-ink); }
 .tm-site .tm-about button:nth-child(2):hover { background: var(--tm-blush); }
-.tm-site .tm-services { border-top: 1px solid var(--tm-rule-dark); }
+.tm-site :is(.tm-about, .tm-services, [data-editorial-contact]) {
+  padding-block: clamp(3.25rem, 6vw, 5rem);
+  border-top: 1px solid var(--tm-rule-dark);
+}
+.tm-site .tm-service-card { min-height: 0; gap: 1.75rem; }
+.tm-site .tm-services > div:last-child > div:nth-child(2) {
+  border-block: 1px solid var(--tm-rule-dark);
+}
 .tm-site .tm-service-card:hover, .tm-site .tm-service-card:focus-within { background: #fbf0e099 !important; }
 .tm-site .tm-service-card[data-selected="true"] {
   border-top-color: var(--tm-burgundy);
   background: var(--tm-blush) !important;
 }
-.tm-site .tm-service-card h3 { color: var(--tm-burgundy); line-height: 1.12; }
-.tm-service-card > div:first-child > div:first-child > span:last-child { color: var(--tm-muted); }
-.tm-site .tm-service-card li { color: var(--tm-ink); line-height: 1.55; }
+.tm-site .tm-service-card h3 {
+  color: var(--tm-burgundy);
+  font-size: clamp(1.125rem, 1.6vw, 1.45rem);
+  line-height: 1.2;
+}
+.tm-site .tm-services h2 { margin-bottom: 1.35rem; }
+.tm-service-summary { color: var(--tm-muted); font-size: .875rem; line-height: 1.55; }
 
-/* The colophon reverses the cover's headline and paper inks. */
-.tm-site [data-editorial-contact] {
-  background-image: var(--tm-grain);
-  background-size: 160px 160px;
-  border-top: 0;
+/* Light-paper correspondence, including the confirmation view. */
+.tm-site [data-editorial-contact] { color: var(--tm-ink); }
+.tm-site [data-editorial-contact] h2 { color: var(--tm-burgundy); }
+.tm-site [data-editorial-contact] :is(label, legend) {
+  color: var(--tm-ink);
+  font-size: .875rem;
+  font-weight: 500;
 }
-.tm-site [data-editorial-contact] h2 { max-width: 10ch; }
-.tm-site [data-editorial-contact] .tm-footer-logotype {
-  font-size: clamp(3.5rem, 7.5vw, 8rem) !important;
-  line-height: .95 !important;
-  color: var(--tm-blush);
+.tm-site [data-editorial-contact] :is(input, textarea) {
+  color: var(--tm-ink);
+  background: var(--tm-blush);
+  border: 1px solid var(--tm-rule-dark);
+  border-radius: 0;
 }
-.tm-site [data-editorial-contact] form button[aria-pressed="true"] { color: var(--tm-burgundy); background: var(--tm-blush); border-color: var(--tm-blush); }
-.tm-site [data-editorial-contact] form button[aria-pressed="false"] { color: var(--tm-blush); background: transparent; }
-.tm-site [data-editorial-contact] form button[aria-pressed="false"]:hover { background: #fbf0e016; }
-.tm-site [data-editorial-contact] :is(button, a):focus-visible { outline-color: var(--tm-blush); }
+.tm-site [data-editorial-contact] :is(input, textarea)::placeholder { color: var(--tm-muted); }
+.tm-site [data-editorial-contact] :is(input, textarea):focus { border-color: var(--tm-burgundy); }
+.tm-site [data-editorial-contact] form button[aria-pressed="false"] {
+  color: var(--tm-ink); border-color: var(--tm-rule-dark); background: transparent;
+}
+.tm-site [data-editorial-contact] form button[aria-pressed="false"]:hover,
+.tm-site [data-editorial-contact] .tm-inquiry-confirmation button:hover { background: var(--tm-blush); }
+.tm-site [data-editorial-contact] form button[aria-pressed="true"],
+.tm-site [data-editorial-contact] form > button[type="submit"] {
+  color: var(--tm-blush); background: var(--tm-burgundy); border-color: var(--tm-burgundy);
+}
+.tm-site [data-editorial-contact] form > button[type="submit"]:hover { background: var(--tm-ink); border-color: var(--tm-ink); }
+.tm-site [data-editorial-contact] :is(button, a, input, textarea):focus-visible { outline-color: var(--tm-burgundy); }
+.tm-site [data-editorial-contact] :is(a, .tm-contact-email) { color: var(--tm-burgundy); }
+.tm-inquiry-confirmation { border-color: var(--tm-rule-dark); background: var(--tm-blush); }
+.tm-inquiry-confirmation button, .tm-site [data-editorial-contact] .grid.border-b { border-color: var(--tm-rule-dark); }
+.tm-inquiry-confirmation h3 { font-size: 1.25rem; }
+.tm-inquiry-confirmation dt, .tm-contact-footer { color: var(--tm-muted); }
+.tm-inquiry-confirmation dd { overflow-wrap: anywhere; }
 
 /* Viewer components portal directly to body. Their chrome uses the same stock. */
 .tm-ma-viewer-scrim, .tm-epok-overlay-scrim { background: #171514db; }
@@ -246,8 +287,6 @@ body { background-color: var(--tm-ivory); }
 @media (max-width: 767px) {
   .tm-site .tm-process .sticky { padding-top: 7.1rem; }
   .tm-ma-running-head { align-items: start; }
-  .tm-ma-running-head > span { max-width: 13ch; font-size: .56rem; line-height: 1.6; }
-  .tm-site .tm-hung-heading { max-width: 15ch; }
   .tm-site .tm-ma-exhibit-caption > span { text-align: left; }
   .tm-site [data-editorial-contact] input, .tm-site [data-editorial-contact] textarea { font-size: 1rem; }
 }

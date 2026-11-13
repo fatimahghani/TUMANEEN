@@ -277,11 +277,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
     <section ref={sectionRef} id="project" className="tm-projects tm-epok-gallery tm-hanging-gallery" aria-labelledby="tm-gallery-title">
       <div className="tm-epok-shell tm-hung-shell">
         <canvas className="tm-lunar-orbit" aria-hidden="true" />
-        <div className="tm-hung-running">
-          <span>01 / SELECTED PROJECTS</span>
-          <span>TUMANEEN — A VISUAL NOTEBOOK</span>
-        </div>
-        <h2 id="tm-gallery-title" className="tm-hung-heading">Selected design projects</h2>
+        <h2 id="tm-gallery-title" className="tm-hung-heading">Selected projects</h2>
 
         <div className="tm-hung-window" ref={apertureRef}>
           <div
@@ -293,7 +289,6 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
           >
             {galleryEntries.map((entry, index) => {
               const title = entryTitle(entry);
-              const number = String(index + 1).padStart(2, '0');
               const isPoster = entry.kind === 'poster-series';
               const image = isPoster
                 ? POSTER_SERIES[0]?.src || ''
@@ -339,7 +334,6 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
                     </button>
                   </div>
                   <div className="tm-hung-label">
-                    <span className="tm-hung-label-folio">{number} / 04</span>
                     <button type="button" onClick={(event) => openEntry(entry, event.currentTarget)} aria-label={'View ' + title}>
                       {title} <ArrowUpRight size={14} strokeWidth={1.5} aria-hidden="true" />
                     </button>
@@ -350,12 +344,11 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
             })}
           </div>
         </div>
-        <div className="tm-hung-mobile-cue" aria-hidden="true">SWIPE TO VIEW ALL FOUR STUDIES <span>→</span></div>
+        <div className="tm-hung-mobile-cue" aria-hidden="true">Swipe for more <span>→</span></div>
 
         <footer className="tm-epok-footer tm-hung-footer">
-          <span>FATIMAH GHANI / SELECTED CASE STUDIES</span>
           <button type="button" ref={indexTrigger} onClick={openIndex}>
-            VIEW INDEX <span>{String(galleryEntries.length).padStart(2, '0')}</span>
+            View index
             <ArrowUpRight size={15} strokeWidth={1.6} aria-hidden="true" />
           </button>
         </footer>
@@ -389,7 +382,6 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
                 </button>
               ))}
             </div>
-            <p className="tm-epok-overlay-foot">TUMANEEN / WORKS IN PROGRESS</p>
           </div>
         </div>,
         document.body

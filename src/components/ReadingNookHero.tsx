@@ -51,7 +51,6 @@ export const ReadingNookHero: React.FC<ReadingNookHeroProps> = ({ onSelectNav, o
       <div className="tm-explorer-foreground-crop">
         <img className="tm-explorer-foreground" src={FOREGROUND} alt="" aria-hidden="true" decoding="sync" fetchPriority="high" draggable={false} />
       </div>
-      <div className="tm-explorer-film-grain" aria-hidden="true" />
       <p className="tm-explorer-tagline"><span className="tm-explorer-tagline-line">Visual</span><span className="tm-explorer-tagline-line">Explorer</span><span className="tm-explorer-tagline-rule" aria-hidden="true" /></p>
 
       <button

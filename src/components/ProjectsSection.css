@@ -327,8 +327,8 @@
 
 /* One vertical pixel moves one pixel along the wall. Without motion the
    existing four-column layout or touch-scrollable strip remains available. */
-.tm-hanging-gallery[data-gallery-mode="native"] .tm-hung-running {
-  padding-top: calc(var(--gallery-header) + 12px);
+.tm-hanging-gallery[data-gallery-mode="native"] .tm-hung-heading {
+  padding-top: calc(var(--gallery-header) + 16px);
 }
 .tm-hanging-gallery[data-gallery-mode="native"] .tm-hung-strip:has(:focus-visible) {
   scroll-snap-type: none;
@@ -346,15 +346,9 @@
   display: flex;
   flex-direction: column;
 }
-#project[data-gallery-mode="pinned"] .tm-hung-running {
-  flex: none;
-  padding: 3px 0 8px;
-}
 #project[data-gallery-mode="pinned"] .tm-hung-heading {
   max-width: none;
   padding-top: .65rem;
-  font-size: clamp(1.85rem, min(5.4vw, 7.8svh), 4.8rem);
-  line-height: 1;
 }
 #project[data-gallery-mode="pinned"] .tm-hung-window {
   margin-block: auto;
@@ -564,7 +558,7 @@
 }
 .tm-epok-study-meta h3 {
   margin: 22px 0 10px;
-  font: 450 clamp(24px, 2.7vw, 37px)/1.16 'Fraunces', Georgia, serif;
+  font: 450 clamp(1.25rem, 2.2vw, 1.65rem)/1.2 'Fraunces', Georgia, serif;
   letter-spacing: -.035em;
 }
 .tm-epok-study-meta > p {
