@@ -118,11 +118,15 @@
   padding: clamp(22px, 2.5vw, 38px) 0 clamp(38px, 5.2vw, 78px);
 }
 .tm-hung-study {
+  --frame-ink: url('../assets/frames/project-ink-1.svg');
   min-width: 0;
   width: 100%;
   display: flex;
   flex-direction: column;
 }
+.tm-hung-study:nth-child(4n + 2) { --frame-ink: url('../assets/frames/project-ink-2.svg'); }
+.tm-hung-study:nth-child(4n + 3) { --frame-ink: url('../assets/frames/project-ink-3.svg'); }
+.tm-hung-study:nth-child(4n) { --frame-ink: url('../assets/frames/project-ink-4.svg'); }
 .tm-hung-piece {
   position: relative;
   width: 100%;
@@ -132,25 +136,34 @@
   position: relative;
   display: block;
   width: 100%;
-  aspect-ratio: .74;
-  padding: clamp(8px, 1.2vw, 17px);
-  background: #F4F1EC;
+  aspect-ratio: 1.10;
+  padding: clamp(12px, 1.45vw, 22px);
+  background: transparent;
   border: 0;
   border-radius: 0;
-  box-shadow:
-    0 1px 1px rgba(40,34,31,.16),
-    4px 8px 9px rgba(40,34,31,.15),
-    8px 19px 22px rgba(40,34,31,.11);
   cursor: pointer;
   isolation: isolate;
 }
 .tm-hung-paper::before {
   content: '';
   position: absolute;
+  inset: 1.2%;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--tm-blush);
+}
+.tm-hung-paper::after {
+  content: '';
+  position: absolute;
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  box-shadow: inset 0 0 0 1px rgba(40,34,31,.035);
+  background: var(--tm-ink);
+  -webkit-mask: var(--frame-ink) center / 100% 100% no-repeat;
+  mask: var(--frame-ink) center / 100% 100% no-repeat;
+}
+@media (forced-colors: active) {
+  .tm-hung-paper::after { background: CanvasText; forced-color-adjust: none; }
 }
 .tm-hung-paper img {
   display: block;
@@ -315,7 +328,6 @@
   .tm-hung-study { flex-basis: min(78vw, 305px); }
   .tm-hung-piece { padding-top: 58px; }
   .tm-hung-hardware { height: 58px; }
-  .tm-hung-paper { padding: 11px; }
   .tm-hung-label button { font-size: 17px; }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -367,14 +379,13 @@
   scroll-snap-type: none;
 }
 #project[data-gallery-mode="pinned"] .tm-hung-study {
-  width: min(82vw, 76svh, 780px);
+  width: min(82vw, max(29vw, 54svh), 620px);
   flex: none;
 }
 #project[data-gallery-mode="pinned"] .tm-hung-piece { padding-top: var(--wire-height); }
 #project[data-gallery-mode="pinned"] .tm-hung-hardware { height: var(--wire-height); }
 #project[data-gallery-mode="pinned"] .tm-hung-paper {
-  height: clamp(150px, 40svh, 510px);
-  aspect-ratio: auto;
+  max-height: 54svh;
 }
 #project[data-gallery-mode="pinned"] .tm-hung-label {
   min-height: 0;
