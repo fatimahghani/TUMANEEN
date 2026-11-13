@@ -132,7 +132,6 @@ body { background-color: var(--tm-ivory); }
 .tm-site #project.tm-hanging-gallery::before, .tm-site #project.tm-hanging-gallery::after { content: none; }
 .tm-hung-heading { padding-bottom: .8rem; border-bottom: 1px solid var(--tm-rule-dark); }
 .tm-hung-footer { justify-content: flex-end; border-color: var(--tm-rule-dark); }
-.tm-hung-paper { background: var(--tm-blush); box-shadow: 0 1px 2px #4d382a33, 3px 8px 15px #4d382a26; }
 .tm-hung-wire { background: #746454; box-shadow: none; }
 .tm-hung-clip { border-color: #73685d; }
 .tm-hung-clip::before { border-color: #897969; }

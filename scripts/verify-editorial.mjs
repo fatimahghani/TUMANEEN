@@ -412,6 +412,38 @@ async function checkGalleryFocus(target) {
   assert.equal(state.stableFrames, 3, `Keyboard focus must reach the visible gallery control: ${JSON.stringify(state)}`);
 }
 
+async function checkProjectInk(covers) {
+  assert.equal(await covers.count(), 4, 'Each of the four project covers needs an ink frame');
+  const frames = await covers.evaluateAll(buttons => Promise.all(buttons.map(async button => {
+    const overlay = getComputedStyle(button, '::after');
+    const url = overlay.maskImage.match(/^url\("(.+)"\)$/)?.[1];
+    if (!url || overlay.content === 'none' || overlay.pointerEvents !== 'none') {
+      throw new Error('Missing passive ink frame on ' + button.getAttribute('aria-label'));
+    }
+    const image = new Image();
+    image.src = url;
+    await image.decode();
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = 128;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(image, 0, 0, 128, 128);
+    const alpha = ctx.getImageData(0, 0, 128, 128).data;
+    let rim = 0, interior = 0;
+    for (let y = 0; y < 128; y++) {
+      for (let x = 0; x < 128; x++) {
+        const inset = Math.min(x, y, 127 - x, 127 - y);
+        if (alpha[(y * 128 + x) * 4 + 3] > 25) {
+          if (inset < 22) rim++;
+          else interior++;
+        }
+      }
+    }
+    return { rim, interior, artworkFit: getComputedStyle(button.querySelector('img')).objectFit };
+  })));
+  assert(frames.every(frame => frame.rim > 80 && frame.interior < 20 && frame.artworkFit === 'contain'),
+    'Ink should surround each cover and leave its artwork clear: ' + JSON.stringify(frames));
+}
+
 async function checkProjectGallery(page, width) {
   await page.emulateMedia({reducedMotion:'no-preference'});
   const section = page.locator('#project');
@@ -427,6 +459,7 @@ async function checkProjectGallery(page, width) {
       !project.closest('.section-reveal-active') && !document.querySelector('.tm-page-turn-flash');
   });
   const {travel} = await seekProjectGallery(section, 0);
+  await checkProjectInk(covers);
   assert(travel > 150, 'The gallery must have real horizontal travel');
   const seek = fraction => seekProjectGallery(section, fraction);
   let initial;
@@ -452,6 +485,11 @@ async function checkProjectGallery(page, width) {
     if (fraction === 0) assert(Math.abs(frame.first-frame.left) < 4, 'First case study should start at the gallery edge');
     if (fraction === 1) assert(Math.abs(frame.last-frame.right) < 4, 'Last case study should finish at the gallery edge');
     await page.screenshot({path:`editorial-snapshots/projects-${width}-${name}.png`, animations:'disabled'});
+    if (fraction === 0) {
+      await section.locator('.tm-hung-study').first().screenshot({
+        path:`editorial-snapshots/project-ink-${width}.png`, animations:'disabled',
+      });
+    }
   }
   if (width === 1440) {
     for (let frame = 0; frame <= 24; frame++) {
