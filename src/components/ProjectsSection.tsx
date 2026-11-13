@@ -38,9 +38,6 @@ const galleryEntries: GalleryEntry[] = [
 const entryTitle = (entry: GalleryEntry): string =>
   entry.kind === 'case' ? entry.project.title : 'Poster Typography';
 
-const entryCaption = (entry: GalleryEntry): string =>
-  entry.kind === 'case' ? entry.project.location : 'Shanakht · Wajood · Chai';
-
 export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
   onSelectProject,
   isAllProjectsOpen,
@@ -135,7 +132,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
     };
 
     // A clipped viewport cannot acquire a second, browser-managed scrollLeft
-    // when Tab moves to an offscreen print. Move along the page's scroll axis.
+    // when Tab moves to an offscreen box. Move along the page's scroll axis.
     const revealFocusedStudy = (event: FocusEvent) => {
       if (!(event.target instanceof HTMLElement) || !event.target.matches(':focus-visible')) return;
       if (!travel) {
@@ -284,15 +281,11 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
             className="tm-hung-strip"
             ref={trackRef}
             role="region"
-            aria-label="Four horizontally arranged hanging case studies"
+            aria-label="Project case studies"
             tabIndex={0}
           >
-            {galleryEntries.map((entry, index) => {
+            {galleryEntries.map((entry) => {
               const title = entryTitle(entry);
-              const isPoster = entry.kind === 'poster-series';
-              const image = isPoster
-                ? POSTER_SERIES[0]?.src || ''
-                : entry.project.slides.find((slide) => slide.imageUrl)?.imageUrl || '';
 
               return (
                 <article
@@ -301,51 +294,19 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
                   data-gallery-kind={entry.kind}
                   data-gallery-title={title}
                 >
-                  <div className="tm-hung-piece">
-                    <div className="tm-hung-hardware" aria-hidden="true">
-                      <span className="tm-hung-anchor tm-hung-anchor--left">
-                        <span className="tm-hung-wire" />
-                        <span className="tm-hung-clip" />
-                      </span>
-                      <span className="tm-hung-anchor tm-hung-anchor--right">
-                        <span className="tm-hung-wire" />
-                        <span className="tm-hung-clip" />
-                      </span>
-                    </div>
-                    <button
-                      type="button"
-                      className="tm-hung-paper"
-                      onClick={(event) => openEntry(entry, event.currentTarget)}
-                      aria-label={isPoster
-                        ? 'Open Poster Typography case study'
-                        : 'Open ' + title + ' case study'}
-                    >
-                      <img
-                        src={image}
-                        alt={isPoster
-                          ? 'Shanakht — cover of the Shanakht, Wajood and Chai typography case study'
-                          : title + ' original project artwork'}
-                        loading={index === 0 ? 'eager' : 'lazy'}
-                        decoding="async"
-                      />
-                      <span className="tm-hung-open" aria-hidden="true">
-                        <ArrowUpRight size={17} strokeWidth={1.6} />
-                      </span>
-                    </button>
-                  </div>
-                  <div className="tm-hung-label">
-                    <button type="button" onClick={(event) => openEntry(entry, event.currentTarget)} aria-label={'View ' + title}>
-                      {title} <ArrowUpRight size={14} strokeWidth={1.5} aria-hidden="true" />
-                    </button>
-                    <p>{entryCaption(entry)}</p>
-                  </div>
+                  <button
+                    type="button"
+                    className="tm-hung-paper"
+                    onClick={(event) => openEntry(entry, event.currentTarget)}
+                    aria-label={'Open ' + title + ' case study'}
+                  >
+                    <span className="tm-box-title">{title}</span>
+                  </button>
                 </article>
               );
             })}
           </div>
         </div>
-        <div className="tm-hung-mobile-cue" aria-hidden="true">Swipe for more <span>→</span></div>
-
         <footer className="tm-epok-footer tm-hung-footer">
           <button type="button" ref={indexTrigger} onClick={openIndex}>
             View index
