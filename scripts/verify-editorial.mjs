@@ -538,10 +538,16 @@ async function checkProjectScrollInput(page, width) {
 }
 
 async function checkChapters(page, width) {
-  const paper = 'rgb(241, 226, 206)', wine = 'rgb(100, 22, 19)', night = 'rgb(27, 27, 26)';
-  const chapters = [['project', night], ['posters', paper], ['process', paper],
-    ['about', paper], ['services', paper], ['contact-form', wine]];
-  for (const [id, background] of chapters) {
+  const paper = 'rgb(241, 226, 206)';
+  const surface = await page.locator('.tm-explorer-hero').evaluate(hero => {
+    const style = getComputedStyle(hero);
+    return {color:style.backgroundColor, grain:style.backgroundImage, size:style.backgroundSize, repeat:style.backgroundRepeat};
+  });
+  assert.equal(surface.color, paper, 'The cover should establish the warm paper color');
+  assert(surface.grain.includes('data:image/svg+xml'), 'The paper should have a fine printed grain');
+  const chapters = ['project', 'posters', 'process', 'about', 'services', 'contact-form'];
+  const orbitSources = new Set();
+  for (const id of chapters) {
     const section = page.locator('#' + id);
     await section.evaluate(el => {
       const navHeight = document.querySelector('[data-editorial-nav]').getBoundingClientRect().height;
@@ -566,27 +572,64 @@ async function checkChapters(page, width) {
         });
         return .2126*r + .7152*g + .0722*b;
       };
-      const background = getComputedStyle(el).backgroundColor;
+      const style = getComputedStyle(el);
+      const background = style.backgroundColor;
       const contrast = (foreground, surface) => {
         const a = tone(surface), b = tone(foreground, surface);
         return (Math.max(a,b) + .05) / (Math.min(a,b) + .05);
       };
       const selectedService = el.querySelector('.tm-service-card[data-selected="true"]');
-      const toolsLabel = selectedService?.querySelector(':scope > div:first-child > div:first-child > span:last-child');
-      return {background, contrast:contrast(getComputedStyle(heading).color, background), font: getComputedStyle(heading).fontFamily,
-        toolsContrast: toolsLabel ? contrast(getComputedStyle(toolsLabel).color, getComputedStyle(selectedService).backgroundColor) : null,
+      const serviceSummary = selectedService?.querySelector('.tm-service-summary');
+      const backgroundLayer = el.id === 'process' ? el.querySelector('.sticky') : el;
+      const orbitStyle = getComputedStyle(backgroundLayer, '::before');
+      const headings = [...el.querySelectorAll('h2,h3')].filter(title => title.getClientRects().length);
+      return {surface:{color:background, grain:style.backgroundImage, size:style.backgroundSize, repeat:style.backgroundRepeat},
+        contrast:contrast(getComputedStyle(heading).color, background), font:getComputedStyle(heading).fontFamily,
+        titleSize:parseFloat(getComputedStyle(heading).fontSize),
+        h2Count:headings.filter(title => title.tagName === 'H2').length,
+        largestHeading:Math.max(...headings.map(title => parseFloat(getComputedStyle(title).fontSize))),
+        summaryContrast:serviceSummary ? contrast(getComputedStyle(serviceSummary).color, getComputedStyle(selectedService).backgroundColor) : null,
+        orbitImage:orbitStyle.backgroundImage, orbitVisible:orbitStyle.content !== 'none' && Number(orbitStyle.opacity) > 0,
+        orbitEvents:orbitStyle.pointerEvents,
         left: bounds.left, right: bounds.right, overflow: document.documentElement.scrollWidth - innerWidth};
     });
-    assert.equal(presentation.background, background, id + ' chapter palette');
+    assert.deepEqual(presentation.surface, surface, id + ' must share the cover paper, grain and tile scale');
+    assert.equal(presentation.h2Count, 1, id + ' should have one visible section heading');
+    assert(presentation.titleSize >= 24 && presentation.largestHeading <= 32.1,
+      id + ' heading sizes should be readable and restrained: ' + JSON.stringify(presentation));
     assert(presentation.font.includes('Bodoni Moda'), id + ' chapter typography');
-    assert(presentation.contrast >= 3, id + ' chapter heading should be readable against its surface');
-    if (id === 'services') assert(presentation.toolsContrast >= 4.5, 'The selected service tools must be readable against the cream card');
+    assert(presentation.contrast >= 4.5, id + ' chapter heading should be readable against the paper');
+    if (id === 'services') assert(presentation.summaryContrast >= 4.5, 'The selected service description must be readable');
+    if (id !== 'project') {
+      const orbit = presentation.orbitImage.match(/url\("([^"]*lunar-paper-[^"]+)"\)/);
+      assert(orbit && presentation.orbitVisible && presentation.orbitEvents === 'none',
+        id + ' should have a visible, passive lunar backdrop');
+      orbitSources.add(orbit[1]);
+    }
     assert(presentation.left >= -1 && presentation.right <= width + 1 && presentation.overflow <= 2,
       id + ' must fit the viewport');
     await page.screenshot({path: `editorial-snapshots/chapter-${width}-${id}.png`, animations: 'disabled'});
   }
+  await page.evaluate(async sources => {
+    for (const url of sources) {
+      const image = new Image();
+      image.src = url;
+      await image.decode();
+      if (!image.naturalWidth) throw new Error('Empty lunar artwork: ' + url);
+    }
+  }, [...orbitSources]);
+
+  assert.deepEqual(await page.locator('.tm-process-card').evaluateAll(cards =>
+    cards.map(card => card.querySelectorAll('p').length)), [1,1,1,1,1],
+    'Each process step should have one short description');
+  assert.equal(await page.locator('#about p').count(), 1, 'The designer bio should be one paragraph');
+  assert.equal(await page.locator('.tm-service-card .tm-service-summary').count(), 4,
+    'Each design service should have a single summary');
 
   const form = page.locator('#contact-form form');
+  await page.getByRole('button', {name:'Inquire about Packaging Design'}).click();
+  assert.equal(await form.getByRole('button', {name:'Packaging', exact:true}).getAttribute('aria-pressed'), 'true',
+    'The project form should select the service the visitor chose');
   assert.equal(await form.evaluate(el => el.checkValidity()), false, 'An empty inquiry should fail validation');
   await form.locator('input[type="text"]').fill('Preview');
   await form.locator('input[type="email"]').fill('invalid');
@@ -764,23 +807,17 @@ try {
       'Both words should remain readable on separate lines');
 
     const finish=await page.locator('.tm-explorer-hero').evaluate(hero=>{
-      const grain=getComputedStyle(hero.querySelector('.tm-explorer-film-grain'));
       const image=getComputedStyle(hero.querySelector('.tm-explorer-foreground'));
       const moon=getComputedStyle(hero.querySelector('.tm-explorer-moon'));
       const tag=getComputedStyle(hero.querySelector('.tm-explorer-tagline'));
       const sky=hero.querySelector('.tm-explorer-sky'),skyStyle=getComputedStyle(sky);
-      return {opacity:Number(grain.opacity),events:grain.pointerEvents,grain:grain.backgroundImage,grainLayer:Number(grain.zIndex),
-        foreground:image.filter,moon:moon.filter,type:tag.filter,
+      return {foreground:image.filter,moon:moon.filter,type:tag.filter,
         skyEvents:skyStyle.pointerEvents,skyLayer:Number(skyStyle.zIndex),skyHidden:sky.getAttribute('aria-hidden'),
         stars:sky.querySelectorAll('.tm-explorer-star').length,
         trails:sky.querySelectorAll('.tm-explorer-stardust').length,
         skyImages:sky.querySelectorAll('img,canvas,video').length,
         animatedStars:[...sky.querySelectorAll('.tm-explorer-star')].some(el=>getComputedStyle(el).animationName!=='none')};
     });
-    assert(finish.opacity>.02&&finish.opacity<.04,'Grain must remain subtle');
-    assert.equal(finish.grainLayer,0,'Film grain should stay in the sky behind the lettering and artwork');
-    assert.equal(finish.events,'none','Filter intercepts clicks');
-    assert(finish.grain.includes('data:image/svg+xml'),'Static grain missing');
     assert(finish.foreground.includes('sepia')&&!finish.foreground.includes('blur'),'Foreground grade not sharp');
     assert(finish.moon.includes('contrast')&&!finish.moon.includes('blur'),'Moon grade not sharp');
     assert.equal(finish.type,'none','Tagline must stay clear');

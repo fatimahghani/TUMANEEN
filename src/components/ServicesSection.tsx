@@ -11,64 +11,19 @@ export interface ServiceItem {
   id: string;
   number: string;
   title: string;
-  subtitle: string;
-  tools: string;
-  deliverables: string[];
+  summary: string;
+  shortTitle: string;
 }
 
 const SERVICES_LIST: ServiceItem[] = [
-  {
-    id: 'brand-identity',
-    number: '01',
-    title: 'Brand Identity',
-    subtitle: 'A distinct visual identity.',
-    tools: 'Illustrator · Affinity',
-    deliverables: [
-      'Primary & Secondary Logos',
-      'Color Palette & Type System',
-      'Brand Guidelines Book',
-      'Social & Stationery Kit',
-    ],
-  },
-  {
-    id: 'packaging-design',
-    number: '02',
-    title: 'Packaging Design',
-    subtitle: 'Packaging made to be held.',
-    tools: 'Illustrator · Dimension',
-    deliverables: [
-      'Box & Bottle Labels',
-      'Print-Ready Dielines',
-      'Material & Finish Specs',
-      '3D Product Mockups',
-    ],
-  },
-  {
-    id: 'ui-ux-design',
-    number: '03',
-    title: 'UI/UX Design',
-    subtitle: 'Clear digital experiences.',
-    tools: 'Figma · Prototyping',
-    deliverables: [
-      'Website & Landing Pages',
-      'Mobile & Web App Screens',
-      'Interactive Figma Prototypes',
-      'Component Design Systems',
-    ],
-  },
-  {
-    id: 'motion-graphics',
-    number: '04',
-    title: 'Motion Graphics',
-    subtitle: 'Design in motion.',
-    tools: 'After Effects · Figma',
-    deliverables: [
-      'Animated Logo Reveals',
-      'Social Media Reels & Loops',
-      'UI Micro-Interactions',
-      'Launch Promo Videos',
-    ],
-  },
+  { id: 'brand-identity', number: '01', title: 'Brand Identity', shortTitle: 'Branding',
+    summary: 'Logos, palettes and type systems with guidelines for everyday use.' },
+  { id: 'packaging-design', number: '02', title: 'Packaging Design', shortTitle: 'Packaging',
+    summary: 'Labels, boxes and print-ready dielines.' },
+  { id: 'ui-ux-design', number: '03', title: 'UI/UX Design', shortTitle: 'UI/UX',
+    summary: 'Websites, app screens and interactive prototypes.' },
+  { id: 'motion-graphics', number: '04', title: 'Motion Graphics', shortTitle: 'Motion',
+    summary: 'Animated identities, social loops and interface details.' },
 ];
 
 interface ServicesSectionProps {
@@ -152,7 +107,6 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
 
   return (
     <>
-      {/* SECTION 05 · DESIGN CAPABILITIES (SEAMLESS ARCHIVAL PARCHMENT FLOW FROM ABOUT SECTION) */}
       <section
         id="services"
         data-editorial-services=""
@@ -169,39 +123,9 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
           className="pointer-events-none absolute inset-y-0 right-4 sm:right-10 lg:right-16 w-px bg-[#5D182B]/[0.08]"
         />
 
-        {/* Structured Architectural Chapter Rule (05 · Studio Capabilities) */}
-        <div className="w-full max-w-[1280px] mx-auto px-5 sm:px-6 md:px-12 mb-8 sm:mb-10 md:mb-12">
-          <div className="border-t border-b border-[#5D182B]/15 py-3 sm:py-3.5 flex items-center justify-between gap-2 text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.18em] sm:tracking-[0.22em] text-[#945640]">
-            <div className="flex items-center gap-2.5 sm:gap-3">
-              <span className="font-semibold text-[#5D182B]">05 / AN INDEX OF POSSIBILITIES</span>
-              <span className="h-3 w-px bg-[#5D182B]/20" />
-              <span>THE COMMISSION INDEX</span>
-            </div>
-            <span className="hidden md:inline font-serif italic normal-case tracking-[0.02em] text-sm text-[#945640]">
-              FOUR DISCIPLINES
-            </span>
-            <span className="text-[#A87B6C] shrink-0">01 — 04</span>
-          </div>
-        </div>
+        <div className="w-full max-w-[1280px] mx-auto px-5 sm:px-6 md:px-12">
+          <h2 className="font-display mb-6">Services</h2>
 
-        <div className="w-full max-w-[1280px] mx-auto px-5 sm:px-6 md:px-12 space-y-8 sm:space-y-10 md:space-y-14">
-          {/* EDITORIAL SECTION HEADER */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-2">
-            <div>
-              <h2 className="font-display text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight text-[#5D182B] leading-[1.05]">
-                What I can make.
-              </h2>
-              <div className="font-serif italic text-2xl sm:text-[28px] tracking-[0.01em] text-[#945640] mt-2">
-                For print, screen &amp; everything between.
-              </div>
-            </div>
-
-            <p className="font-sans text-sm text-[#945640] max-w-md leading-relaxed">
-              Select a discipline to begin.
-            </p>
-          </div>
-
-          {/* ARCHITECTURAL 4-COLUMN EDITORIAL LEDGER (SHARED HAIRLINE BORDERS INSTEAD OF SEPARATE FLOATING BOXES) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-y border-[#5D182B]/15 divide-y sm:divide-y-0 sm:divide-x divide-[#5D182B]/15">
             {SERVICES_LIST.map((service) => {
               const isSelected = selectedServiceId === service.id;
@@ -210,81 +134,32 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
                   key={service.id}
                   data-selected={isSelected}
                   onClick={() => setSelectedServiceId(service.id)}
-                  className={`tm-service-card group relative flex flex-col justify-between p-7 md:p-8 min-h-[390px] transition-all duration-300 cursor-pointer ${
+                  className={`tm-service-card group relative flex flex-col justify-between gap-6 p-6 transition-all duration-300 cursor-pointer ${
                     isSelected
                       ? 'bg-[#5D182B] text-[#F0E4D2]'
                       : 'bg-transparent hover:bg-[#5D182B]/[0.03] text-[#5D182B]'
                   }`}
                 >
-                  {/* Top Number & Tools Row */}
                   <div>
-                    <div className="flex items-center justify-between text-xs font-mono pb-4 mb-6 border-b border-current/15">
-                      <span className="font-bold tabular-nums">{service.number}</span>
-                      <span
-                        className={
-                          isSelected ? 'text-[#D9C0A8]/80' : 'text-[#945640]'
-                        }
-                      >
-                        {service.tools}
-                      </span>
-                    </div>
-
-                    {/* Service Title & Short Description */}
-                    <h3 className="font-display text-2xl md:text-[26px] font-semibold tracking-tight mb-2.5">
-                      {service.title}
-                    </h3>
-                    <p
-                      className={`font-serif italic text-lg leading-snug mb-6 ${
-                        isSelected ? 'text-[#D9C0A8]' : 'text-[#945640]'
-                      }`}
-                    >
-                      {service.subtitle}
-                    </p>
+                    <h3 className="font-display">{service.title}</h3>
+                    <p className="tm-service-summary text-sm leading-relaxed mt-3">{service.summary}</p>
                   </div>
-
-                  {/* Deliverables List & Action */}
-                  <div>
-                    <div
-                      className={`text-[10px] font-mono uppercase tracking-[0.2em] mb-3 ${
-                        isSelected ? 'text-[#D9C0A8]/70' : 'text-[#A87B6C]'
-                      }`}
-                    >
-                      INCLUDES
-                    </div>
-                    <ul className="space-y-2.5 mb-8">
-                      {service.deliverables.map((item) => (
-                        <li
-                          key={item}
-                          className="flex items-start gap-2.5 text-xs leading-snug"
-                        >
-                          <span
-                            className={`font-mono select-none ${
-                              isSelected ? 'text-[#D9C0A8]' : 'text-[#945640]'
-                            }`}
-                          >
-                            —
-                          </span>
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleSelectService(service);
-                      }}
-                      className={`w-full py-3 px-4 text-xs font-mono uppercase tracking-wider flex items-center justify-between transition-colors cursor-pointer ${
-                        isSelected
-                          ? 'bg-[#F0E4D2] text-[#5D182B] hover:bg-[#D9C0A8]'
-                          : 'border border-[#5D182B]/25 text-[#5D182B] group-hover:bg-[#5D182B] group-hover:text-[#F0E4D2]'
-                      }`}
-                    >
-                      <span>Commission {service.title}</span>
-                      <ArrowUpRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
+                  <button
+                    type="button"
+                    aria-label={`Inquire about ${service.title}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleSelectService(service);
+                    }}
+                    className={`w-full py-3 px-4 text-xs font-mono uppercase tracking-wider flex items-center justify-between transition-colors cursor-pointer ${
+                      isSelected
+                        ? 'bg-[#F0E4D2] text-[#5D182B] hover:bg-[#D9C0A8]'
+                        : 'border border-[#5D182B]/25 text-[#5D182B] group-hover:bg-[#5D182B] group-hover:text-[#F0E4D2]'
+                    }`}
+                  >
+                    <span>Inquire</span>
+                    <ArrowUpRight className="w-3.5 h-3.5" />
+                  </button>
                 </div>
               );
             })}
@@ -292,308 +167,138 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
         </div>
       </section>
 
-      {/* SECTION 06 / CORRESPONDENCE DESK & GRAND STUDIO COLOPHON (UNIFIED DEEP STUDIO FINALE) */}
       <section
         id="contact-form"
         data-editorial-contact=""
-        aria-label="Start a Project"
-        className="relative bg-[#4B2830] text-[#EFE6D6] pt-24 pb-14 md:pt-32 md:pb-16 overflow-hidden"
+        aria-labelledby="tm-contact-title"
+        className="relative pt-16 pb-12 md:pt-20 overflow-hidden"
       >
-        {/* Top Atmospheric Transition Veil from Parchment into Deep Studio */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#F0E4D2]/25 to-transparent"
-        />
-        {/* Ambient Warm Radial Studio Glow */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(900px_circle_at_80%_15%,rgba(253,251,212,0.06),transparent_65%),radial-gradient(700px_circle_at_15%_85%,rgba(148,86,64,0.18),transparent_65%)]"
-        />
-        {/* Continuous Vertical Architectural Studio Margin Lines */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-y-0 left-4 sm:left-10 lg:left-16 w-px bg-[#F0E4D2]/[0.07]"
-        />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-y-0 right-4 sm:right-10 lg:right-16 w-px bg-[#F0E4D2]/[0.07]"
-        />
-
-        <div className="relative z-10 w-full max-w-[1280px] mx-auto px-5 sm:px-6 md:px-12">
-          {/* Open Architectural Editorial Inquiry Layout (No Heavy Box Container) */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 sm:gap-12 lg:gap-16 items-start pb-16 sm:pb-20 md:pb-24 border-b border-[#F0E4D2]/15">
-            {/* Left Info Column (5 Cols) */}
-            <div className="lg:col-span-5 flex flex-col justify-between space-y-8">
-              <div>
-                <div className="text-[11px] font-sans font-medium uppercase tracking-[0.24em] text-[#D9C0A8]/75 mb-3">
-                  06 / INQUIRIES
-                </div>
-                <h2 className="font-display text-4xl sm:text-5xl md:text-6xl font-semibold tracking-tight text-[#F0E4D2] leading-[1.04]">
-                  Let's make something.
-                </h2>
-                <div className="font-serif italic text-2xl sm:text-[28px] tracking-[0.01em] text-[#D9C0A8] mt-2">
-                  Tell me what you have in mind.
-                </div>
-                <p className="font-sans text-sm text-[#D9C0A8]/80 mt-4 leading-relaxed max-w-md">
-                  A few details are all we need to begin.
-                </p>
-              </div>
-
-              <div className="border-t border-[#F0E4D2]/15 pt-6 space-y-4 text-xs">
-                <div className="flex items-center justify-between">
-                  <span className="font-mono uppercase tracking-wider text-[#D9C0A8]/60">DESIGNER</span>
-                  <span className="font-medium text-[#F0E4D2]">Fatimah Ghani</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="font-mono uppercase tracking-wider text-[#D9C0A8]/60">SELECTED SCOPE</span>
-                  <span className="font-mono font-semibold text-[#F0E4D2]">
-                    {activeService.number} · {activeService.title}
-                  </span>
-                </div>
-                <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
-                  <span className="font-mono uppercase tracking-wider text-[#D9C0A8]/60">DIRECT MAIL</span>
-                  <button
-                    type="button"
-                    onClick={handleCopyEmail}
-                    className="inline-flex items-center gap-1.5 font-mono text-[#F0E4D2] hover:text-[#D9C0A8] underline underline-offset-4 cursor-pointer"
-                  >
-                    <Mail className="w-3.5 h-3.5 shrink-0" />
-                    <span className="truncate">{designerEmail}</span>
-                    {emailCopied ? (
-                      <Check className="w-3.5 h-3.5 shrink-0" />
-                    ) : (
-                      <Copy className="w-3.5 h-3.5 opacity-70 shrink-0" />
-                    )}
-                  </button>
-                </div>
-
-                {/* Social & Portfolio Channels in Inquiry Ledger */}
-                <div className="pt-4 mt-4 border-t border-[#F0E4D2]/15">
-                  <span className="block font-mono text-[10px] uppercase tracking-[0.2em] text-[#D9C0A8]/60 mb-3">
-                    ELSEWHERE
-                  </span>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                    {[
-                      {
-                        label: 'Behance',
-                        handle: '@fatimahghani',
-                        href: 'https://www.behance.net/fatimahghani',
-                      },
-                      {
-                        label: 'LinkedIn',
-                        handle: '/in/fatimahghani',
-                        href: 'https://www.linkedin.com/in/fatimahghani/',
-                      },
-                      {
-                        label: 'Instagram',
-                        handle: '@tumaneen',
-                        href: 'https://www.instagram.com/tumaneen/',
-                      },
-                    ].map((account) => (
-                      <a
-                        key={account.label}
-                        href={account.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="group flex sm:flex-col items-center sm:items-stretch justify-between p-3 bg-[#F0E4D2]/[0.04] hover:bg-[#F0E4D2] border border-[#F0E4D2]/20 hover:border-[#F0E4D2] text-[#F0E4D2] hover:text-[#391E25] transition-colors"
-                      >
-                        <div className="flex items-center justify-between gap-1.5">
-                          <span className="font-mono text-[11px] font-semibold uppercase tracking-wider">
-                            {account.label}
-                          </span>
-                          <ArrowUpRight className="hidden sm:block w-3.5 h-3.5 opacity-75 group-hover:opacity-100 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                        </div>
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              </div>
+        <div className="w-full max-w-[1280px] mx-auto px-5 sm:px-6 md:px-12">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start pb-10 border-b">
+            <div className="lg:col-span-5">
+              <h2 id="tm-contact-title" className="font-display">Start a project</h2>
+              <button
+                type="button"
+                onClick={handleCopyEmail}
+                aria-label={emailCopied ? 'Email copied' : 'Copy ' + designerEmail}
+                className="tm-contact-email inline-flex items-center gap-2 mt-4 text-sm underline underline-offset-4"
+              >
+                <Mail size={15} aria-hidden="true" />
+                {designerEmail}
+                {emailCopied ? <Check size={14} aria-hidden="true" /> : <Copy size={14} aria-hidden="true" />}
+              </button>
             </div>
 
-            {/* Right Form Column (7 Cols) */}
             <div className="lg:col-span-7">
               {inquirySubmitted ? (
-                <div className="py-10 sm:py-14 px-5 sm:px-8 bg-[#F0E4D2]/[0.04] border border-[#F0E4D2]/20 text-center space-y-5">
-                  <div className="w-11 h-11 bg-[#F0E4D2] text-[#391E25] mx-auto flex items-center justify-center">
-                    <Check className="w-5 h-5" />
-                  </div>
-                  <h4 className="font-display text-2xl sm:text-3xl font-normal text-[#F0E4D2]">
-                    Thank you, {clientName}.
-                  </h4>
-                  <p className="text-xs text-[#D9C0A8]/90 font-mono max-w-lg mx-auto leading-relaxed">
-                    Your {activeService.title.toLowerCase()} inquiry is noted. Here's your copy:
-                  </p>
-                  <div className="max-w-lg mx-auto text-left bg-[#F0E4D2]/[0.04] border border-[#F0E4D2]/15 p-4 sm:p-5 space-y-2.5 text-xs font-mono text-[#D9C0A8]">
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-[#D9C0A8]/65 shrink-0">1. CLIENT NAME:</span>
-                      <span className="text-[#F0E4D2] text-right break-all">{clientName}</span>
-                    </div>
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-[#D9C0A8]/65 shrink-0">2. CLIENT EMAIL:</span>
-                      <span className="text-[#F0E4D2] text-right break-all">{clientEmail}</span>
-                    </div>
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-[#D9C0A8]/65 shrink-0">3. SELECTED SCOPE:</span>
-                      <span className="text-[#F0E4D2] text-right">
-                        {activeService.number} · {activeService.title}
-                      </span>
-                    </div>
-                    <div className="pt-2 border-t border-[#F0E4D2]/10 space-y-1">
-                      <span className="block text-[#D9C0A8]/65">4. PROJECT BRIEF:</span>
-                      <p className="text-[#F0E4D2] leading-relaxed whitespace-pre-wrap break-words">
-                        {projectNotes.trim() || 'Looking forward to discussing this project.'}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-center pt-2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setInquirySubmitted(false);
-                        setClientName('');
-                        setClientEmail('');
-                        setProjectNotes('');
-                      }}
-                      className="px-6 py-3 text-xs font-mono uppercase tracking-wider border border-[#F0E4D2]/30 text-[#F0E4D2] hover:bg-[#F0E4D2] hover:text-[#391E25] transition-colors cursor-pointer"
-                    >
-                      Write another note
-                    </button>
-                  </div>
+                <div className="tm-inquiry-confirmation border p-5 sm:p-8 space-y-4">
+                  <h3 className="font-display">Thank you, {clientName}.</h3>
+                  <dl className="space-y-2 text-sm">
+                    <div><dt>Reply to</dt><dd>{clientEmail}</dd></div>
+                    <div><dt>Project type</dt><dd>{activeService.title}</dd></div>
+                    {projectNotes.trim() && (
+                      <div><dt>Project brief</dt><dd className="whitespace-pre-wrap break-words">{projectNotes}</dd></div>
+                    )}
+                  </dl>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setInquirySubmitted(false);
+                      setClientName('');
+                      setClientEmail('');
+                      setProjectNotes('');
+                    }}
+                    className="px-4 py-3 text-xs border"
+                  >
+                    Write another note
+                  </button>
                 </div>
               ) : (
                 <form onSubmit={handleInitiateInquirySubmit} className="space-y-6">
-                  {/* Interactive Service Selector Bar */}
-                  <div>
-                    <label className="block text-[11px] font-mono uppercase tracking-[0.18em] text-[#D9C0A8]/75 mb-3">
-                      01 / PROJECT TYPE
-                    </label>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                      {SERVICES_LIST.map((srv) => {
-                        const active = selectedServiceId === srv.id;
-                        return (
-                          <button
-                            key={srv.id}
-                            type="button"
-                            aria-pressed={active}
-                            onClick={() => setSelectedServiceId(srv.id)}
-                            className={`px-3.5 py-3 text-xs font-mono text-left transition-colors border cursor-pointer truncate ${
-                              active
-                                ? 'bg-[#F0E4D2] text-[#391E25] border-[#F0E4D2] font-semibold'
-                                : 'bg-[#F0E4D2]/[0.04] text-[#F0E4D2]/85 border-[#F0E4D2]/20 hover:border-[#F0E4D2]/45 hover:bg-[#F0E4D2]/[0.08]'
-                            }`}
-                          >
-                            {srv.number} · {srv.title.split(' ')[0]}
-                          </button>
-                        );
-                      })}
+                  <fieldset>
+                    <legend className="mb-2">Project type</legend>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                      {SERVICES_LIST.map((service) => (
+                        <button
+                          key={service.id}
+                          type="button"
+                          aria-pressed={selectedServiceId === service.id}
+                          onClick={() => setSelectedServiceId(service.id)}
+                          className="px-3 py-3 text-sm border"
+                        >
+                          {service.shortTitle}
+                        </button>
+                      ))}
                     </div>
-                  </div>
+                  </fieldset>
 
-                  {/* Name & Email */}
-                  <div>
-                    <label className="block text-[11px] font-mono uppercase tracking-[0.18em] text-[#D9C0A8]/75 mb-3">
-                      02 / YOUR DETAILS
-                    </label>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label htmlFor="tm-client-name" className="block mb-2">Name</label>
                       <input
+                        id="tm-client-name"
                         type="text"
+                        autoComplete="name"
                         required
                         value={clientName}
                         onChange={(e) => setClientName(e.target.value)}
-                        placeholder="Your Name *"
-                        className="w-full px-4 py-3.5 text-base sm:text-xs bg-[#F0E4D2]/[0.04] border border-[#F0E4D2]/20 text-[#F0E4D2] placeholder:text-[#D9C0A8]/50 focus:outline-none focus:border-[#F0E4D2]"
+                        className="w-full px-4 py-3 text-base border"
                       />
+                    </div>
+                    <div>
+                      <label htmlFor="tm-client-email" className="block mb-2">Email</label>
                       <input
+                        id="tm-client-email"
                         type="email"
+                        autoComplete="email"
                         required
                         value={clientEmail}
                         onChange={(e) => setClientEmail(e.target.value)}
-                        placeholder="Your Email *"
-                        className="w-full px-4 py-3.5 text-base sm:text-xs bg-[#F0E4D2]/[0.04] border border-[#F0E4D2]/20 text-[#F0E4D2] placeholder:text-[#D9C0A8]/50 focus:outline-none focus:border-[#F0E4D2]"
+                        className="w-full px-4 py-3 text-base border"
                       />
                     </div>
                   </div>
 
-                  {/* Project Notes */}
                   <div>
-                    <label className="block text-[11px] font-mono uppercase tracking-[0.18em] text-[#D9C0A8]/75 mb-3">
-                      03 / YOUR IDEA
-                    </label>
+                    <label htmlFor="tm-project-brief" className="block mb-2">Project brief (optional)</label>
                     <textarea
+                      id="tm-project-brief"
                       rows={4}
                       value={projectNotes}
                       onChange={(e) => setProjectNotes(e.target.value)}
-                      placeholder={`Tell me about your ${activeService.title.toLowerCase()} vision, deliverables, or target launch...`}
-                      className="w-full px-4 py-3.5 text-base sm:text-xs bg-[#F0E4D2]/[0.04] border border-[#F0E4D2]/20 text-[#F0E4D2] placeholder:text-[#D9C0A8]/50 focus:outline-none focus:border-[#F0E4D2]"
+                      placeholder="What do you have in mind?"
+                      className="w-full px-4 py-3 text-base border"
                     />
                   </div>
 
                   <button
                     type="submit"
                     disabled={isSending}
-                    className="w-full py-4 px-6 bg-[#F0E4D2] hover:bg-[#D9C0A8] disabled:opacity-60 text-[#391E25] text-xs font-mono font-semibold uppercase tracking-[0.2em] transition-colors flex items-center justify-center gap-2.5 cursor-pointer"
+                    className="w-full py-3 px-6 text-sm disabled:opacity-60 flex items-center justify-center gap-2"
                   >
-                    <Send className="w-3.5 h-3.5" />
-                    <span>
-                      {isSending
-                        ? 'Sending...'
-                        : `Send ${activeService.title} Inquiry`}
-                    </span>
+                    <Send size={14} aria-hidden="true" />
+                    {isSending ? 'Sending…' : 'Send inquiry'}
                   </button>
                 </form>
               )}
             </div>
           </div>
 
-          {/* Grand Studio Colophon & Footer */}
-          <div className="pt-12 flex flex-col md:flex-row items-start md:items-end justify-between gap-8">
-            <div>
-              <div className="tm-footer-logotype font-display text-3xl sm:text-4xl tracking-tight text-[#F0E4D2]">
-                tumaneen.
-              </div>
-              <p className="font-serif italic text-lg text-[#D9C0A8]/80 mt-1">
-                Brand worlds, tactile packaging, and visual storytelling by Fatimah Ghani.
-              </p>
+          <footer className="tm-contact-footer flex flex-wrap items-center justify-between gap-4 pt-6">
+            <span className="text-xs">© 2026 TUMANEEN</span>
+            <div className="flex flex-wrap gap-5 text-sm">
+              {[
+                ['Behance', 'https://www.behance.net/fatimahghani'],
+                ['LinkedIn', 'https://www.linkedin.com/in/fatimahghani/'],
+                ['Instagram', 'https://www.instagram.com/tumaneen/'],
+              ].map(([name, href]) => (
+                <a key={name} href={href} target="_blank" rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 underline underline-offset-4">
+                  {name}<ArrowUpRight size={13} aria-hidden="true" />
+                </a>
+              ))}
             </div>
-
-            <div className="flex flex-col items-start md:items-end gap-4">
-              {/* Direct Social & Portfolio Links in Colophon */}
-              <div className="flex flex-wrap items-center gap-6 text-xs font-mono uppercase tracking-[0.2em]">
-                <a
-                  href="https://www.behance.net/fatimahghani"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-[#F0E4D2] hover:text-[#D9C0A8] underline underline-offset-4 transition-colors"
-                >
-                  <span>Behance</span>
-                  <ArrowUpRight className="w-3.5 h-3.5" />
-                </a>
-                <a
-                  href="https://www.linkedin.com/in/fatimahghani/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-[#F0E4D2] hover:text-[#D9C0A8] underline underline-offset-4 transition-colors"
-                >
-                  <span>LinkedIn</span>
-                  <ArrowUpRight className="w-3.5 h-3.5" />
-                </a>
-                <a
-                  href="https://www.instagram.com/tumaneen/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-[#F0E4D2] hover:text-[#D9C0A8] underline underline-offset-4 transition-colors"
-                >
-                  <span>Instagram</span>
-                  <ArrowUpRight className="w-3.5 h-3.5" />
-                </a>
-              </div>
-
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-8 text-[11px] font-mono tracking-[0.16em] text-[#D9C0A8]/65">
-                <span>© 2026 TUMANEEN</span>
-                <span>BRAND IDENTITY · PACKAGING · UI/UX · MOTION</span>
-              </div>
-            </div>
-          </div>
+          </footer>
         </div>
       </section>
     </>
