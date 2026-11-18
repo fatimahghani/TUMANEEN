@@ -273,7 +273,6 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
   return (
     <section ref={sectionRef} id="project" className="tm-projects tm-epok-gallery tm-hanging-gallery" aria-labelledby="tm-gallery-title">
       <div className="tm-epok-shell tm-hung-shell">
-        <canvas className="tm-lunar-orbit" aria-hidden="true" />
         <h2 id="tm-gallery-title" className="tm-hung-heading">Selected projects</h2>
 
         <div className="tm-hung-window" ref={apertureRef}>

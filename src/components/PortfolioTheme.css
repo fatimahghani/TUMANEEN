@@ -38,7 +38,7 @@ body { background-color: var(--tm-ivory); }
 .tm-site :is(#posters, .tm-about, .tm-services, [data-editorial-contact]) {
   isolation: isolate;
 }
-.tm-site :is(#posters, .tm-about, .tm-services, [data-editorial-contact], .tm-process .sticky)::before {
+.tm-site :is(.tm-hung-shell, #posters, .tm-about, .tm-services, [data-editorial-contact], .tm-process .sticky)::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -47,9 +47,14 @@ body { background-color: var(--tm-ivory); }
   pointer-events: none;
   background: var(--tm-paper-orbit) center / 100% auto no-repeat;
 }
+.tm-site .tm-hung-shell::before {
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+}
 .tm-site #posters::before { background-position: center 1.5rem; }
 @media (forced-colors: active) {
-  .tm-site :is(#posters, .tm-about, .tm-services, [data-editorial-contact], .tm-process .sticky)::before {
+  .tm-site :is(.tm-hung-shell, #posters, .tm-about, .tm-services, [data-editorial-contact], .tm-process .sticky)::before {
     display: none;
   }
 }

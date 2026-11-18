@@ -279,78 +279,35 @@ async function seekHeroScroll(page, fraction) {
 }
 
 async function checkLunarScroll(page, width) {
-  const project = page.locator('#project');
   const moon = page.locator('.tm-explorer-moon');
-  const orbit = project.locator('canvas.tm-lunar-orbit');
-  const height = page.viewportSize().height;
-  const body = () => moon.evaluate(el => {
-    const rect = el.getBoundingClientRect();
-    return {x:rect.x + rect.width / 2, y:rect.y + rect.height / 2, diameter:rect.width,
-      projectTop:document.querySelector('#project').getBoundingClientRect().top, scroll:scrollY,
-      overflow:document.documentElement.scrollWidth - innerWidth};
-  });
-  // Measure pixels actually painted into the gallery decoration, including
-  // sparse, antialiased grains. A canvas that is sized but blank has zero span.
-  const footprint = () => orbit.evaluate(canvas => {
-    const thumb = document.createElement('canvas');
-    thumb.width = 300;
-    thumb.height = Math.max(1, Math.round(300 * canvas.height / Math.max(1, canvas.width)));
-    const ctx = thumb.getContext('2d');
-    if (canvas.width && canvas.height) ctx.drawImage(canvas, 0, 0, thumb.width, thumb.height);
-    const rgba = ctx.getImageData(0, 0, thumb.width, thumb.height).data;
-    let count = 0, left = thumb.width, right = -1;
-    for (let i = 3; i < rgba.length; i += 4) {
-      if (rgba[i] < 3) continue;
-      const x = ((i - 3) / 4) % thumb.width;
-      left = Math.min(left, x);
-      right = Math.max(right, x);
-      count++;
-    }
-    return {count, span:Math.max(0, right-left+1)/thumb.width};
+  const position = () => moon.evaluate(el => {
+    const bounds = el.getBoundingClientRect();
+    const hero = el.closest('.tm-explorer-hero');
+    const cover = hero.getBoundingClientRect();
+    return {left:bounds.left-cover.left, top:bounds.top-cover.top,
+      width:bounds.width, height:bounds.height, bottom:bounds.bottom,
+      clip:getComputedStyle(hero).overflowY};
   });
   await page.emulateMedia({reducedMotion:'no-preference'});
-  await page.locator('#project[data-gallery-mode="pinned"]').waitFor();
-  await page.mouse.move(-4, -4);
-  const positions = [], paint = [];
-  for (let frame = 0; frame <= 21; frame++) {
-    await seekHeroScroll(page, frame / 21);
-    positions.push(await body());
-    if (frame >= 10) paint.push(await footprint());
-    if (width === 1440 || [7,12,21].includes(frame)) {
-      const prefix = width === 1440 ? 'lunar-scroll' : 'lunar-phone';
-      await page.screenshot({path:`editorial-snapshots/${prefix}-${String(frame).padStart(2,'0')}.png`});
+  await seekHeroScroll(page, 0);
+  const original = await position();
+  for (const progress of [.45, 1, .45, 0]) {
+    await seekHeroScroll(page, progress);
+    const actual = await position();
+    assert(['left','top','width','height'].every(key => Math.abs(actual[key]-original[key]) < 1),
+      'The moon must keep its position and size on the cover while the page scrolls: ' + JSON.stringify({original,actual}));
+    assert(['clip','hidden'].includes(actual.clip), 'The cover must contain its moon and loose grains');
+    if (progress === 1) {
+      assert(actual.bottom <= 1, 'The moon should leave the viewport with the cover');
+      await page.waitForFunction(() => document.querySelector('.tm-explorer-moon')?.dataset.animating === 'false');
     }
   }
-  const origin = positions[0], moving = positions[7], full = paint.at(-1);
-  assert(moving.x > origin.x + width*.04 && moving.y > origin.y + height*.015 && moving.diameter < origin.diameter,
-    'The same moon must shrink and move lower-right in the viewport: ' + JSON.stringify({origin,moving}));
-  assert(positions.slice(7,14).some(p => p.x > width*.60 && p.y > height*.60 && p.y > p.projectTop),
-    'The lower-right moon must cross the visible boundary into Projects');
-  assert(positions.every(p => p.overflow <= 2), 'Lunar travel must stay inside the page width');
-  assert(full.count > 100 && full.span > .48 && paint.some(p => p.count > 5 && p.span < full.span*.88),
-    'A compact field of visible grains must spread into a wide composition: ' + JSON.stringify(paint));
-  await seekProjectGallery(project, .65);
-  assert((await footprint()).span >= full.span*.95, 'The finished lunar shape must persist behind the moving gallery');
-  const reachable = await project.locator('.tm-hung-paper').evaluateAll(covers =>
-    covers.some(cover => {
-      const box = cover.getBoundingClientRect();
-      const hit = document.elementFromPoint(box.x + box.width/2, box.y + box.height/2);
-      return hit && cover.contains(hit);
-    }));
-  assert(reachable, 'The lunar background must leave the framed projects clickable');
-  await seekHeroScroll(page, 7/21);
-  const reverse = await body();
-  assert(Math.abs(moving.x-reverse.x) < 3 && Math.abs(moving.y-reverse.y) < 3,
-    'Scrolling back must retrace the lunar path');
+  await seekHeroScroll(page, .45);
+  await page.screenshot({path:`editorial-snapshots/moon-stays-home-${width}.png`});
   await page.emulateMedia({reducedMotion:'reduce'});
-  await page.locator('#project[data-gallery-mode="native"]').waitFor();
-  await seekHeroScroll(page, 7/21);
-  const still = await body();
-  assert(Math.abs(still.x-origin.x) < 3 && Math.abs(still.y+still.scroll-origin.y) < 3,
-    'Reduced motion should leave the moon in its original cover position: ' + JSON.stringify({origin,still}));
-  await seekHeroScroll(page, 1);
-  const staticArt = await footprint();
-  assert(staticArt.count > 100 && staticArt.span > .48, 'Reduced motion should show the completed gallery artwork');
+  const reduced = await position();
+  assert(['left','top','width','height'].every(key => Math.abs(reduced[key]-original[key]) < 1),
+    'Changing the motion preference must keep the moon in its cover position');
 }
 
 async function seekProjectGallery(section, fraction) {
@@ -631,7 +588,8 @@ async function checkChapters(page, width) {
       };
       const selectedService = el.querySelector('.tm-service-card[data-selected="true"]');
       const serviceSummary = selectedService?.querySelector('.tm-service-summary');
-      const backgroundLayer = el.id === 'process' ? el.querySelector('.sticky') : el;
+      const backgroundLayer = el.id === 'process' ? el.querySelector('.sticky')
+        : el.id === 'project' ? el.querySelector('.tm-hung-shell') : el;
       const orbitStyle = getComputedStyle(backgroundLayer, '::before');
       const headings = [...el.querySelectorAll('h2,h3')].filter(title => title.getClientRects().length);
       return {surface:{color:background, grain:style.backgroundImage, size:style.backgroundSize, repeat:style.backgroundRepeat},
@@ -651,12 +609,10 @@ async function checkChapters(page, width) {
     assert(presentation.font.includes('Bodoni Moda'), id + ' chapter typography');
     assert(presentation.contrast >= 4.5, id + ' chapter heading should be readable against the paper');
     if (id === 'services') assert(presentation.summaryContrast >= 4.5, 'The selected service description must be readable');
-    if (id !== 'project') {
-      const orbit = presentation.orbitImage.match(/url\("([^"]*lunar-paper-[^"]+)"\)/);
-      assert(orbit && presentation.orbitVisible && presentation.orbitEvents === 'none',
-        id + ' should have a visible, passive lunar backdrop');
-      orbitSources.add(orbit[1]);
-    }
+    const orbit = presentation.orbitImage.match(/url\("([^"]*lunar-paper-[^"]+)"\)/);
+    assert(orbit && presentation.orbitVisible && presentation.orbitEvents === 'none',
+      id + ' should have a visible, passive lunar backdrop');
+    orbitSources.add(orbit[1]);
     assert(presentation.left >= -1 && presentation.right <= width + 1 && presentation.overflow <= 2,
       id + ' must fit the viewport');
     await page.screenshot({path: `editorial-snapshots/chapter-${width}-${id}.png`, animations: 'disabled'});
