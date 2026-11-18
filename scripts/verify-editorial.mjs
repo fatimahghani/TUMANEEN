@@ -626,7 +626,8 @@ async function checkChapters(page, width) {
         orbitEvents:orbitStyle.pointerEvents,
         left: bounds.left, right: bounds.right, overflow: document.documentElement.scrollWidth - innerWidth};
     });
-    assert.deepEqual(presentation.surface, surface, id + ' must share the cover paper, grain and tile scale');
+    const expectedSurface = id === 'project' ? {...surface, color: 'rgb(223, 185, 173)'} : surface;
+    assert.deepEqual(presentation.surface, expectedSurface, id + ' must use its section paper color and shared grain');
     assert.equal(presentation.h2Count, 1, id + ' should have one visible section heading');
     assert(presentation.titleSize >= 24 && presentation.largestHeading <= 32.1,
       id + ' heading sizes should be readable and restrained: ' + JSON.stringify(presentation));
