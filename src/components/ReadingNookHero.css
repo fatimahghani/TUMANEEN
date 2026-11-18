@@ -88,12 +88,6 @@
 .tm-site .tm-explorer-hero .tm-explorer-moon {
   filter: sepia(.04) saturate(.83) contrast(1.025) brightness(1.025);
 }
-/* The actual lunar surface crosses the horizontal edge of the cover.
-   Foreground art stays cropped to the page it was printed on. */
-@media (prefers-reduced-motion: no-preference) {
-  .tm-site .tm-explorer-hero { isolation: auto; overflow: clip visible; }
-  .tm-site #project.tm-hanging-gallery { isolation: auto; }
-}
 .tm-explorer-menu-button {
   position: absolute; z-index: 8; left: 10px; top: 14px;
   width: 44px; height: 44px; display: grid; place-items: center;
