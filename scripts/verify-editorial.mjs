@@ -322,7 +322,8 @@ async function seekProjectGallery(section, fraction) {
       const transform = getComputedStyle(track).transform;
       return {sectionTop, pageY:scrollY, targetY:scrollY + sectionTop + travel * progress,
         travel, expectedOffset:offset, trackX:new DOMMatrixReadOnly(transform === 'none' ? undefined : transform).m41,
-        transform, first:first.getBoundingClientRect().left, expectedFirst:aperture.getBoundingClientRect().left - offset};
+        transform, first:first.getBoundingClientRect().left,
+        expectedFirst:aperture.getBoundingClientRect().left + first.closest('.tm-hung-study').offsetLeft - offset};
     };
     let reading = sample(), targetY = reading.targetY, stableFrames = 0;
     window.scrollTo({top:targetY, behavior:'instant'});
@@ -400,8 +401,22 @@ async function checkProjectBoxes(covers, viewportWidth) {
     range.selectNodeContents(title);
     const label = range.getBoundingClientRect();
     const box = button.getBoundingClientRect();
+    const cover = button.querySelector('.tm-box-cover');
+    if (!cover?.src) throw new Error('Missing project photograph on ' + button.getAttribute('aria-label'));
+    // Decode each source independently so offscreen, lazily loaded covers are
+    // checked without changing their loading behavior in the actual gallery.
+    const photograph = new Image();
+    photograph.src = cover.currentSrc || cover.src;
+    await photograph.decode();
+    const photographBox = cover.getBoundingClientRect();
+    const photographStyle = getComputedStyle(cover);
     return {rim, interior, title:title.textContent.trim(), expected:button.closest('article').dataset.galleryTitle,
-      text:button.innerText.trim(), width:box.width, height:box.height, hasImage:!!button.querySelector('img'),
+      text:button.innerText.trim(), width:box.width, height:box.height,
+      source:photograph.src, imageWidth:photograph.naturalWidth, imageHeight:photograph.naturalHeight,
+      visibleImage:photographStyle.display !== 'none' && photographStyle.visibility === 'visible' &&
+        parseFloat(photographStyle.opacity) > 0 && photographBox.width > box.width*.8 && photographBox.height > box.height*.8,
+      containedImage:photographBox.left >= box.left && photographBox.top >= box.top &&
+        photographBox.right <= box.right && photographBox.bottom <= box.bottom,
       centerX:label.left + label.width/2 - box.left - box.width/2,
       centerY:label.top + label.height/2 - box.top - box.height/2};
   })));
@@ -409,12 +424,15 @@ async function checkProjectBoxes(covers, viewportWidth) {
     'The hand-drawn ink should stay around the edge of each box');
   const previousWidth = viewportWidth === 375 ? 307.5 : 486;
   for (const box of frames) {
-    assert(box.title && box.title === box.expected && box.text === box.title && !box.hasImage,
-      'Each box should show its project name as its only content: ' + JSON.stringify(box));
+    assert(box.title && box.title === box.expected && box.text === box.title,
+      'Each box should show only its project name over the photograph: ' + JSON.stringify(box));
+    assert(box.imageWidth > 0 && box.imageHeight > 0 && box.visibleImage && box.containedImage,
+      'Each project photograph should load and fit inside its ink frame: ' + JSON.stringify(box));
     assert(box.width < previousWidth && box.height > 0 &&
       Math.abs(box.centerX) < 3 && Math.abs(box.centerY) < 5,
       'The compact box should center its project title: ' + JSON.stringify(box));
   }
+  assert.equal(new Set(frames.map(box => box.source)).size, 4, 'Each project should have its own cover artwork');
 }
 
 async function checkProjectGallery(page, width) {
@@ -445,6 +463,7 @@ async function checkProjectGallery(page, width) {
       const view = el.querySelector('.tm-hung-window').getBoundingClientRect();
       const sheets = [...el.querySelectorAll('.tm-hung-paper')];
       return {top:el.getBoundingClientRect().top, first:sheets[0].getBoundingClientRect().left,
+        firstRight:sheets[0].getBoundingClientRect().right,
         last:sheets.at(-1).getBoundingClientRect().right, left:view.left, right:view.right,
         bodyOverflow:document.documentElement.scrollWidth-innerWidth};
     });
@@ -453,7 +472,12 @@ async function checkProjectGallery(page, width) {
     assert(Math.abs((initial.first-frame.first) - settled.travel*fraction) < 4,
       `The sheets must move horizontally with page scroll: ${JSON.stringify({initialFirst:initial.first, frameFirst:frame.first, ...settled})}`);
     assert(frame.bodyOverflow <= 2, 'The gallery should never widen the document');
-    if (fraction === 0) assert(Math.abs(frame.first-frame.left) < 4, 'First case study should start at the gallery edge');
+    if (fraction === 0) {
+      assert(Math.abs(frame.firstRight-frame.right) < 4 && frame.first >= frame.left - 1,
+        'The first case study should start fully visible at the right edge of the gallery');
+      if (width >= 1024) assert(frame.first > (frame.left+frame.right)/2,
+        'The first desktop project should begin on the right side of the section');
+    }
     if (fraction === 1) assert(Math.abs(frame.last-frame.right) < 4, 'Last case study should finish at the gallery edge');
     await page.screenshot({path:`editorial-snapshots/projects-${width}-${name}.png`, animations:'disabled'});
     if (fraction === 0) {

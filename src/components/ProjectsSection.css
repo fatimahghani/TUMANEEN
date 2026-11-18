@@ -124,7 +124,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: 2;
   pointer-events: none;
   background: var(--tm-ink);
   -webkit-mask: var(--frame-ink) center / 100% 100% no-repeat;
@@ -134,10 +134,24 @@
   .tm-hung-paper::after { background: CanvasText; forced-color-adjust: none; }
 }
 .tm-box-title {
+  position: relative;
+  z-index: 1;
+  padding: .5em .75em .55em;
+  background: rgb(251 240 224 / .94);
   font: 450 clamp(1.125rem, 1.45vw, 1.45rem)/1.2 var(--tm-caption);
   letter-spacing: -.025em;
   text-wrap: balance;
 }
+.tm-box-cover {
+  position: absolute;
+  inset: 2.8%;
+  width: 94.4%;
+  height: 94.4%;
+  object-fit: cover;
+  pointer-events: none;
+}
+.tm-hung-study[data-gallery-id="riwaq-fragrance-identity"] .tm-box-cover { object-position: 100% 50%; }
+.tm-hung-study[data-gallery-id="poster-typography"] .tm-box-cover { object-position: 50% 25%; }
 .tm-hung-paper:hover, .tm-hung-paper:focus-visible { color: var(--tm-burgundy); }
 .tm-hanging-gallery :is(.tm-hung-paper, .tm-hung-strip, .tm-hung-footer button):focus-visible {
   outline: 2px solid var(--tm-burgundy);
@@ -193,6 +207,7 @@
   max-width: none;
   margin: 0;
   padding-block: 5px;
+  padding-inline-start: var(--gallery-lead, 0px);
   overflow: visible;
   scroll-snap-type: none;
 }
