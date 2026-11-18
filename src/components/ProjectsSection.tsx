@@ -120,6 +120,11 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
         section.getBoundingClientRect().top < window.innerHeight;
       section.style.setProperty('--gallery-header', `${header?.offsetHeight ?? 96}px`);
       section.dataset.galleryMode = motion.matches ? 'pinned' : 'native';
+      // Open the sequence with one cover at the right edge. The leading space
+      // belongs to the track so ordinary page scroll brings every study across.
+      const firstStudy = track.querySelector<HTMLElement>('.tm-hung-study');
+      const lead = motion.matches && firstStudy ? Math.max(0, aperture.clientWidth - firstStudy.offsetWidth) : 0;
+      section.style.setProperty('--gallery-lead', `${lead}px`);
       travel = motion.matches ? Math.max(0, track.scrollWidth - aperture.clientWidth) : 0;
       section.style.setProperty('--gallery-travel', `${travel}px`);
       if (travel) {
@@ -285,11 +290,14 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
           >
             {galleryEntries.map((entry) => {
               const title = entryTitle(entry);
+              const id = entry.kind === 'case' ? entry.project.id : entry.id;
+              const cover = entry.kind === 'case' ? entry.project.slides[0].imageUrl : POSTER_SERIES[0].src;
 
               return (
                 <article
-                  key={entry.kind === 'case' ? entry.project.id : entry.id}
+                  key={id}
                   className="tm-hung-study"
+                  data-gallery-id={id}
                   data-gallery-kind={entry.kind}
                   data-gallery-title={title}
                 >
@@ -299,6 +307,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
                     onClick={(event) => openEntry(entry, event.currentTarget)}
                     aria-label={'Open ' + title + ' case study'}
                   >
+                    <img className="tm-box-cover" src={cover} alt="" loading="lazy" decoding="async" draggable={false} />
                     <span className="tm-box-title">{title}</span>
                   </button>
                 </article>
