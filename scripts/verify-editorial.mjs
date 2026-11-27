@@ -293,57 +293,84 @@ async function checkOpeningCamera(page, width) {
   const position = () => scene.evaluate(el => {
     const hero = el.querySelector('.tm-explorer-hero');
     const project = el.querySelector('#project');
+    const world = el.querySelector('.tm-camera-world');
+    const space = el.querySelector('.tm-camera-space');
     const cover = hero.getBoundingClientRect(), work = project.getBoundingClientRect();
     const moon = hero.querySelector('.tm-explorer-moon').getBoundingClientRect();
-    const sky = hero.querySelector('.tm-explorer-sky').getBoundingClientRect();
-    const transform = getComputedStyle(project.querySelector('.tm-hung-strip')).transform;
-    const x = matrix => new DOMMatrixReadOnly(matrix === 'none' ? undefined : matrix).m41;
-    const seam = cover.right;
-    const inHero = seam > 1 ? hero.contains(document.elementFromPoint(seam / 2, innerHeight * .7)) : true;
-    const inProjects = seam < innerWidth - 1
-      ? project.contains(document.elementFromPoint((Math.max(0, seam) + innerWidth) / 2, innerHeight * .7)) : true;
+    const sky = space.querySelector('.tm-explorer-sky');
+    const foreground = hero.querySelector('.tm-explorer-foreground').getBoundingClientRect();
+    const spaceStyle = getComputedStyle(space), heroStyle = getComputedStyle(hero), projectStyle = getComputedStyle(project);
+    const matrix = node => {
+      const value = getComputedStyle(node).transform;
+      return new DOMMatrixReadOnly(value === 'none' ? undefined : value);
+    };
     return {hero:cover.toJSON(), project:work.toJSON(),
       moon:{left:moon.left-cover.left, top:moon.top-cover.top, width:moon.width, height:moon.height, right:moon.right},
-      clip:getComputedStyle(hero).overflowY, skyShift:sky.left-cover.left, galleryX:x(transform),
-      overflow:document.documentElement.scrollWidth-innerWidth, inHero, inProjects,
+      heroClip:heroStyle.overflowX, foregroundClip:getComputedStyle(hero.querySelector('.tm-explorer-foreground-crop')).overflowX,
+      foregroundRight:foreground.right, skyX:matrix(sky).m41, worldX:matrix(world).m41,
+      galleryX:matrix(project.querySelector('.tm-hung-strip')).m41,
+      surfaces:[heroStyle,projectStyle].map(style => ({color:style.backgroundColor, image:style.backgroundImage})),
+      space:{...space.getBoundingClientRect().toJSON(), display:spaceStyle.display, position:spaceStyle.position,
+        events:spaceStyle.pointerEvents, hidden:space.getAttribute('aria-hidden'), count:el.querySelectorAll('.tm-camera-space').length},
+      sharedWorld:world.contains(hero) && world.contains(project),
+      heroSkyDisplay:getComputedStyle(hero.querySelector('.tm-explorer-sky')).display,
+      overflow:document.documentElement.scrollWidth-innerWidth,
       homeTransform:getComputedStyle(el.querySelector('.tm-camera-home')).transform,
-      projectTransform:getComputedStyle(el.querySelector('.tm-camera-projects')).transform};
+      projectTransform:getComputedStyle(el.querySelector('.tm-camera-projects')).transform,
+      worldTransform:getComputedStyle(world).transform};
   });
+  const checkBackdrop = actual => {
+    const {space} = actual;
+    assert(space.count === 1 && space.display !== 'none' && space.position === 'sticky' &&
+      space.events === 'none' && space.hidden === 'true', 'The camera should share one passive space backdrop');
+    assert(Math.abs(space.left) < 2 && Math.abs(space.top) < 2 &&
+      Math.abs(space.width-width) < 2 && Math.abs(space.height-page.viewportSize().height) < 2,
+      'The shared backdrop should fill the viewport throughout the opening and gallery');
+  };
   await page.emulateMedia({reducedMotion:'no-preference'});
   await page.locator('.tm-camera-sequence[data-camera-mode="pan"]').waitFor();
   await seekHeroScroll(page, 0);
   const original = await position();
   assert(Math.abs(original.hero.left) < 2 && Math.abs(original.project.left-width) < 2,
-    'The cover should open in front of the camera, with Projects just to its right');
-  const samples = width === 1440 ? [0,.2,.4,.5,.6,.8,1] : [0,.5,1];
+    'The camera should open on the hero, with the project content farther to its right');
+  const captures = width === 1440 ? [0,.2,.4,.5,.6,.8,1] : [0,.5,1];
+  const samples = [...new Set([...captures,.25,.75])].sort((a,b) => a-b);
   let previous = original, midpoint;
   for (const progress of samples) {
     await seekHeroScroll(page, progress);
     const actual = await position();
     assert(['left','top','width','height'].every(key => Math.abs(actual.moon[key]-original.moon[key]) < 1),
       'The moon must keep its position and size within the moving cover: ' + JSON.stringify({original,actual}));
-    assert(['clip','hidden'].includes(actual.clip), 'The cover must contain its moon and loose grains');
+    checkBackdrop(actual);
+    assert(actual.sharedWorld && actual.homeTransform === 'none' && actual.projectTransform === original.projectTransform &&
+      Math.abs(actual.worldX-actual.hero.left) < 2, 'One shared world should move past the camera');
+    assert(actual.surfaces.every(surface => surface.color === 'rgba(0, 0, 0, 0)' && surface.image === 'none') &&
+      actual.heroSkyDisplay === 'none', 'Section panels should be transparent over the shared space');
     assert(Math.abs(actual.hero.top) < 2 && Math.abs(actual.project.top) < 2,
-      'The two sections should share a level horizon during the camera pan');
-    assert(Math.abs(actual.hero.right-actual.project.left) < 2 && actual.inHero && actual.inProjects,
-      'The moving pages should meet without a gap or an empty viewport');
+      'The scene should keep a level horizon during the camera pan');
+    assert(Math.abs(actual.hero.right-actual.project.left) < 2,
+      'The hero and project content should keep their positions in the shared world');
+    if (width === 375 && progress > 0 && progress < 1) assert(actual.heroClip === 'visible' &&
+      actual.foregroundClip === 'visible' && actual.foregroundRight > actual.hero.right + width*.1,
+      'The phone foreground should extend across the logical section edge');
     assert(actual.hero.left <= previous.hero.left + 1 && actual.project.left <= previous.project.left + 1,
       'Scrolling down must carry the cover left and bring Projects in from the right');
     assert(actual.overflow <= 2, 'The camera must not widen the document');
     assert(Math.abs(actual.galleryX) < 2, 'The project rail should wait until the camera arrives');
-    if (progress > 0) assert(actual.skyShift > 0 && actual.skyShift < Math.abs(actual.hero.left) * .5,
-      'The distant sky should drift more slowly than the foreground');
+    if (progress > 0) assert(actual.skyX < 0 && Math.abs(actual.skyX) < Math.abs(actual.worldX) * .75,
+      'The shared distant sky should drift more slowly than the foreground');
     if (progress === .5) {
       midpoint = actual;
       assert(actual.hero.left < -width*.2 && actual.project.left > width*.2 && actual.project.left < width*.8,
-        'Both pages should be visible in the middle of the pan');
+        'The camera should reveal the right side of the scene during the pan');
     }
     if (progress === 1) {
       assert(actual.moon.right <= 1 && Math.abs(actual.project.left) < 2,
         'The moon should leave through the left edge as Projects arrives');
       await page.waitForFunction(() => document.querySelector('.tm-explorer-moon')?.dataset.animating === 'false');
     }
-    const capture = await page.screenshot({path:`editorial-snapshots/camera-${width}-${String(Math.round(progress*100)).padStart(3,'0')}.png`});
+    const capture = captures.includes(progress)
+      ? await page.screenshot({path:`editorial-snapshots/camera-${width}-${String(Math.round(progress*100)).padStart(3,'0')}.png`}) : null;
     if (width === 375 && progress === .5) {
       const seamDifference = await page.evaluate(async ({encoded, seam}) => {
         const image = new Image();
@@ -363,6 +390,8 @@ async function checkOpeningCamera(page, width) {
     }
     previous = actual;
   }
+  await seekProjectGallery(page.locator('#project'), .5);
+  checkBackdrop(await position());
   await seekHeroScroll(page, .5);
   const reverse = await position();
   assert(Math.abs(reverse.hero.left-midpoint.hero.left) < 2 && Math.abs(reverse.project.left-midpoint.project.left) < 2,
@@ -387,7 +416,8 @@ async function checkOpeningCamera(page, width) {
   await page.locator('.tm-camera-sequence[data-camera-mode="native"]').waitFor();
   await seekHeroScroll(page, .5);
   const reduced = await position();
-  assert(reduced.homeTransform === 'none' && reduced.projectTransform === 'none' &&
+  assert(reduced.worldTransform === 'none' && reduced.homeTransform === 'none' && reduced.projectTransform === 'none' &&
+    reduced.space.display === 'none' && reduced.heroSkyDisplay !== 'none' &&
     Math.abs(reduced.hero.left) < 2 && Math.abs(reduced.project.left) < 2 &&
     reduced.hero.top < -reduced.hero.height*.2 && reduced.project.top > reduced.hero.height*.2,
     'Reduced motion should restore ordinary vertical sections');
@@ -1146,7 +1176,9 @@ try {
     }));
   assert(fallbackInk, 'All eight letters should have visible solid ink when the atlas fails');
   assert.notEqual(await fallback.locator('.tm-explorer-masthead').getAttribute('data-paint-ready'), 'true');
-  assert.equal(await fallback.locator('.tm-explorer-star').count(),14,'CSS sky should work without WebGL');
+  assert(await fallback.locator('.tm-camera-space .tm-explorer-sky').isVisible() &&
+    await fallback.locator('.tm-camera-space .tm-explorer-star').count() > 14,
+    'The panoramic CSS sky should work without WebGL');
   await fallback.screenshot({path:'editorial-snapshots/hero-fallback.png'});
   const fallbackBox = await fallback.locator('.tm-explorer-moon').boundingBox();
   const unlit = await sampleSurface(fallback, fallbackBox);

@@ -1,20 +1,67 @@
 .tm-camera-sequence {
   position: relative;
   isolation: isolate;
-  /* Clip the sideways scene without creating another scroll container. */
+  /* One viewport clips the entire world, never its individual scenes. */
   overflow: clip;
 }
+.tm-camera-world,
 .tm-camera-home,
 .tm-camera-projects {
   position: relative;
 }
-/* Warm the shared sky into the gallery's clay tone without a hard color seam. */
-.tm-site .tm-camera-sequence[data-camera-mode="pan"] :is(.tm-explorer-hero, #project.tm-hanging-gallery) {
-  background-color: color-mix(in srgb, var(--tm-ivory), var(--tm-project-paper) var(--camera-tint, 0%));
+.tm-camera-world { z-index: 1; }
+.tm-camera-space { display: none; }
+
+/* This single paper sky stays behind both the opening and the project rail.
+   Its negative margin preserves the sections' native document positions. */
+.tm-camera-sequence[data-camera-mode="pan"] .tm-camera-space {
+  display: block;
+  position: sticky;
+  top: 0;
+  z-index: 0;
+  height: 100svh;
+  margin-bottom: -100svh;
+  overflow: clip;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--tm-ivory), var(--tm-project-paper) var(--camera-tint, 0%)) var(--tm-grain) repeat;
+  background-size: 160px 160px;
 }
-.tm-camera-sequence[data-camera-mode="pan"] .tm-explorer-sky {
+.tm-camera-space .tm-explorer-sky {
+  overflow: visible;
   transform: translate3d(var(--camera-sky-x, 0px), 0, 0);
 }
-.tm-camera-sequence[data-camera-mode="pan"] .tm-hung-shell::before {
-  transform: translateX(calc(-50% + var(--camera-orbit-x, 0px)));
+.tm-camera-space .tm-explorer-stardust--beyond {
+  left: 112%;
+  top: 58%;
+  width: 35%;
+}
+.tm-camera-orbit {
+  position: absolute;
+  top: 0;
+  left: 45%;
+  width: 150%;
+  height: 100%;
+  opacity: .5;
+  background: var(--tm-paper-orbit) center / 100% auto no-repeat;
+  transform: translate3d(var(--camera-orbit-x, 0px), 0, 0);
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+
+/* The content belongs to a continuous landscape, with no separate page fill
+   or vertical cropping edge as the camera passes from lettering to projects. */
+.tm-site .tm-camera-sequence[data-camera-mode="pan"] :is(.tm-explorer-hero, #project.tm-hanging-gallery) {
+  background: none;
+  overflow: visible;
+}
+.tm-camera-sequence[data-camera-mode="pan"] .tm-explorer-foreground-crop {
+  overflow: visible;
+}
+.tm-camera-sequence[data-camera-mode="pan"] .tm-camera-home .tm-explorer-sky {
+  display: none;
+}
+.tm-site .tm-camera-sequence[data-camera-mode="pan"] .tm-hung-shell::before {
+  content: none;
+}
+@media (forced-colors: active) {
+  .tm-camera-orbit { display: none; }
 }
