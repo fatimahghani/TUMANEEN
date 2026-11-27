@@ -1,4 +1,5 @@
 import React, { useLayoutEffect, useRef } from 'react';
+import { ExplorerSky } from './ExplorerSky';
 import { documentTop } from '../utils/documentTop';
 import './OpeningCamera.css';
 
@@ -9,17 +10,19 @@ interface OpeningCameraProps {
 
 export const OpeningCamera: React.FC<OpeningCameraProps> = ({ home, children }) => {
   const sceneRef = useRef<HTMLDivElement>(null);
+  const worldRef = useRef<HTMLDivElement>(null);
   const homeRef = useRef<HTMLDivElement>(null);
   const projectsRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
-    const scene = sceneRef.current, cover = homeRef.current, projects = projectsRef.current;
-    if (!scene || !cover || !projects) return;
+    const scene = sceneRef.current, world = worldRef.current;
+    const cover = homeRef.current, projects = projectsRef.current;
+    if (!scene || !world || !cover || !projects) return;
     const motion = window.matchMedia('(prefers-reduced-motion: no-preference) and (min-height: 600px)');
     let start = 0, distance = 0, width = 0, frame = 0;
 
     const clear = () => {
-      cover.style.removeProperty('transform');
+      world.style.removeProperty('transform');
       projects.style.removeProperty('transform');
       scene.style.removeProperty('--camera-sky-x');
       scene.style.removeProperty('--camera-orbit-x');
@@ -32,19 +35,12 @@ export const OpeningCamera: React.FC<OpeningCameraProps> = ({ home, children }) 
       }
       const travelled = Math.max(0, Math.min(distance, window.scrollY - start));
       const progress = travelled / distance;
-      // Share one pixel-aligned edge; fractional clipping can expose a hairline
-      // of the page underneath on odd-width phone viewports.
       const pan = Math.round(progress * width);
-      // Counter the vertical scroll for one viewport. The two pages then share
-      // a horizon while the camera travels right across their joined edge.
-      cover.style.transform = `translate3d(${-pan}px, ${travelled}px, 0)`;
-      if (progress < 1) {
-        projects.style.transform = `translate3d(${width - pan}px, ${travelled - distance}px, 0)`;
-      } else {
-        projects.style.removeProperty('transform');
-      }
-      scene.style.setProperty('--camera-sky-x', `${progress * width * .14}px`);
-      scene.style.setProperty('--camera-orbit-x', `${(1 - progress) * width * .08}px`);
+      // Move one world beneath the camera. Vertical compensation holds its
+      // horizon still, then lets the gallery use its existing document scroll.
+      world.style.transform = `translate3d(${-pan}px, ${travelled}px, 0)`;
+      scene.style.setProperty('--camera-sky-x', `${-pan * .4}px`);
+      scene.style.setProperty('--camera-orbit-x', `${-pan * .65}px`);
       scene.style.setProperty('--camera-tint', `${progress * 100}%`);
     };
     const schedule = () => {
@@ -59,6 +55,9 @@ export const OpeningCamera: React.FC<OpeningCameraProps> = ({ home, children }) 
       distance = cover.offsetHeight;
       width = scene.clientWidth;
       scene.dataset.cameraMode = motion.matches ? 'pan' : 'native';
+      // Projects occupies the right side of the same world. Keeping its native
+      // layout position preserves anchor, keyboard and sticky-gallery offsets.
+      if (motion.matches) projects.style.transform = `translate3d(${width}px, ${-distance}px, 0)`;
       paint();
     };
     const revealFocusedPanel = (event: FocusEvent) => {
@@ -94,8 +93,14 @@ export const OpeningCamera: React.FC<OpeningCameraProps> = ({ home, children }) 
 
   return (
     <div className="tm-camera-sequence" ref={sceneRef}>
-      <div id="home" className="tm-camera-home" ref={homeRef}>{home}</div>
-      <div className="tm-camera-projects" ref={projectsRef}>{children}</div>
+      <div className="tm-camera-space" aria-hidden="true">
+        <span className="tm-camera-orbit" />
+        <ExplorerSky panorama />
+      </div>
+      <div className="tm-camera-world" ref={worldRef}>
+        <div id="home" className="tm-camera-home" ref={homeRef}>{home}</div>
+        <div className="tm-camera-projects" ref={projectsRef}>{children}</div>
+      </div>
     </div>
   );
 };
