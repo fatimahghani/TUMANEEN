@@ -259,54 +259,122 @@ async function swipe(session, from, to) {
   await dispatch('touchEnd', []);
 }
 
-// Scroll the document itself. The project boundary is measured afresh because
-// changing the motion preference can change the gallery's section height.
+// Read layout anchors rather than camera-transformed rectangles. The motion
+// preference can change the gallery height, so resample after each frame.
 async function seekHeroScroll(page, fraction) {
   await page.locator('#project').evaluate(async (project, progress) => {
-    let stable = 0;
+    const topOf = element => {
+      let top = 0;
+      for (let node = element; node; node = node.offsetParent) top += node.offsetTop;
+      return top;
+    };
+    const destination = () => {
+      const start = topOf(document.querySelector('#home'));
+      return Math.round(start + (topOf(project) - start) * progress);
+    };
+    let target = destination(), stable = 0;
+    window.scrollTo({top:target, behavior:'instant'});
     const deadline = performance.now() + 5000;
     do {
-      const boundary = scrollY + project.getBoundingClientRect().top;
-      const destination = Math.round(boundary * progress);
-      if (Math.abs(scrollY - destination) > 1) {
-        stable = 0;
-        window.scrollTo({top:destination, behavior:'instant'});
-      } else stable++;
       await new Promise(resolve => requestAnimationFrame(resolve));
+      const next = destination();
+      if (Math.abs(next - target) > 1 || Math.abs(scrollY - next) > 1) {
+        target = next;
+        stable = 0;
+        window.scrollTo({top:target, behavior:'instant'});
+      } else stable++;
     } while (stable < 3 && performance.now() < deadline);
-    if (stable < 3) throw new Error('Moon capture could not settle at ' + progress + ' of the cover');
+    if (stable < 3) throw new Error('Camera capture could not settle at ' + progress + ' of the opening');
   }, fraction);
 }
 
-async function checkLunarScroll(page, width) {
-  const moon = page.locator('.tm-explorer-moon');
-  const position = () => moon.evaluate(el => {
-    const bounds = el.getBoundingClientRect();
-    const hero = el.closest('.tm-explorer-hero');
-    const cover = hero.getBoundingClientRect();
-    return {left:bounds.left-cover.left, top:bounds.top-cover.top,
-      width:bounds.width, height:bounds.height, bottom:bounds.bottom,
-      clip:getComputedStyle(hero).overflowY};
+async function checkOpeningCamera(page, width) {
+  const scene = page.locator('.tm-camera-sequence');
+  const position = () => scene.evaluate(el => {
+    const hero = el.querySelector('.tm-explorer-hero');
+    const project = el.querySelector('#project');
+    const cover = hero.getBoundingClientRect(), work = project.getBoundingClientRect();
+    const moon = hero.querySelector('.tm-explorer-moon').getBoundingClientRect();
+    const sky = hero.querySelector('.tm-explorer-sky').getBoundingClientRect();
+    const transform = getComputedStyle(project.querySelector('.tm-hung-strip')).transform;
+    const x = matrix => new DOMMatrixReadOnly(matrix === 'none' ? undefined : matrix).m41;
+    const seam = cover.right;
+    const inHero = seam > 1 ? hero.contains(document.elementFromPoint(seam / 2, innerHeight * .7)) : true;
+    const inProjects = seam < innerWidth - 1
+      ? project.contains(document.elementFromPoint((Math.max(0, seam) + innerWidth) / 2, innerHeight * .7)) : true;
+    return {hero:cover.toJSON(), project:work.toJSON(),
+      moon:{left:moon.left-cover.left, top:moon.top-cover.top, width:moon.width, height:moon.height, right:moon.right},
+      clip:getComputedStyle(hero).overflowY, skyShift:sky.left-cover.left, galleryX:x(transform),
+      overflow:document.documentElement.scrollWidth-innerWidth, inHero, inProjects,
+      homeTransform:getComputedStyle(el.querySelector('.tm-camera-home')).transform,
+      projectTransform:getComputedStyle(el.querySelector('.tm-camera-projects')).transform};
   });
   await page.emulateMedia({reducedMotion:'no-preference'});
+  await page.locator('.tm-camera-sequence[data-camera-mode="pan"]').waitFor();
   await seekHeroScroll(page, 0);
   const original = await position();
-  for (const progress of [.45, 1, .45, 0]) {
+  assert(Math.abs(original.hero.left) < 2 && Math.abs(original.project.left-width) < 2,
+    'The cover should open in front of the camera, with Projects just to its right');
+  const samples = width === 1440 ? [0,.2,.4,.5,.6,.8,1] : [0,.5,1];
+  let previous = original, midpoint;
+  for (const progress of samples) {
     await seekHeroScroll(page, progress);
     const actual = await position();
-    assert(['left','top','width','height'].every(key => Math.abs(actual[key]-original[key]) < 1),
-      'The moon must keep its position and size on the cover while the page scrolls: ' + JSON.stringify({original,actual}));
+    assert(['left','top','width','height'].every(key => Math.abs(actual.moon[key]-original.moon[key]) < 1),
+      'The moon must keep its position and size within the moving cover: ' + JSON.stringify({original,actual}));
     assert(['clip','hidden'].includes(actual.clip), 'The cover must contain its moon and loose grains');
+    assert(Math.abs(actual.hero.top) < 2 && Math.abs(actual.project.top) < 2,
+      'The two sections should share a level horizon during the camera pan');
+    assert(Math.abs(actual.hero.right-actual.project.left) < 2 && actual.inHero && actual.inProjects,
+      'The moving pages should meet without a gap or an empty viewport');
+    assert(actual.hero.left <= previous.hero.left + 1 && actual.project.left <= previous.project.left + 1,
+      'Scrolling down must carry the cover left and bring Projects in from the right');
+    assert(actual.overflow <= 2, 'The camera must not widen the document');
+    assert(Math.abs(actual.galleryX) < 2, 'The project rail should wait until the camera arrives');
+    if (progress > 0) assert(actual.skyShift > 0 && actual.skyShift < Math.abs(actual.hero.left) * .5,
+      'The distant sky should drift more slowly than the foreground');
+    if (progress === .5) {
+      midpoint = actual;
+      assert(actual.hero.left < -width*.2 && actual.project.left > width*.2 && actual.project.left < width*.8,
+        'Both pages should be visible in the middle of the pan');
+    }
     if (progress === 1) {
-      assert(actual.bottom <= 1, 'The moon should leave the viewport with the cover');
+      assert(actual.moon.right <= 1 && Math.abs(actual.project.left) < 2,
+        'The moon should leave through the left edge as Projects arrives');
       await page.waitForFunction(() => document.querySelector('.tm-explorer-moon')?.dataset.animating === 'false');
     }
+    await page.screenshot({path:`editorial-snapshots/camera-${width}-${String(Math.round(progress*100)).padStart(3,'0')}.png`});
+    previous = actual;
   }
-  await seekHeroScroll(page, .45);
-  await page.screenshot({path:`editorial-snapshots/moon-stays-home-${width}.png`});
+  await seekHeroScroll(page, .5);
+  const reverse = await position();
+  assert(Math.abs(reverse.hero.left-midpoint.hero.left) < 2 && Math.abs(reverse.project.left-midpoint.project.left) < 2,
+    'Scrolling upward should retrace the camera path');
+
+  // Tab must reveal the real project controls, even while their panel is offscreen.
+  await seekHeroScroll(page, 0);
+  const next = page.getByRole('link',{name:'Explore selected projects',exact:true});
+  await next.focus({preventScroll:true});
+  await page.keyboard.press('Tab');
+  await page.waitForFunction(() => document.activeElement === document.querySelector('#project .tm-hung-strip'));
+  await page.keyboard.press('Tab');
+  await checkGalleryFocus(page.locator('#project .tm-hung-paper').first());
+  assert(Math.abs((await position()).project.left) < 2, 'Keyboard entry should complete the camera pan');
+  await page.keyboard.press('Shift+Tab');
+  await page.keyboard.press('Shift+Tab');
+  await page.waitForFunction(() => document.activeElement === document.querySelector('.tm-explorer-next') &&
+    Math.abs(document.querySelector('.tm-explorer-hero').getBoundingClientRect().left) < 2);
+
+  await seekHeroScroll(page, .5);
   await page.emulateMedia({reducedMotion:'reduce'});
+  await page.locator('.tm-camera-sequence[data-camera-mode="native"]').waitFor();
+  await seekHeroScroll(page, .5);
   const reduced = await position();
-  assert(['left','top','width','height'].every(key => Math.abs(reduced[key]-original[key]) < 1),
+  assert(reduced.homeTransform === 'none' && reduced.projectTransform === 'none' &&
+    Math.abs(reduced.hero.left) < 2 && Math.abs(reduced.project.left) < 2 &&
+    reduced.hero.top < -reduced.hero.height*.2 && reduced.project.top > reduced.hero.height*.2,
+    'Reduced motion should restore ordinary vertical sections');
+  assert(['left','top','width','height'].every(key => Math.abs(reduced.moon[key]-original.moon[key]) < 1),
     'Changing the motion preference must keep the moon in its cover position');
 }
 
@@ -316,7 +384,9 @@ async function seekProjectGallery(section, fraction) {
     const aperture = el.querySelector('.tm-hung-window');
     const first = el.querySelector('.tm-hung-paper');
     const sample = () => {
-      const sectionTop = el.getBoundingClientRect().top;
+      let pageTop = 0;
+      for (let node = el; node; node = node.offsetParent) pageTop += node.offsetTop;
+      const sectionTop = pageTop - scrollY;
       const travel = track.scrollWidth - aperture.clientWidth;
       const offset = Math.min(travel, Math.max(0, travel * progress));
       const transform = getComputedStyle(track).transform;
@@ -446,7 +516,9 @@ async function checkProjectGallery(page, width) {
   await page.keyboard.press('Enter');
   await page.waitForFunction(() => {
     const project = document.querySelector('#project');
-    return Math.abs(project.getBoundingClientRect().top) < 2 &&
+    let pageTop = 0;
+    for (let node = project; node; node = node.offsetParent) pageTop += node.offsetTop;
+    return Math.abs(scrollY-pageTop) < 2 && Math.abs(project.getBoundingClientRect().left) < 2 &&
       !project.closest('.section-reveal-active') && !document.querySelector('.tm-page-turn-flash');
   });
   const {travel} = await seekProjectGallery(section, 0);
@@ -554,17 +626,37 @@ async function checkProjectScrollInput(page, width) {
   await page.emulateMedia({reducedMotion:'no-preference'});
   const section = page.locator('#project[data-gallery-mode="pinned"]');
   await section.waitFor();
-  // Begin inside the pinned section so the gesture measures horizontal motion.
-  const start = await seekProjectGallery(section, 0.1);
   const {height} = page.viewportSize();
-  if (width === 375) {
-    const touch = await page.context().newCDPSession(page);
-    await swipe(touch, {x:width/2,y:height*.65}, {x:width/2,y:height*.47});
-    await touch.detach();
-  } else {
-    await page.mouse.move(width/2, height*.6);
-    await page.mouse.wheel(0, 160);
-  }
+  const gesture = async () => {
+    if (width === 375) {
+      const touch = await page.context().newCDPSession(page);
+      await swipe(touch, {x:width/2,y:height*.65}, {x:width/2,y:height*.47});
+      await touch.detach();
+    } else {
+      await page.mouse.move(width/2, height*.6);
+      await page.mouse.wheel(0, 160);
+    }
+  };
+  await seekHeroScroll(page, .1);
+  const opening = await page.locator('.tm-explorer-hero').evaluate(el =>
+    ({left:el.getBoundingClientRect().left, pageY:scrollY}));
+  await gesture();
+  await page.waitForFunction(({left, pageY}) => scrollY > pageY + 20 &&
+    document.querySelector('.tm-explorer-hero').getBoundingClientRect().left < left - 20, opening);
+  // Finish the first physical gesture before seeking the gallery; touch inertia
+  // must not compete with the exact start position of the second check.
+  await page.evaluate(async () => {
+    let previous = scrollY, still = 0;
+    const deadline = performance.now() + 5000;
+    do {
+      await new Promise(resolve => requestAnimationFrame(resolve));
+      still = Math.abs(scrollY-previous) < .5 ? still + 1 : 0;
+      previous = scrollY;
+    } while (still < 8 && performance.now() < deadline);
+    if (still < 8) throw new Error('The opening scroll gesture did not settle');
+  });
+  const start = await seekProjectGallery(section, 0.1);
+  await gesture();
   await page.waitForFunction(({first, pageY}) =>
     scrollY > pageY + 20 && document.querySelector('#project .tm-hung-paper').getBoundingClientRect().left < first - 20, start);
 }
@@ -583,7 +675,9 @@ async function checkChapters(page, width) {
     const section = page.locator('#' + id);
     await section.evaluate(el => {
       const navHeight = document.querySelector('[data-editorial-nav]').getBoundingClientRect().height;
-      window.scrollTo({top: scrollY + el.getBoundingClientRect().top - navHeight, behavior: 'instant'});
+      let pageTop = 0;
+      for (let node = el; node; node = node.offsetParent) pageTop += node.offsetTop;
+      window.scrollTo({top: pageTop - navHeight, behavior: 'instant'});
     });
     await page.waitForFunction(() => document.querySelector('[data-editorial-nav]').getBoundingClientRect().y >= -1);
     await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
@@ -975,10 +1069,10 @@ try {
       assert.equal(await posters.evaluate(cursorOf), 'none', 'The comet should continue across portfolio backgrounds');
       const offscreen=await angle(page);await wait(page,250);
       assert.equal(await angle(page),offscreen,'Offscreen suspension failed');
-      await page.locator('.tm-explorer-hero').scrollIntoViewIfNeeded();
+      await seekHeroScroll(page, 0);
     }
     if (width === 375 || width === 1440) {
-      await checkLunarScroll(page, width);
+      await checkOpeningCamera(page, width);
       await checkProjectGallery(page, width);
       await checkChapters(page, width);
       await checkProjectScrollInput(page, width);
