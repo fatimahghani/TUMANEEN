@@ -343,7 +343,24 @@ async function checkOpeningCamera(page, width) {
         'The moon should leave through the left edge as Projects arrives');
       await page.waitForFunction(() => document.querySelector('.tm-explorer-moon')?.dataset.animating === 'false');
     }
-    await page.screenshot({path:`editorial-snapshots/camera-${width}-${String(Math.round(progress*100)).padStart(3,'0')}.png`});
+    const capture = await page.screenshot({path:`editorial-snapshots/camera-${width}-${String(Math.round(progress*100)).padStart(3,'0')}.png`});
+    if (width === 375 && progress === .5) {
+      const seamDifference = await page.evaluate(async ({encoded, seam}) => {
+        const image = new Image();
+        image.src = 'data:image/png;base64,' + encoded;
+        await image.decode();
+        const canvas = document.createElement('canvas');
+        canvas.width = 7; canvas.height = 1;
+        const ctx = canvas.getContext('2d');
+        // Sample plain sky above the lettering. A compositing gap reveals the
+        // original ivory body here, even when DOM rectangles meet exactly.
+        ctx.drawImage(image, Math.floor(seam)-3, 8, 7, 1, 0, 0, 7, 1);
+        const pixels = ctx.getImageData(0, 0, 7, 1).data;
+        return Math.max(...[3,4].flatMap(x => [0,1,2].map(channel =>
+          Math.abs(pixels[x*4+channel] - (pixels[channel]+pixels[24+channel])/2))));
+      }, {encoded:capture.toString('base64'), seam:actual.hero.right});
+      assert(seamDifference < 10, 'The phone camera pan should have no visible raster seam');
+    }
     previous = actual;
   }
   await seekHeroScroll(page, .5);

@@ -32,11 +32,14 @@ export const OpeningCamera: React.FC<OpeningCameraProps> = ({ home, children }) 
       }
       const travelled = Math.max(0, Math.min(distance, window.scrollY - start));
       const progress = travelled / distance;
+      // Share one pixel-aligned edge; fractional clipping can expose a hairline
+      // of the page underneath on odd-width phone viewports.
+      const pan = Math.round(progress * width);
       // Counter the vertical scroll for one viewport. The two pages then share
       // a horizon while the camera travels right across their joined edge.
-      cover.style.transform = `translate3d(${-progress * width}px, ${travelled}px, 0)`;
+      cover.style.transform = `translate3d(${-pan}px, ${travelled}px, 0)`;
       if (progress < 1) {
-        projects.style.transform = `translate3d(${(1 - progress) * width}px, ${travelled - distance}px, 0)`;
+        projects.style.transform = `translate3d(${width - pan}px, ${travelled - distance}px, 0)`;
       } else {
         projects.style.removeProperty('transform');
       }
