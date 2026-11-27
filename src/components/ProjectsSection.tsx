@@ -116,9 +116,11 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
     const measure = () => {
       const wasPinned = section.dataset.galleryMode === 'pinned';
       const focused = document.activeElement;
+      // The outer camera and this rail release their pins on the same media
+      // change. Their intermediate rectangles cannot tell whether the focused
+      // control was visible; restore its position after both layouts settle.
       const keepFocus = wasPinned && !motion.matches && focused instanceof HTMLElement &&
-        track.contains(focused) && section.getBoundingClientRect().bottom > 0 &&
-        section.getBoundingClientRect().top < window.innerHeight;
+        track.contains(focused);
       section.style.setProperty('--gallery-header', `${header?.offsetHeight ?? 96}px`);
       section.dataset.galleryMode = motion.matches ? 'pinned' : 'native';
       // Open the sequence with one cover at the right edge. The leading space
