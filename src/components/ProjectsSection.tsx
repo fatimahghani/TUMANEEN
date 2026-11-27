@@ -73,6 +73,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
     let travel = 0;
     let frame = 0;
     let focusFrame = 0;
+    let nativeFocus: HTMLElement | null = null;
 
     const offset = () => Math.max(0, Math.min(travel, window.scrollY - documentTop(section)));
     const paint = () => {
@@ -106,8 +107,8 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
     };
     const keepNativeFocusVisible = (control: HTMLElement) => {
       revealNative(control);
-      // Focus can trigger a browser scroll after focusin. Recheck once, using
-      // the final layout, without following a control the user has since left.
+      // Recheck after the current layout pass without following a control the
+      // user has since left. Later resize measurements also restore nativeFocus.
       cancelAnimationFrame(focusFrame);
       focusFrame = requestAnimationFrame(() => {
         if (document.activeElement === control) revealNative(control);
@@ -116,9 +117,12 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
     const measure = () => {
       const wasPinned = section.dataset.galleryMode === 'pinned';
       const focused = document.activeElement;
-      const keepFocus = wasPinned && !motion.matches && focused instanceof HTMLElement &&
-        track.contains(focused) && section.getBoundingClientRect().bottom > 0 &&
-        section.getBoundingClientRect().top < window.innerHeight;
+      // Both pins release together, but native layout can resize again afterward.
+      // Retain the target for those real measurements until the user leaves it.
+      if (wasPinned && !motion.matches && focused instanceof HTMLElement && track.contains(focused)) {
+        nativeFocus = focused;
+      }
+      if (motion.matches || document.activeElement !== nativeFocus) nativeFocus = null;
       section.style.setProperty('--gallery-header', `${header?.offsetHeight ?? 96}px`);
       section.dataset.galleryMode = motion.matches ? 'pinned' : 'native';
       // Open the sequence with one cover at the right edge. The leading space
@@ -133,7 +137,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
         paint();
       } else {
         track.style.removeProperty('transform');
-        if (keepFocus) keepNativeFocusVisible(focused);
+        if (nativeFocus) keepNativeFocusVisible(nativeFocus);
       }
     };
 

@@ -27,6 +27,8 @@ export const OpeningCamera: React.FC<OpeningCameraProps> = ({ home, children }) 
       scene.style.removeProperty('--camera-sky-x');
       scene.style.removeProperty('--camera-orbit-x');
       scene.style.removeProperty('--camera-tint');
+      scene.style.removeProperty('--camera-height');
+      scene.style.removeProperty('--camera-viewport-height');
     };
     const paint = () => {
       if (!motion.matches || !distance) {
@@ -36,9 +38,9 @@ export const OpeningCamera: React.FC<OpeningCameraProps> = ({ home, children }) 
       const travelled = Math.max(0, Math.min(distance, window.scrollY - start));
       const progress = travelled / distance;
       const pan = Math.round(progress * width);
-      // Move one world beneath the camera. Vertical compensation holds its
-      // horizon still, then lets the gallery use its existing document scroll.
-      world.style.transform = `translate3d(${-pan}px, ${travelled}px, 0)`;
+      // CSS pins the camera's vertical position, including during native touch
+      // momentum. Scrolling changes only X; no frame has to compensate for Y.
+      world.style.transform = `translate3d(${-pan}px, 0, 0)`;
       scene.style.setProperty('--camera-sky-x', `${-pan * .4}px`);
       scene.style.setProperty('--camera-orbit-x', `${-pan * .65}px`);
       scene.style.setProperty('--camera-tint', `${progress * 100}%`);
@@ -51,13 +53,17 @@ export const OpeningCamera: React.FC<OpeningCameraProps> = ({ home, children }) 
       });
     };
     const measure = () => {
-      start = documentTop(cover);
+      start = documentTop(scene);
       distance = cover.offsetHeight;
       width = scene.clientWidth;
       scene.dataset.cameraMode = motion.matches ? 'pan' : 'native';
       // Projects occupies the right side of the same world. Keeping its native
       // layout position preserves anchor, keyboard and sticky-gallery offsets.
-      if (motion.matches) projects.style.transform = `translate3d(${width}px, ${-distance}px, 0)`;
+      if (motion.matches) {
+        projects.style.transform = `translate3d(${width}px, ${-distance}px, 0)`;
+        scene.style.setProperty('--camera-viewport-height', `${distance}px`);
+        scene.style.setProperty('--camera-height', `${distance + projects.offsetHeight}px`);
+      }
       paint();
     };
     const revealFocusedPanel = (event: FocusEvent) => {
@@ -73,6 +79,7 @@ export const OpeningCamera: React.FC<OpeningCameraProps> = ({ home, children }) 
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(cover);
+    observer.observe(projects);
     observer.observe(scene);
     motion.addEventListener('change', measure);
     window.addEventListener('resize', measure);
@@ -93,13 +100,15 @@ export const OpeningCamera: React.FC<OpeningCameraProps> = ({ home, children }) 
 
   return (
     <div className="tm-camera-sequence" ref={sceneRef}>
-      <div className="tm-camera-space" aria-hidden="true">
-        <span className="tm-camera-orbit" />
-        <ExplorerSky panorama />
-      </div>
-      <div className="tm-camera-world" ref={worldRef}>
-        <div id="home" className="tm-camera-home" ref={homeRef}>{home}</div>
-        <div className="tm-camera-projects" ref={projectsRef}>{children}</div>
+      <div className="tm-camera-viewport">
+        <div className="tm-camera-space" aria-hidden="true">
+          <span className="tm-camera-orbit" />
+          <ExplorerSky panorama />
+        </div>
+        <div className="tm-camera-world" ref={worldRef}>
+          <div id="home" className="tm-camera-home" ref={homeRef}>{home}</div>
+          <div className="tm-camera-projects" ref={projectsRef}>{children}</div>
+        </div>
       </div>
     </div>
   );

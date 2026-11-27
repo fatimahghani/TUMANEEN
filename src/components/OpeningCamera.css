@@ -1,9 +1,10 @@
 .tm-camera-sequence {
   position: relative;
   isolation: isolate;
-  /* One viewport clips the entire world, never its individual scenes. */
+  /* Contain the wide world without adding a horizontal scroll container. */
   overflow: clip;
 }
+.tm-camera-viewport,
 .tm-camera-world,
 .tm-camera-home,
 .tm-camera-projects {
@@ -12,15 +13,30 @@
 .tm-camera-world { z-index: 1; }
 .tm-camera-space { display: none; }
 
-/* This single paper sky stays behind both the opening and the project rail.
-   Its negative margin preserves the sections' native document positions. */
-.tm-camera-sequence[data-camera-mode="pan"] .tm-camera-space {
-  display: block;
+/* Native mode takes effect atomically, even before pending scroll/resize
+   callbacks finish clearing their last inline camera positions. */
+.tm-camera-sequence[data-camera-mode="native"] :is(.tm-camera-world, .tm-camera-projects) {
+  transform: none !important;
+}
+
+/* Native sticky positioning locks the horizon throughout the camera pan and
+   project rail. The scene supplies their full original scrolling distance. */
+.tm-camera-sequence[data-camera-mode="pan"] {
+  height: var(--camera-height, auto);
+}
+.tm-camera-sequence[data-camera-mode="pan"] .tm-camera-viewport {
   position: sticky;
   top: 0;
+  height: var(--camera-viewport-height, 100svh);
+  overflow: clip;
+}
+
+/* One paper sky fills the pinned viewport behind the entire moving world. */
+.tm-camera-sequence[data-camera-mode="pan"] .tm-camera-space {
+  display: block;
+  position: absolute;
+  inset: 0;
   z-index: 0;
-  height: 100svh;
-  margin-bottom: -100svh;
   overflow: clip;
   pointer-events: none;
   background: color-mix(in srgb, var(--tm-ivory), var(--tm-project-paper) var(--camera-tint, 0%)) var(--tm-grain) repeat;
@@ -61,6 +77,12 @@
 }
 .tm-site .tm-camera-sequence[data-camera-mode="pan"] .tm-hung-shell::before {
   content: none;
+}
+.tm-camera-sequence[data-camera-mode="pan"] #project[data-gallery-mode="pinned"] .tm-hung-shell {
+  /* The camera viewport owns the pin; a second sticky layer would move the
+     project controls vertically as the document scrolls underneath it. */
+  position: relative;
+  top: 0;
 }
 @media (forced-colors: active) {
   .tm-camera-orbit { display: none; }
