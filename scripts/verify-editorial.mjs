@@ -265,7 +265,10 @@ async function seekHeroScroll(page, fraction) {
   await page.locator('#project').evaluate(async (project, progress) => {
     const topOf = element => {
       let top = 0;
-      for (let node = element; node; node = node.offsetParent) top += node.offsetTop;
+      for (let node = element; node; node = node.offsetParent) {
+        if (node.classList.contains('tm-camera-viewport') && node.parentElement?.dataset.cameraMode === 'pan') continue;
+        top += node.offsetTop;
+      }
       return top;
     };
     const destination = () => {
@@ -295,6 +298,12 @@ async function checkOpeningCamera(page, width) {
     const project = el.querySelector('#project');
     const world = el.querySelector('.tm-camera-world');
     const space = el.querySelector('.tm-camera-space');
+    const viewport = el.querySelector('.tm-camera-viewport');
+    let projectTop = 0;
+    for (let node = project; node; node = node.offsetParent) {
+      if (node === viewport && el.dataset.cameraMode === 'pan') continue;
+      projectTop += node.offsetTop;
+    }
     const cover = hero.getBoundingClientRect(), work = project.getBoundingClientRect();
     const moon = hero.querySelector('.tm-explorer-moon').getBoundingClientRect();
     const sky = space.querySelector('.tm-explorer-sky');
@@ -307,7 +316,9 @@ async function checkOpeningCamera(page, width) {
     return {hero:cover.toJSON(), project:work.toJSON(),
       moon:{left:moon.left-cover.left, top:moon.top-cover.top, width:moon.width, height:moon.height, right:moon.right},
       heroClip:heroStyle.overflowX, foregroundClip:getComputedStyle(hero.querySelector('.tm-explorer-foreground-crop')).overflowX,
-      foregroundRight:foreground.right, skyX:matrix(sky).m41, worldX:matrix(world).m41,
+      foregroundRight:foreground.right, skyX:matrix(sky).m41, worldX:matrix(world).m41, worldY:matrix(world).m42,
+      projectTop, viewportOffset:viewport.offsetTop, cardTop:project.querySelector('.tm-hung-paper').getBoundingClientRect().top,
+      viewport:{...viewport.getBoundingClientRect().toJSON(), position:getComputedStyle(viewport).position},
       galleryX:matrix(project.querySelector('.tm-hung-strip')).m41,
       surfaces:[heroStyle,projectStyle].map(style => ({color:style.backgroundColor, image:style.backgroundImage})),
       space:{...space.getBoundingClientRect().toJSON(), display:spaceStyle.display, position:spaceStyle.position,
@@ -320,10 +331,10 @@ async function checkOpeningCamera(page, width) {
       worldTransform:getComputedStyle(world).transform};
   });
   const checkBackdrop = actual => {
-    const {space} = actual;
-    assert(space.count === 1 && space.display !== 'none' && space.position === 'sticky' &&
+    const {space, viewport} = actual;
+    assert(space.count === 1 && space.display !== 'none' && space.position === 'absolute' && viewport.position === 'sticky' &&
       space.events === 'none' && space.hidden === 'true', 'The camera should share one passive space backdrop');
-    assert(Math.abs(space.left) < 2 && Math.abs(space.top) < 2 &&
+    assert(Math.abs(viewport.top) < 2 && Math.abs(space.left) < 2 && Math.abs(space.top) < 2 &&
       Math.abs(space.width-width) < 2 && Math.abs(space.height-page.viewportSize().height) < 2,
       'The shared backdrop should fill the viewport throughout the opening and gallery');
   };
@@ -343,7 +354,10 @@ async function checkOpeningCamera(page, width) {
       'The moon must keep its position and size within the moving cover: ' + JSON.stringify({original,actual}));
     checkBackdrop(actual);
     assert(actual.sharedWorld && actual.homeTransform === 'none' && actual.projectTransform === original.projectTransform &&
-      Math.abs(actual.worldX-actual.hero.left) < 2, 'One shared world should move past the camera');
+      Math.abs(actual.worldX-actual.hero.left) < 2 && Math.abs(actual.worldY) < .01,
+      'One shared world should move only horizontally past the camera');
+    assert(Math.abs(actual.projectTop-original.projectTop) < 1 && Math.abs(actual.cardTop-original.cardTop) < 2,
+      'The project anchor and card height should stay stable while the viewport pins');
     assert(actual.surfaces.every(surface => surface.color === 'rgba(0, 0, 0, 0)' && surface.image === 'none') &&
       actual.heroSkyDisplay === 'none', 'Section panels should be transparent over the shared space');
     assert(Math.abs(actual.hero.top) < 2 && Math.abs(actual.project.top) < 2,
@@ -391,7 +405,11 @@ async function checkOpeningCamera(page, width) {
     previous = actual;
   }
   await seekProjectGallery(page.locator('#project'), .5);
-  checkBackdrop(await position());
+  const galleryMiddle = await position();
+  checkBackdrop(galleryMiddle);
+  assert(Math.abs(galleryMiddle.projectTop-original.projectTop) < 1 &&
+    Math.abs(galleryMiddle.cardTop-original.cardTop) < 2 && Math.abs(galleryMiddle.worldY) < .01,
+    'The logical project destination and vertical framing should remain fixed through gallery travel');
   await seekHeroScroll(page, .5);
   const reverse = await position();
   assert(Math.abs(reverse.hero.left-midpoint.hero.left) < 2 && Math.abs(reverse.project.left-midpoint.project.left) < 2,
@@ -432,7 +450,10 @@ async function seekProjectGallery(section, fraction) {
     const first = el.querySelector('.tm-hung-paper');
     const sample = () => {
       let pageTop = 0;
-      for (let node = el; node; node = node.offsetParent) pageTop += node.offsetTop;
+      for (let node = el; node; node = node.offsetParent) {
+        if (node.classList.contains('tm-camera-viewport') && node.parentElement?.dataset.cameraMode === 'pan') continue;
+        pageTop += node.offsetTop;
+      }
       const sectionTop = pageTop - scrollY;
       const travel = track.scrollWidth - aperture.clientWidth;
       const offset = Math.min(travel, Math.max(0, travel * progress));
@@ -564,7 +585,10 @@ async function checkProjectGallery(page, width) {
   await page.waitForFunction(() => {
     const project = document.querySelector('#project');
     let pageTop = 0;
-    for (let node = project; node; node = node.offsetParent) pageTop += node.offsetTop;
+    for (let node = project; node; node = node.offsetParent) {
+        if (node.classList.contains('tm-camera-viewport') && node.parentElement?.dataset.cameraMode === 'pan') continue;
+        pageTop += node.offsetTop;
+      }
     return Math.abs(scrollY-pageTop) < 2 && Math.abs(project.getBoundingClientRect().left) < 2 &&
       !project.closest('.section-reveal-active') && !document.querySelector('.tm-page-turn-flash');
   });
@@ -615,6 +639,9 @@ async function checkProjectGallery(page, width) {
   const posters = page.locator('#posters');
   await seek(1 + page.viewportSize().height * .6 / travel);
   assert((await posters.boundingBox()).y < page.viewportSize().height * .6, 'Scrolling past the last project must reveal Posters');
+  const released = await page.locator('.tm-camera-viewport').boundingBox();
+  assert(released.y < -page.viewportSize().height*.4, 'The camera pin should release after the final project');
+  await page.screenshot({path:`editorial-snapshots/projects-${width}-exit.png`, animations:'disabled'});
 
   await seek(0);
   const firstCover = section.getByRole('button',{name:'Open LUMERA case study',exact:true});
@@ -684,15 +711,31 @@ async function checkProjectScrollInput(page, width) {
       await page.mouse.wheel(0, 160);
     }
   };
-  await seekHeroScroll(page, .1);
-  const opening = await page.locator('.tm-explorer-hero').evaluate(el =>
-    ({left:el.getBoundingClientRect().left, pageY:scrollY}));
-  await gesture();
-  await page.waitForFunction(({left, pageY}) => scrollY > pageY + 20 &&
-    document.querySelector('.tm-explorer-hero').getBoundingClientRect().left < left - 20, opening);
-  // Finish the first physical gesture before seeking the gallery; touch inertia
-  // must not compete with the exact start position of the second check.
-  await page.evaluate(async () => {
+  const startProbe = () => page.evaluate(() => {
+    const scene = document.querySelector('.tm-camera-sequence');
+    const hero = scene.querySelector('.tm-explorer-hero');
+    const project = scene.querySelector('#project');
+    const world = scene.querySelector('.tm-camera-world');
+    const viewport = scene.querySelector('.tm-camera-viewport');
+    const probe = window.cameraMotionProbe = {samples:[], frame:0};
+    const record = () => {
+      let anchor = 0;
+      for (let node = project; node; node = node.offsetParent) {
+        if (node === viewport && scene.dataset.cameraMode === 'pan') continue;
+        anchor += node.offsetTop;
+      }
+      const bounds = scene.getBoundingClientRect();
+      const transform = getComputedStyle(world).transform;
+      probe.samples.push({scrollY, anchor, viewportOffset:viewport.offsetTop,
+        pinned:bounds.top <= 1 && bounds.bottom >= viewport.offsetHeight - 1,
+        heroTop:hero.getBoundingClientRect().top, projectTop:project.getBoundingClientRect().top,
+        cardTop:project.querySelector('.tm-hung-paper').getBoundingClientRect().top,
+        worldY:new DOMMatrixReadOnly(transform === 'none' ? undefined : transform).m42});
+      probe.frame = requestAnimationFrame(record);
+    };
+    record();
+  });
+  const settle = () => page.evaluate(async () => {
     let previous = scrollY, still = 0;
     const deadline = performance.now() + 5000;
     do {
@@ -700,12 +743,41 @@ async function checkProjectScrollInput(page, width) {
       still = Math.abs(scrollY-previous) < .5 ? still + 1 : 0;
       previous = scrollY;
     } while (still < 8 && performance.now() < deadline);
-    if (still < 8) throw new Error('The opening scroll gesture did not settle');
+    if (still < 8) throw new Error('The camera scroll gesture did not settle');
   });
+  const checkProbe = async label => {
+    const samples = await page.evaluate(() => {
+      const probe = window.cameraMotionProbe;
+      cancelAnimationFrame(probe.frame);
+      delete window.cameraMotionProbe;
+      return probe.samples.filter(sample => sample.pinned);
+    });
+    assert(samples.length >= 2 && samples.some(sample => Math.abs(sample.scrollY-samples[0].scrollY) > 20),
+      label + ' should capture frames during native scrolling');
+    for (const sample of samples) {
+      assert(Math.abs(sample.heroTop) < 1.1 && Math.abs(sample.projectTop) < 1.1 &&
+        Math.abs(sample.worldY) < .01 && Math.abs(sample.cardTop-samples[0].cardTop) < 1.1 &&
+        Math.abs(sample.anchor-samples[0].anchor) < 1,
+        label + ' must keep the horizon, cards and logical anchor fixed on every frame: ' + JSON.stringify(sample));
+    }
+  };
+  await seekHeroScroll(page, .1);
+  const opening = await page.locator('.tm-explorer-hero').evaluate(el =>
+    ({left:el.getBoundingClientRect().left, pageY:scrollY}));
+  await startProbe();
+  await gesture();
+  await page.waitForFunction(({left, pageY}) => scrollY > pageY + 20 &&
+    document.querySelector('.tm-explorer-hero').getBoundingClientRect().left < left - 20, opening);
+  // Capture live frames through momentum, then settle before seeking the rail.
+  await settle();
+  await checkProbe('The opening gesture');
   const start = await seekProjectGallery(section, 0.1);
+  await startProbe();
   await gesture();
   await page.waitForFunction(({first, pageY}) =>
     scrollY > pageY + 20 && document.querySelector('#project .tm-hung-paper').getBoundingClientRect().left < first - 20, start);
+  await settle();
+  await checkProbe('The gallery gesture');
 }
 
 async function checkChapters(page, width) {
@@ -723,7 +795,10 @@ async function checkChapters(page, width) {
     await section.evaluate(el => {
       const navHeight = document.querySelector('[data-editorial-nav]').getBoundingClientRect().height;
       let pageTop = 0;
-      for (let node = el; node; node = node.offsetParent) pageTop += node.offsetTop;
+      for (let node = el; node; node = node.offsetParent) {
+        if (node.classList.contains('tm-camera-viewport') && node.parentElement?.dataset.cameraMode === 'pan') continue;
+        pageTop += node.offsetTop;
+      }
       window.scrollTo({top: pageTop - navHeight, behavior: 'instant'});
     });
     await page.waitForFunction(() => document.querySelector('[data-editorial-nav]').getBoundingClientRect().y >= -1);
