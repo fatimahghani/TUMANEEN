@@ -11,6 +11,8 @@ import {
 } from './data/portfolioData';
 import { CaseStudyModal } from './components/CaseStudyModal';
 import { ReadingNookHero } from './components/ReadingNookHero';
+import { OpeningCamera } from './components/OpeningCamera';
+import { documentTop } from './utils/documentTop';
 import './EditorialSystem.css';
 import { CometCursor } from './components/CometCursor';
 import { ProcessSection } from './components/ProcessSection';
@@ -65,7 +67,7 @@ export default function App() {
     const handleScroll = () => {
       setShowFloatingHeader(window.scrollY > window.innerHeight * 0.65);
       const readingLine = window.innerHeight * 0.38;
-      const current = sections.find(({ el }) => el && el.getBoundingClientRect().top <= readingLine);
+      const current = sections.find(({ el }) => el && documentTop(el) <= window.scrollY + readingLine);
       if (current) setActiveNav(current.id);
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -112,6 +114,20 @@ export default function App() {
       setActiveNav(sectionId === 'contact-form' ? 'services' : sectionId);
 
       clearTransitionTimers();
+      if (sectionId === 'home' || sectionId === 'project') {
+        setActiveTransitionKey(null);
+        setRevealedSection(null);
+        const target = document.getElementById(sectionId);
+        const projects = document.getElementById('project');
+        const pan = document.querySelector('.tm-camera-sequence')?.getAttribute('data-camera-mode') === 'pan';
+        if (target) {
+          window.scrollTo({
+            top: documentTop(target),
+            behavior: pan && projects && window.scrollY <= documentTop(projects) + 1 ? 'smooth' : 'instant',
+          });
+        }
+        return;
+      }
       const transitionKey = Date.now();
       setActiveTransitionKey(transitionKey);
 
@@ -119,7 +135,7 @@ export default function App() {
       const scrollTimer = window.setTimeout(() => {
         const el = document.getElementById(sectionId);
         if (el) {
-          const top = el.getBoundingClientRect().top + window.scrollY;
+          const top = documentTop(el);
           window.scrollTo({ top, behavior: 'auto' });
         }
         const wrapperId = sectionId === 'contact-form' ? 'services' : sectionId;
@@ -265,27 +281,21 @@ export default function App() {
       </header>
 
       <main className="flex-1" inert={!!selectedProjectId}>
-        {/* ISSUE COVER — SHANAKHT / THE VISUAL NOTEBOOK */}
-        <div
-          id="home"
-          className={revealedSection?.id === 'home' ? 'section-reveal-active' : undefined}
-        >
+        {/* The cover and first gallery share one continuous camera move. */}
+        <OpeningCamera home={
           <ReadingNookHero
             activeNav={activeNav}
             onSelectNav={(section) => scrollToSection(section)}
             onEmailClick={() => scrollToSection('contact-form')}
           />
-        </div>
-
-        {/* 01 / SELECTED CASE STUDIES */}
-        <div className={revealedSection?.id === 'project' ? 'section-reveal-active' : undefined}>
+        }>
           <ProjectsSection
             onSelectProject={openCaseStudy}
             isAllProjectsOpen={isAllProjectsOpen}
             onOpenAllProjects={() => setIsAllProjectsOpen(true)}
             onCloseAllProjects={() => setIsAllProjectsOpen(false)}
           />
-        </div>
+        </OpeningCamera>
 
         {/* 02 / THE POSTER ARCHIVE */}
         <div className={revealedSection?.id === 'posters' ? 'section-reveal-active' : undefined}>

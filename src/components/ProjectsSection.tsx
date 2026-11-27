@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { ArrowLeft, ArrowRight, ArrowUpRight, X } from 'lucide-react';
 import { PORTFOLIO_PROJECTS, type PortfolioProject } from '../data/portfolioData';
 import { LENS_BLOOM_POSTERS, type LensBloomPosterCard } from './PosterSection';
+import { documentTop } from '../utils/documentTop';
 import './ProjectsSection.css';
 
 interface ProjectsSectionProps {
@@ -73,7 +74,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
     let frame = 0;
     let focusFrame = 0;
 
-    const offset = () => Math.max(0, Math.min(travel, -section.getBoundingClientRect().top));
+    const offset = () => Math.max(0, Math.min(travel, window.scrollY - documentTop(section)));
     const paint = () => {
       if (travel) track.style.transform = `translate3d(${-offset()}px, 0, 0)`;
     };
@@ -153,7 +154,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
       if (left < current - 1) next = left;
       else if (right > current + aperture.clientWidth + 1) next = right - aperture.clientWidth;
       else return;
-      const start = window.scrollY + section.getBoundingClientRect().top;
+      const start = documentTop(section);
       window.scrollTo({ top: start + Math.min(travel, Math.max(0, next)), behavior: 'instant' });
       paint();
     };

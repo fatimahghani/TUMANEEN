@@ -1,0 +1,20 @@
+.tm-camera-sequence {
+  position: relative;
+  isolation: isolate;
+  /* Clip the sideways scene without creating another scroll container. */
+  overflow: clip;
+}
+.tm-camera-home,
+.tm-camera-projects {
+  position: relative;
+}
+/* Warm the shared sky into the gallery's clay tone without a hard color seam. */
+.tm-site .tm-camera-sequence[data-camera-mode="pan"] :is(.tm-explorer-hero, #project.tm-hanging-gallery) {
+  background-color: color-mix(in srgb, var(--tm-ivory), var(--tm-project-paper) var(--camera-tint, 0%));
+}
+.tm-camera-sequence[data-camera-mode="pan"] .tm-explorer-sky {
+  transform: translate3d(var(--camera-sky-x, 0px), 0, 0);
+}
+.tm-camera-sequence[data-camera-mode="pan"] .tm-hung-shell::before {
+  transform: translateX(calc(-50% + var(--camera-orbit-x, 0px)));
+}
