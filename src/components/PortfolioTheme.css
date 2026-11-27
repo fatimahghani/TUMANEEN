@@ -2,7 +2,6 @@
 :root {
   --tm-burgundy: #641613;
   --tm-ivory: #f1e2ce;
-  --tm-project-paper: #dfb9ad;
   --tm-ink: #211f1e;
   --tm-night: #1b1b1a;
   --tm-blush: #fbf0e0;
@@ -133,9 +132,8 @@ body { background-color: var(--tm-ivory); }
 .tm-ma-open-arrow { color: var(--tm-burgundy); background: var(--tm-blush); }
 .tm-ma-primary-paper::before, .tm-ma-secondary-paper::before { background: #dfc9ae; }
 
-/* Selected project covers sit on muted clay paper. */
+/* Selected project covers share the same paper as the opening landscape. */
 .tm-site #project.tm-hanging-gallery {
-  background-color: var(--tm-project-paper);
   color: var(--tm-ink);
 }
 .tm-site #project.tm-hanging-gallery::before, .tm-site #project.tm-hanging-gallery::after { content: none; }
