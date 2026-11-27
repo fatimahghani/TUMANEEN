@@ -503,7 +503,7 @@ async function checkGalleryFocus(target) {
       result = {intended:label(button), active:label(document.activeElement), rect:rect.toJSON(), aperture:aperture.toJSON(),
         trackScrollLeft:track.scrollLeft, sectionTop:section.getBoundingClientRect().top, scrollY, stableFrames};
     } while (stableFrames < 3 && performance.now() < deadline);
-    return result;
+    return {...result, trace:stableFrames < 3 ? window.galleryFocusTrace?.events : undefined};
   });
   assert.equal(state.stableFrames, 3, `Keyboard focus must reach the visible gallery control: ${JSON.stringify(state)}`);
 }
@@ -671,11 +671,46 @@ async function checkProjectGallery(page, width) {
   await posterStudy.waitFor({state:'hidden'});
   await checkGalleryFocus(lastCover);
 
+  // Capture event order if focus is lost while the camera/rail releases its pin.
+  await lastCover.evaluate(button => {
+    const events = [], started = performance.now();
+    const originalTo = window.scrollTo, originalBy = window.scrollBy;
+    let frame = 0, previous = '';
+    const record = (type, args) => {
+      const rect = button.getBoundingClientRect();
+      const scene = document.querySelector('.tm-camera-sequence');
+      const gallery = document.querySelector('#project');
+      const active = document.activeElement;
+      const state = {scrollY, rect:{x:rect.x,y:rect.y,width:rect.width,height:rect.height},
+        camera:scene.dataset.cameraMode, gallery:gallery.dataset.galleryMode,
+        sceneHeight:scene.offsetHeight, viewportTop:scene.querySelector('.tm-camera-viewport').getBoundingClientRect().top,
+        active:active?.getAttribute('aria-label') || active?.tagName};
+      const signature = JSON.stringify(state);
+      if (type !== 'raf' || signature !== previous) {
+        events.push({type,time:Math.round(performance.now()-started),args,...state});
+        if (events.length > 120) events.splice(1,1);
+      }
+      previous = signature;
+    };
+    window.scrollTo = function(...args) { record('scrollTo-before',args); const result=originalTo.apply(window,args); record('scrollTo-after'); return result; };
+    window.scrollBy = function(...args) { record('scrollBy-before',args); const result=originalBy.apply(window,args); record('scrollBy-after'); return result; };
+    const onScroll = () => record('scroll');
+    const onFrame = () => { record('raf'); frame=requestAnimationFrame(onFrame); };
+    window.addEventListener('scroll',onScroll,{passive:true});
+    window.galleryFocusTrace = {events,restore:() => {
+      window.scrollTo=originalTo; window.scrollBy=originalBy;
+      window.removeEventListener('scroll',onScroll); cancelAnimationFrame(frame);
+      delete window.galleryFocusTrace;
+    }};
+    record('before-reduced-motion');
+    frame=requestAnimationFrame(onFrame);
+  });
   await page.emulateMedia({reducedMotion:'reduce'});
   await page.locator('#project[data-gallery-mode="native"]').waitFor();
   await page.waitForFunction(() => getComputedStyle(document.querySelector('#project .tm-hung-strip')).transform === 'none');
   assert.notEqual(await stage.evaluate(el => getComputedStyle(el).position), 'sticky', 'Reduced motion should release the gallery');
   await checkGalleryFocus(lastCover);
+  await page.evaluate(() => window.galleryFocusTrace?.restore());
   await page.keyboard.press('Home');
   for (const cover of await covers.all()) {
     await checkGalleryFocus(cover);

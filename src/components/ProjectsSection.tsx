@@ -106,11 +106,16 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
     };
     const keepNativeFocusVisible = (control: HTMLElement) => {
       revealNative(control);
-      // Focus can trigger a browser scroll after focusin. Recheck once, using
-      // the final layout, without following a control the user has since left.
+      // The camera can unpin after this rail's media-query handler. Recheck
+      // through the next layout frame, including the browser's scroll anchoring,
+      // without following a control the user has since left.
       cancelAnimationFrame(focusFrame);
       focusFrame = requestAnimationFrame(() => {
-        if (document.activeElement === control) revealNative(control);
+        if (document.activeElement !== control) return;
+        revealNative(control);
+        focusFrame = requestAnimationFrame(() => {
+          if (document.activeElement === control) revealNative(control);
+        });
       });
     };
     const measure = () => {
