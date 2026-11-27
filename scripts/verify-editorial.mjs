@@ -675,16 +675,30 @@ async function checkProjectGallery(page, width) {
   await lastCover.evaluate(button => {
     const events = [], started = performance.now();
     const originalTo = window.scrollTo, originalBy = window.scrollBy;
+    const originalFrame = window.requestAnimationFrame, originalCancel = window.cancelAnimationFrame;
+    const focusFrames = new Set();
     let frame = 0, previous = '';
+    const stack = () => new Error().stack?.split('\n').slice(2,7);
+    const layout = node => {
+      const rect = node.getBoundingClientRect(), style = getComputedStyle(node);
+      return {x:rect.x,y:rect.y,w:rect.width,h:rect.height,
+        inline:node.style.transform, computed:style.transform, position:style.position,
+        offsetTop:node.offsetTop, offsetParent:node.offsetParent?.className,
+        scrollTop:node.scrollTop, scrollLeft:node.scrollLeft, overflowY:style.overflowY};
+    };
     const record = (type, args) => {
       const rect = button.getBoundingClientRect();
       const scene = document.querySelector('.tm-camera-sequence');
       const gallery = document.querySelector('#project');
       const active = document.activeElement;
       const state = {scrollY, rect:{x:rect.x,y:rect.y,width:rect.width,height:rect.height},
-        camera:scene.dataset.cameraMode, gallery:gallery.dataset.galleryMode,
-        sceneHeight:scene.offsetHeight, viewportTop:scene.querySelector('.tm-camera-viewport').getBoundingClientRect().top,
-        active:active?.getAttribute('aria-label') || active?.tagName};
+        camera:scene.dataset.cameraMode, gallery:gallery.dataset.galleryMode, sceneHeight:scene.offsetHeight,
+        viewport:layout(scene.querySelector('.tm-camera-viewport')), world:layout(scene.querySelector('.tm-camera-world')),
+        projects:layout(scene.querySelector('.tm-camera-projects')), rail:layout(gallery.querySelector('.tm-hung-strip')),
+        aperture:layout(gallery.querySelector('.tm-hung-window')), shell:layout(gallery.querySelector('.tm-hung-shell')),
+        active:active?.getAttribute('aria-label') || active?.tagName,
+        activeIsButton:active === button, connected:button.isConnected,
+        isLast:button === gallery.querySelector('.tm-hung-study:last-child button')};
       const signature = JSON.stringify(state);
       if (type !== 'raf' || signature !== previous) {
         events.push({type,time:Math.round(performance.now()-started),args,...state});
@@ -692,18 +706,36 @@ async function checkProjectGallery(page, width) {
       }
       previous = signature;
     };
-    window.scrollTo = function(...args) { record('scrollTo-before',args); const result=originalTo.apply(window,args); record('scrollTo-after'); return result; };
-    window.scrollBy = function(...args) { record('scrollBy-before',args); const result=originalBy.apply(window,args); record('scrollBy-after'); return result; };
+    window.scrollTo = function(...args) { record('scrollTo-before',{args,stack:stack()}); const result=originalTo.apply(window,args); record('scrollTo-after'); return result; };
+    window.scrollBy = function(...args) { record('scrollBy-before',{args,stack:stack()}); const result=originalBy.apply(window,args); record('scrollBy-after'); return result; };
+    window.requestAnimationFrame = function(callback) {
+      const source = String(callback);
+      if (!source.includes('activeElement')) return originalFrame.call(window,callback);
+      const id = originalFrame.call(window,time => {
+        record('focus-raf-run',{id});
+        focusFrames.delete(id);
+        callback.call(window,time);
+        record('focus-raf-after',{id});
+      });
+      focusFrames.add(id);
+      record('focus-raf-scheduled',{id,source:source.slice(0,300),stack:stack()});
+      return id;
+    };
+    window.cancelAnimationFrame = function(id) {
+      if (focusFrames.has(id)) record('focus-raf-cancelled',{id,stack:stack()});
+      return originalCancel.call(window,id);
+    };
     const onScroll = () => record('scroll');
-    const onFrame = () => { record('raf'); frame=requestAnimationFrame(onFrame); };
+    const onFrame = () => { record('raf'); frame=originalFrame.call(window,onFrame); };
     window.addEventListener('scroll',onScroll,{passive:true});
     window.galleryFocusTrace = {events,restore:() => {
       window.scrollTo=originalTo; window.scrollBy=originalBy;
-      window.removeEventListener('scroll',onScroll); cancelAnimationFrame(frame);
+      window.requestAnimationFrame=originalFrame; window.cancelAnimationFrame=originalCancel;
+      window.removeEventListener('scroll',onScroll); originalCancel.call(window,frame);
       delete window.galleryFocusTrace;
     }};
     record('before-reduced-motion');
-    frame=requestAnimationFrame(onFrame);
+    frame=originalFrame.call(window,onFrame);
   });
   await page.emulateMedia({reducedMotion:'reduce'});
   await page.locator('#project[data-gallery-mode="native"]').waitFor();

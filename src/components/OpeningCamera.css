@@ -13,6 +13,12 @@
 .tm-camera-world { z-index: 1; }
 .tm-camera-space { display: none; }
 
+/* Native mode takes effect atomically, even before pending scroll/resize
+   callbacks finish clearing their last inline camera positions. */
+.tm-camera-sequence[data-camera-mode="native"] :is(.tm-camera-world, .tm-camera-projects) {
+  transform: none !important;
+}
+
 /* Native sticky positioning locks the horizon throughout the camera pan and
    project rail. The scene supplies their full original scrolling distance. */
 .tm-camera-sequence[data-camera-mode="pan"] {
