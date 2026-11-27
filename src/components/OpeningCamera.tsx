@@ -26,7 +26,6 @@ export const OpeningCamera: React.FC<OpeningCameraProps> = ({ home, children }) 
       projects.style.removeProperty('transform');
       scene.style.removeProperty('--camera-sky-x');
       scene.style.removeProperty('--camera-orbit-x');
-      scene.style.removeProperty('--camera-tint');
       scene.style.removeProperty('--camera-height');
       scene.style.removeProperty('--camera-viewport-height');
     };
@@ -43,7 +42,6 @@ export const OpeningCamera: React.FC<OpeningCameraProps> = ({ home, children }) 
       world.style.transform = `translate3d(${-pan}px, 0, 0)`;
       scene.style.setProperty('--camera-sky-x', `${-pan * .4}px`);
       scene.style.setProperty('--camera-orbit-x', `${-pan * .65}px`);
-      scene.style.setProperty('--camera-tint', `${progress * 100}%`);
     };
     const schedule = () => {
       if (frame) return;

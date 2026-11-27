@@ -39,7 +39,7 @@
   z-index: 0;
   overflow: clip;
   pointer-events: none;
-  background: color-mix(in srgb, var(--tm-ivory), var(--tm-project-paper) var(--camera-tint, 0%)) var(--tm-grain) repeat;
+  background: var(--tm-ivory) var(--tm-grain) repeat;
   background-size: 160px 160px;
 }
 .tm-camera-space .tm-explorer-sky {
